@@ -66,17 +66,23 @@ class PulsarPhases():
         if dataframe is None:
             if pdata==None:
                 raise ValueError('No dataframe or phase list is provided') 
+            if ptimes==None:
+                raise ValueError('No dataframe or time list provided')
             else:
                 dataframe = pd.DataFrame({"dragon_time":ptimes,"pulsar_phase":pdata})   
-        try:
-            dataframe=add_delta_t_key(dataframe)
-            self.phases=np.array(dataframe['pulsar_phase'].to_list())
-            self.times=np.array(dataframe['dragon_time'].to_list())
-            self.mjd_times=np.array(dataframe['mjd_time'].to_list()) 
-            
-            self.info=dataframe
-        except:
-            raise ValueError('Dataframe has no valid format') 
+                dataframe=add_delta_t_key(dataframe)
+                self.phases=np.array(dataframe['pulsar_phase'].to_list())
+                self.times=np.array(dataframe['dragon_time'].to_list())
+                self.info=dataframe
+        else:
+            try:
+                dataframe=add_delta_t_key(dataframe)
+                self.phases=np.array(dataframe['pulsar_phase'].to_list())
+                self.times=np.array(dataframe['dragon_time'].to_list())
+                self.mjd_times=np.array(dataframe['mjd_time'].to_list())
+                self.info=dataframe
+            except:
+                raise ValueError('Dataframe has no valid format') 
 
                 
         #If the range of phases is not [0,1], shift the negative ones (the 0 phase is the same)
@@ -143,7 +149,7 @@ class FermiPulsarPhases(PulsarPhases):
 
             
         def create_df_from_info(self,fits_table):
-            time=fits_table['MJD_BARYCENT_TIME'].byteswap().newbyteorder()
+            time=fits_table['BARYCENTRIC_TIME'].byteswap().newbyteorder()
             phases=fits_table['PULSE_PHASE'].byteswap().newbyteorder()
             dataframe = pd.DataFrame({"mjd_time":time,"pulsar_phase":phases,"dragon_time":time*3600*24})
             self.info=dataframe

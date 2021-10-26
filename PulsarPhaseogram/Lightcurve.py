@@ -102,7 +102,8 @@ class Lightcurve():
         if pulsar_phases.fitting.model=='dgaussian':
             y=hoff*double_gaussian(x, *pulsar_phases.fitting.params[0:7])
         elif pulsar_phases.fitting.model=='asym_dgaussian':
-            y=hoff*assymetric_double_gaussian(x, *pulsar_phases.fitting.params)
+            assymetric_gaussian_pdf_vec=np.vectorize(assymetric_double_gaussian)
+            y=hoff*assymetric_gaussian_pdf_vec(x, *pulsar_phases.fitting.params)
         elif pulsar_phases.fitting.model=='lorentzian':
             y=hoff*double_lorentz(x, *pulsar_phases.fitting.params)
         

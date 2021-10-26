@@ -57,17 +57,17 @@ class PeakFitting():
                     
                 elif self.model=='asym_dgaussian':
                     if pulsar_phases.regions.P1.limits[0]>pulsar_phases.regions.P1.limits[1]:
-                        self.init=[(pulsar_phases.regions.P1.limits[0]+pulsar_phases.regions.P1.limits[1]+1)/2,pulsar_phases.regions.P1.deltaP/2,pulsar_phases.regions.P1.deltaP/2, np.sum(pulsar_phases.regions.P2.limits)/2,pulsar_phases.regions.P2.deltaP/2,pulsar_phases.regions.P2.deltaP/2,10,0.1,0.1]   
+                        self.init=[(pulsar_phases.regions.P1.limits[0]+pulsar_phases.regions.P1.limits[1]+1)/2,pulsar_phases.regions.P1.deltaP/2,pulsar_phases.regions.P1.deltaP/2, np.sum(pulsar_phases.regions.P2.limits)/2,pulsar_phases.regions.P2.deltaP/2,pulsar_phases.regions.P2.deltaP/2,100,0.1,0.1]   
                     
                         self.shift=2*pulsar_phases.regions.P1.deltaP
                         
                     elif pulsar_phases.regions.P2.limits[0]>pulsar_phases.regions.P2.limits[1]:
-                        self.init=[np.sum(pulsar_phases.regions.P1.limits)/2,pulsar_phases.regions.P1.deltaP/2,pulsar_phases.regions.P1.deltaP/2, (pulsar_phases.regions.P2.limits[0]+pulsar_phases.regions.P2.limits[1]+1)/2,pulsar_phases.regions.P2.deltaP/2,pulsar_phases.regions.P2.deltaP/2,10,0.1,0.1]   
+                        self.init=[np.sum(pulsar_phases.regions.P1.limits)/2,pulsar_phases.regions.P1.deltaP/2,pulsar_phases.regions.P1.deltaP/2, (pulsar_phases.regions.P2.limits[0]+pulsar_phases.regions.P2.limits[1]+1)/2,pulsar_phases.regions.P2.deltaP/2,pulsar_phases.regions.P2.deltaP/2,100,0.1,0.1]   
                     
                         self.shift=2*pulsar_phases.regions.P2.deltaP
                         
                     else:
-                        self.init=[np.sum(pulsar_phases.regions.P1.limits)/2,pulsar_phases.regions.P1.deltaP/2,pulsar_phases.regions.P1.deltaP/2, np.sum(pulsar_phases.regions.P2.limits)/2,pulsar_phases.regions.P2.deltaP/2,pulsar_phases.regions.P2.deltaP/2,10,0.1,0.1]   
+                        self.init=[np.sum(pulsar_phases.regions.P1.limits)/2,pulsar_phases.regions.P1.deltaP/2,pulsar_phases.regions.P1.deltaP/2, np.sum(pulsar_phases.regions.P2.limits)/2,pulsar_phases.regions.P2.deltaP/2,pulsar_phases.regions.P2.deltaP/2,100,0.1,0.1]   
                     
                         self.shift=0
                 
@@ -97,7 +97,7 @@ class PeakFitting():
                 unbinned_likelihood_a = UnbinnedLH(assymetric_double_gaussian, np.array(shift_phases))
                 minuit_a = Minuit(unbinned_likelihood_a, mu=self.init[0], sigma1=self.init[1],sigma2=self.init[2],mu_2=self.init[3],sigma1_2=self.init[4],sigma2_2=self.init[5],A=self.init[6],B=self.init[7],C=self.init[8])
                 minuit_a.errordef=0.5
-                minuit.migrad()
+                minuit_a.migrad()
                 
                 #Store results as minuit object
                 self.minuit=minuit_a
@@ -148,7 +148,8 @@ class PeakFitting():
                 
                 
             elif self.model=='asym_dgaussian':
-                self.params,pcov_l=curve_fit(assymetric_double_gaussian,bin_centres,histogram.lc[0],p0=self.init)
+                assymetric_gaussian_pdf_vec=np.vectorize(assymetric_double_gaussian)
+                self.params,pcov_l=curve_fit(assymetric_gaussian_pdf_vec,bin_centres,histogram.lc[0],p0=self.init)
                 self.parnames=['mu', 'sigma1','sigma2','mu_2','sigma1_2','sigma2_2','A','B','C']
                 self.errors=np.sqrt(np.diag(pcov_l))
                 

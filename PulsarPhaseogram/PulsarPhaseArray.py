@@ -71,22 +71,28 @@ class PulsarPhasesArray():
         
         self.energy_edges=np.array(energy_edges)
         self.energy_centres=(self.energy_edges[1:]+self.energy_edges[:-1])/2
+        self.energy_units='TeV'
         
         #Create the dataframe from the list (or the FITS table)
         if dataframe is None:
             if pdata==None:
                 raise ValueError('No dataframe or phase list is provided') 
             else:
-                dataframe = pd.DataFrame({"dragon_time":ptimes,"pulsar_phase":pdata,"reco_energy":penergies})   
-        try:
-            self.phases=np.array(dataframe['pulsar_phase'].to_list())
-            self.times=np.array(dataframe['dragon_time'].to_list())
-            self.mjd_times=np.array(dataframe['mjd_time'].to_list()) 
-            
-            self.info=dataframe
-        except:
-            raise ValueError('Dataframe has no valid format')               
-       
+                dataframe = pd.DataFrame({"dragon_time":ptimes,"pulsar_phase":pdata,"reco_energy":penergies}) 
+                self.phases=np.array(dataframe['pulsar_phase'].to_list())
+                self.times=np.array(dataframe['dragon_time'].to_list())
+                self.energies=np.array(dataframe['reco_energy'].to_list())
+                self.info=dataframe
+        else:
+            try:
+                self.phases=np.array(dataframe['pulsar_phase'].to_list())
+                self.times=np.array(dataframe['dragon_time'].to_list())
+                self.mjd_times=np.array(dataframe['mjd_time'].to_list()) 
+                self.energies=np.array(dataframe['reco_energy'].to_list())
+                self.info=dataframe
+            except:
+                raise ValueError('Dataframe has no valid format')               
+                                    
         try:                    
             dataframe=add_delta_t_key(dataframe)
             if tobservation is not None:
@@ -106,56 +112,54 @@ class PulsarPhasesArray():
     def calculate_tobs(self):
         return(get_effective_time(self.info)[1].value/3600)
     
-    
-    def PeaksVsEnergy(self):
-        fig, (ax1, ax2,ax3) = plt.subplots(1, 3)
-        fig.set_figheight(3)
-        fig.set_figwidth(12)
-        
-        
-        #First figure:significance vs Energy
-        y1=[]
-        y2=[]
-        y3=[]
+
+    def PSigVsEnergy(self):
+        P1_s=[]
+        P2_s=[]
+        P3_s=[]
         
         for i in range(0,len(self.energy_centres)):
-            y1.append(self.Parray[i].regions.P1.sign)
-            y2.append(self.Parray[i].regions.P2.sign)
-            y3.append(self.Parray[i].regions.P1P2.sign)
+            P1_s.append(self.Parray[i].regions.P1.sign)
+            P2_s.append(self.Parray[i].regions.P2.sign)
+            P3_s.append(self.Parray[i].regions.P1P2.sign)
             
-        ax1.plot(self.energy_centres,y1,'o-',color='tab:orange')
-        ax1.plot(self.energy_centres,y2,'o-',color='tab:green')
-        ax1.plot(self.energy_centres,y3,'o-',color='tab:red')
+        plt.plot(self.energy_centres,P1_s,'o-',color='tab:orange')
+        plt.plot(self.energy_centres,P2_s,'o-',color='tab:green')
+        plt.plot(self.energy_centres,P3_s,'o-',color='tab:red')
             
-        ax1.set_ylabel('Sign(sigmas)')
-        ax1.set_xlabel('Enegy(TeV)')
+        plt.ylabel('Sign($\sigma$)')
+        plt.xlabel('Enegy ('+ str(self.energy_units)+')')
         
-        ax1.legend(['P1','P2','P1+P2'])
-        ax1.grid()
+        plt.legend(['P1','P2','P1+P2'])
+        plt.tight_layout()
+        plt.grid()
+        plt.xscale('log')
+
         
-        
-        #Second figure: P1/P2 vs energy
-        y4=[]
+    def P1P2VsEnergy(self):
+        P1P2E=[]
         
         for i in range(0,len(self.energy_centres)):
-            y4.append(self.Parray[i].regions.P1P2_ratio)
+            P1P2E.append(self.Parray[i].regions.P1P2_ratio)
             
-        ax2.plot(self.energy_centres,y4,'o-',color='tab:blue')
+        plt.plot(self.energy_centres,P1P2E,'o-',color='tab:blue')
                                                 
-        ax2.set_ylabel('P1/P2')
-        ax2.set_xlabel('Enegy(TeV)')
-        ax2.grid()
-        
-        
-        # Third figure: FWHM vs Energy
-        y5=[]
-        y6=[]
+        plt.ylabel('P1/P2')
+        plt.xlabel('Enegy ('+ str(self.energy_units)+')')
+        plt.tight_layout()
+        plt.xscale('log')
+        plt.grid()
+
+     
+    def FWHMVsEnergy(self):
+        FP1=[]
+        FP2=[]
         
         if self.Parray[0].fitting.model=='asym_dgaussian':
             prefactor=2.35482  
             for i in range(0,len(self.energy_centres)):
-                y5.append(prefactor*self.Parray[i].fitting.params[1]/2+prefactor*self.Parray[i].fitting.params[2]/2)
-                y6.append(prefactor*self.Parray[i].fitting.params[4]/2+prefactor*self.Parray[i].fitting.params[5]/2)
+                FP1.append(prefactor*self.Parray[i].fitting.params[1]/2+prefactor*self.Parray[i].fitting.params[2]/2)
+                FP2.append(prefactor*self.Parray[i].fitting.params[4]/2+prefactor*self.Parray[i].fitting.params[5]/2)
         
         else:
             if self.Parray[0].fitting.model=='dgaussian':
@@ -165,18 +169,39 @@ class PulsarPhasesArray():
                 prefactor=2
 
             for i in range(0,len(self.energy_centres)):
-                y5.append(prefactor*self.Parray[i].fitting.params[1])
-                y6.append(prefactor*self.Parray[i].fitting.params[3])
+                FP1.append(prefactor*self.Parray[i].fitting.params[1])
+                FP2.append(prefactor*self.Parray[i].fitting.params[3])
 
-        ax3.plot(self.energy_centres,y5,'o-',color='tab:orange')
-        ax3.plot(self.energy_centres,y6,'o-',color='tab:green')
+        plt.plot(self.energy_centres,FP1,'o-',color='tab:orange')
+        plt.plot(self.energy_centres,FP2,'o-',color='tab:green')
                                                 
-        ax3.set_ylabel('FWHM')
-        ax3.set_xlabel('Enegy(TeV)')
-        ax3.legend(['P1','P2'])
-        ax3.grid()
+        plt.ylabel('FWHM')
+        plt.xlabel('Enegy ('+ str(self.energy_units)+')')
+        plt.legend(['P1','P2'])
+        plt.tight_layout()
+        plt.grid()
+        plt.xscale('log')
+
         
+    def PeaksVsEnergy(self):
+   
+        fig = plt.figure(figsize=(12,3))
+        
+        plt.subplot(1, 3, 1)
+        self.PSigVsEnergy()
+
+        plt.subplot(1, 3, 2)
+        self.P1P2VsEnergy()
+        
+        plt.subplot(1, 3, 3)
+        self.FWHMVsEnergy()
+        
+        plt.tight_layout()
         plt.show()
+        
+        
+        
+        
         
         
         
@@ -238,11 +263,12 @@ class FermiPulsarPhasesArray(PulsarPhasesArray):
             #Store global information (before binning)
             self.energy_edges=np.array(energy_edges)
             self.energy_centres=(self.energy_edges[1:]+self.energy_edges[:-1])/2
+            self.energy_units='GeV'
             
             self.create_df_from_info(fits_table)
             self.phases=np.array(self.info['pulsar_phase'].to_list())
             self.mjd_times=np.array(self.info['mjd_time'].to_list())            
-        
+            self.energies=np.array(self.info['energy'].to_list()) 
             self.tobs=self.calculate_tobs()
             
             #Create array of PulsarPhases objects binning in energy
@@ -252,7 +278,7 @@ class FermiPulsarPhasesArray(PulsarPhasesArray):
 
     
     def create_df_from_info(self,fits_table):
-            time=fits_table['MJD_BARYCENT_TIME'].byteswap().newbyteorder()
+            time=fits_table['BARYCENTRIC_TIME'].byteswap().newbyteorder()
             phases=fits_table['PULSE_PHASE'].byteswap().newbyteorder()
             energy=fits_table['ENERGY'].byteswap().newbyteorder()
             dataframe = pd.DataFrame({"mjd_time":time,"pulsar_phase":phases,"dragon_time":time*3600*24,"energy":energy})

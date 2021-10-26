@@ -14,11 +14,12 @@ def assymetric_gaussian_pdf(x,mu,sigma1,sigma2):
             return(2 / np.sqrt(2 * np.pi) / (sigma1+sigma2) * np.exp(-(x - mu) ** 2 / 2. / sigma1 ** 2))
     else:
             return(2 / np.sqrt(2 * np.pi) / (sigma1+sigma2) * np.exp(-(x - mu) ** 2 / 2. / sigma2 ** 2))
+        
 @nb.njit(**kwd)
 def assymetric_double_gaussian(x, mu, sigma1,sigma2,mu_2,sigma1_2,sigma2_2,A,B,C):
-    assymetric_gaussian_pdf_vec=np.vectorize(assymetric_gaussian_pdf)
-    return (A+B*assymetric_gaussian_pdf_vec(x,mu,sigma1,sigma2)+C*assymetric_gaussian_pdf_vec(x,mu_2,sigma1_2,sigma2_2))/(A+B+C)
-
+    #assymetric_gaussian_pdf_vec=np.vectorize(assymetric_gaussian_pdf)
+    return (A+B*assymetric_gaussian_pdf(x,mu,sigma1,sigma2)+C*assymetric_gaussian_pdf(x,mu_2,sigma1_2,sigma2_2))/(A+B+C)
+    
 
 @nb.njit(**kwd)  
 def lorentz_pdf(x,mu,gamma):

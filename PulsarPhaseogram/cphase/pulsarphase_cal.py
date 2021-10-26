@@ -1,5 +1,6 @@
 import pandas as pd
 import csv
+import os
 import numpy as np
 from astropy.time import Time
 import pint
@@ -14,7 +15,7 @@ from pint.fits_utils import read_fits_event_mjds
 from pint.fermi_toas import *
 from pint.scripts import *
 from .utils import  add_mjd,dl2time_totim, model_fromephem
-
+import pint.models as models
 
 __all__=['fermi_calphase','calphase']
 
@@ -53,17 +54,21 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
     pickle: boolean
     True if want to save a pickle file with the loaded TOAs
     
-    Returns:
-    --------
-    Returns same DL2 with two additional columns: 'mjd_barycenter_time' and 'pulsar_phase'
-    The name of this new file is dl2.....run_number_ON_Crab_pulsar.h5
     
     '''
     print('Input file:'+str(file))
     #Load observatory and TOAs
     get_satellite_observatory("Fermi", ft2_file)
     tl=load_Fermi_TOAs(file,fermiobs='fermi')
+    
+    #Extract the timelist in MJD
+    timelist=[]
+    for i in range(0,len(tl)):
+        timelist.append(tl[i].mjd.value)
+
+    #Create TOAs object
     t = toa.get_TOAs_list(tl)
+   
         
     #Calculate the phases in intervals of 1000 events so that ephemeris are updated
     barycent_toas=[]
@@ -81,6 +86,7 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
 
             
     #Write if dir given
+    hdul=fits.open(file)
     orig_cols = hdul[1].columns
     new_col1 = fits.Column(name='BARYCENTRIC_TIME', format='D',array=barycent_toas)
     new_col2 = fits.Column(name='PULSE_PHASE', format='D',array=phase)
