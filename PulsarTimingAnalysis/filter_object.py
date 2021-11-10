@@ -14,8 +14,8 @@ class FilterPulsarAna():
         self.check_cuts()
         
             
-    def apply_fixed_cut(self,pulsarana):
-        dataframe=pulsarana.info
+    def apply_fixed_cut(self,events):
+        dataframe=events.info
         
         if self.gammaness_cut is not None:
             if isinstance(self.gammaness_cut, float):
@@ -29,9 +29,8 @@ class FilterPulsarAna():
         if self.zd_cut is not None:
             if isinstance(self.zd_cut, float) or isinstance(self.zd_cut, int):
                 dataframe=dataframe[(90-dataframe['alt_tel']*180/3.1416)<self.zd_cut]
-        
-        pulsarana.phases=np.array(dataframe['pulsar_phase'].to_list())
-        pulsarana.info=dataframe
+
+        events.info=dataframe
     
     
     def check_cuts(self):
@@ -64,7 +63,7 @@ class FilterPulsarAna():
                         
         if self.zd_cut is not None:
             if isinstance(self.zd_cut, (float,int)):
-                if self.zd>90 or self.zd_cut<0:
+                if self.zd_cut>90 or self.zd_cut<0:
                     raise ValueError('Zenith angle cut no valid')
             elif isinstance(self.zd_cut, (list,np.ndarray)):
                 for cut in self.zd_cut:

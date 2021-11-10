@@ -4,6 +4,7 @@ import astropy as ast
 import numpy as np
 from astropy.time import Time
 import matplotlib.pylab as plt
+from matplotlib.backends.backend_pdf import PdfPages
 from astropy import units as u
 import warnings
 from .ptime_analysis import PulsarTimeAnalysis
@@ -113,13 +114,10 @@ class PulsarAnalysis():
         self.energy_units='GeV'
             
     
-    def setLSTInputFile(self,filename):
-        if 'h5' in filename:
-            self.r=ReadLSTFile(filename)
-            self.telescope='lst'
-            self.energy_units='TeV'
-        else:
-            raise ValueError('No hdf5 file given for LST1 data')
+    def setLSTInputFile(self,filename=None,dirname=None,src_dep=False):
+        self.r=ReadLSTFile(file=filename,directory=dirname,src_dependent=src_dep)
+        self.telescope='lst'
+        self.energy_units='TeV'
 
     def setBinning(self,nbins,xmin=None,xmax=None):
         self.nbins=nbins
@@ -224,18 +222,12 @@ class PulsarAnalysis():
         
         
     def initialize(self):
-        #Read the data
-        self.r.run()
+        #Read the data and filter
+        self.r.run(self)
         
         #Extract each attribute
         self.phases=np.array(self.r.info['pulsar_phase'].to_list()) 
         self.info=self.r.info
-        
-        #Filter the data
-        if self.telescope=='fermi':
-            pass
-        else:
-            self.cuts.apply_fixed_cut(self)
         
         #Shift phases if necessary
         self.shift_phases(xmin=self.binning.xmin)
@@ -270,9 +262,12 @@ class PulsarAnalysis():
         
         #Excute stats
         self.execute_stats(self.r.tobs)
-        
-        #Execute stats in energy bins  
-        self.EnergyAna.run(self)
+       
+        #Execute stats in energy bins
+        try:
+            self.EnergyAna.run(self)
+        except:
+            print('No Energy Analysis has been done')
         
             
 
@@ -284,11 +279,11 @@ class PulsarAnalysis():
     #############################################
     
 
-    def draw_phaseogram(self,phase_limits=[0,2],peakstats=True,periodstats=True,background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True):
+    def draw_phaseogram(self,phase_limits=[0,2],stats='short',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True):
         #Plot histogram from 0 to 1 and from 1 to 2 (2 periods)
-        plt.figure(figsize=(15,5))
-        self.histogram.show_phaseogram(self,phase_limits,peakstats,periodstats,background,signal,colorhist,colorb,colorP,colorfit,fit,hline)
-        plt.show()
+        fig=plt.figure(figsize=(15,5))
+        self.histogram.show_phaseogram(self,phase_limits,stats,background,signal,colorhist,colorb,colorP,colorfit,fit,hline)
+        return(fig)
                            
 
     def show_Presults(self):
@@ -335,7 +330,7 @@ class PulsarAnalysis():
         
         
         plt.tight_layout()
-        plt.show()
+        return(fig)
         
         
     
@@ -361,8 +356,23 @@ class PulsarAnalysis():
     def show_all_lc(self,ylimits=None):
         self.EnergyAna.show_joined_Energy_lightcurve(ylimits=ylimits)
       
-        
     def show_all_fits(self):
         self.EnergyAna.show_joined_Energy_fits()
         
+    def save_df(self,output_dir):
+        self.info.to_hdf(output_dir,key='dl2/event/telescope/parameters/LST_LSTCam')
+    
+    
+    
+    def save_results(self,output_dir):
+        with PdfPages('prueba.pdf') as pdf:
+            pdf.savefig(self.draw_phaseogram(phase_limits=[0,2],stats='long',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True),bbox_inches='tight',pad_inches=1)
+            pdf.savefig(self.TimeEv.PsigVsTime())
+            pdf.savefig(self.TimeEv.PexVsTime())
+            pdf.savefig(self.TimeEv.StatsVsTime())
+
+            fig2=plt.figure()
+            
+            plt.text
+
     

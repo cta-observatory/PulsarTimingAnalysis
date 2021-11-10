@@ -48,6 +48,7 @@ class PulsarTimeAnalysis():
         self.PexVsTime() 
         self.StatsVsTime()
 
+
     
     def compare_Peaksig(self):
         plt.figure()
@@ -123,6 +124,8 @@ class PulsarTimeAnalysis():
             
         plt.tight_layout()
         plt.show()
+        
+        return(fig)
        
     
     
@@ -185,7 +188,7 @@ class PulsarTimeAnalysis():
         plt.tight_layout()
         plt.show()
       
-    
+        return(fig)
     
     
     def StatsVsTime(self):
@@ -255,7 +258,8 @@ class PulsarTimeAnalysis():
             ax3.annotate('Plot not available', xy=(0.8,0.6), xytext=(0.8,0.6), fontsize=10, xycoords='axes fraction', textcoords='offset points', color='k',bbox=dict(facecolor='white',alpha=0.8),horizontalalignment='right', verticalalignment='top')
         plt.tight_layout()
         plt.show()
-    
+        
+        return(fig)
     
     
     

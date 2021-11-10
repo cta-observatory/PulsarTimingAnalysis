@@ -56,13 +56,11 @@ class Lightcurve():
     
     
     
-    
-    def draw_periodstats(self,pulsar_phases,phase_limits):
-        plt.annotate(f'$\chi^{2}$-test: $\chi^{2}$={pulsar_phases.stats.chisqr_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.chisqr_res[1])} sign={pulsar_phases.stats.chisqr_res[2]:.2f}$\sigma$ \n H-test: H={pulsar_phases.stats.Htest_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.Htest_res[1])} sign={pulsar_phases.stats.Htest_res[2]:.2f}$\sigma$ \n Z$_{{10}}$-test: Z$_{{10}}$={pulsar_phases.stats.Zntest_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.Zntest_res[1])} sign={pulsar_phases.stats.Zntest_res[2]:.2f}$\sigma$ ', xy=(0.52, 1.3), xytext=(0.52,1.3), fontsize=15,xycoords='axes fraction', textcoords='offset points', color='black',bbox=dict(facecolor='white', edgecolor='black'),horizontalalignment='left', verticalalignment='top')
+   
     
     
     
-    def draw_peakstats(self,pulsar_phases,phase_limits): 
+    def draw_stats(self,pulsar_phases,phase_limits,stats='short'): 
         text_towrite=''
         count=0
         for key, value in pulsar_phases.regions.dic.items():
@@ -73,9 +71,14 @@ class Lightcurve():
                 else:
                     text_towrite=text_towrite+'\n'+key+f': Sig(Li&Ma):{value.sign:.2f}$\sigma$'
                 
-                
-        plt.annotate(text_towrite, xy=(0.25, 1.3), xytext=(0.25,1.3), fontsize=15,xycoords='axes fraction', textcoords='offset points', color='black',bbox=dict(facecolor='white', edgecolor='black'),horizontalalignment='left', verticalalignment='top')
-    
+        
+        if stats=='long':
+            plt.annotate(text_towrite, xy=(0.29, 1.3), xytext=(0.29,1.3), fontsize=15,xycoords='axes fraction', textcoords='offset points', color='black',bbox=dict(facecolor='white', edgecolor='black'),horizontalalignment='left', verticalalignment='top')
+            
+            plt.annotate(f'$\chi^{2}$-test: $\chi^{2}$={pulsar_phases.stats.chisqr_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.chisqr_res[1])} sign={pulsar_phases.stats.chisqr_res[2]:.2f}$\sigma$ \n H-test: H={pulsar_phases.stats.Htest_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.Htest_res[1])} sign={pulsar_phases.stats.Htest_res[2]:.2f}$\sigma$ \n Z$_{{10}}$-test: Z$_{{10}}$={pulsar_phases.stats.Zntest_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.Zntest_res[1])} sign={pulsar_phases.stats.Zntest_res[2]:.2f}$\sigma$ ', xy=(0.54, 1.3), xytext=(0.54,1.3), fontsize=15,xycoords='axes fraction', textcoords='offset points', color='black',bbox=dict(facecolor='white', edgecolor='black'),horizontalalignment='left', verticalalignment='top')
+            
+        elif stats=='short':
+            plt.annotate(text_towrite +'\n'+f'$\chi^{2}$-test={pulsar_phases.stats.chisqr_res[2]:.2f}$\sigma$ \n H-test= {pulsar_phases.stats.Htest_res[2]:.2f}$\sigma$ \n Z$_{{10}}$-test={pulsar_phases.stats.Zntest_res[2]:.2f}$\sigma$ ', xy=(0.72, 1.3), xytext=(0.72,1.3), fontsize=15,xycoords='axes fraction', textcoords='offset points', color='black',bbox=dict(facecolor='white', edgecolor='black'),horizontalalignment='left', verticalalignment='top')
     
     
     
@@ -175,8 +178,8 @@ class Lightcurve():
     
     def draw_histogram(self,phase_limits,colorhist):
         
-        plt.bar((self.lc[1][1:]+self.lc[1][:-1])/2,self.lc[0],width=1/len(self.lc[0]),color=colorhist,alpha=0.5,edgecolor = colorhist)
-        plt.bar((self.lc[1][1:]+self.lc[1][:-1])/2+np.ones(len(self.lc[1][:-1])),self.lc[0],width=1/len(self.lc[0]),color=colorhist,alpha=0.5,edgecolor = colorhist)
+        plt.bar((self.lc[1][1:]+self.lc[1][:-1])/2,self.lc[0],width=1/len(self.lc[0]),color=colorhist,alpha=0.5)
+        plt.bar((self.lc[1][1:]+self.lc[1][:-1])/2+np.ones(len(self.lc[1][:-1])),self.lc[0],width=1/len(self.lc[0]),color=colorhist,alpha=0.5)
         
         #Plot errorbars
         plt.errorbar((self.lc[1][1:]+self.lc[1][:-1])/2,self.lc[0],yerr=np.sqrt(self.lc[0]),color=colorhist,fmt='.')
@@ -194,17 +197,13 @@ class Lightcurve():
     
     
     
-    def show_phaseogram(self,pulsar_phases,phase_limits=[0,1],peakstats=True,periodstats=True,background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True,time_label=True):
+    def show_phaseogram(self,pulsar_phases,phase_limits=[0,1],stats='short',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True,time_label=True):
         
         #Draw the histogram
         self.draw_histogram(phase_limits,colorhist)
      
         #Plot statistics (default True)
-        if peakstats==True:
-            self.draw_peakstats(pulsar_phases,phase_limits)
-            
-        if periodstats==True:
-            self.draw_periodstats(pulsar_phases,phase_limits)
+        self.draw_stats(pulsar_phases,phase_limits,stats)
         
         #Plot regions (default True)
         if background==True:
@@ -222,7 +221,9 @@ class Lightcurve():
             
         #Add Tobs label
         if time_label==True:
-            plt.annotate(f'Tobs={pulsar_phases.tobs:.1f} h', xy=(0.45, 0.1), xytext=(0.3,1.2), fontsize=15, xycoords='axes fraction', textcoords='offset points', color='k',bbox=dict(facecolor='white', edgecolor='k',alpha=0.8),horizontalalignment='left', verticalalignment='top')
+            plt.annotate(f'Tobs={pulsar_phases.tobs:.1f} h'+'\n'+f'Entries={len(pulsar_phases.phases)}', xy=(0.11, 1.3), xytext=(0.11,1.3), fontsize=15, xycoords='axes fraction', textcoords='offset points', color='k',bbox=dict(facecolor='white', edgecolor='k',alpha=0.8),horizontalalignment='left', verticalalignment='top')
+            
+            
 
         
         #Add legend
