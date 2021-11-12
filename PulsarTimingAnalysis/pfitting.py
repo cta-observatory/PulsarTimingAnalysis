@@ -21,7 +21,15 @@ class PeakFitting():
             self.check_model()
             self.binned=binned
 
-            
+       
+    
+    
+                
+        ##############################################
+                           #EXECUTION
+        #############################################
+    
+    
         def run(self,pulsar_phases):
             #Estimate initial values 
             self.est_initial_values(pulsar_phases)
@@ -159,7 +167,13 @@ class PeakFitting():
             self.errors=np.sqrt(np.diag(pcov_l))
             self.create_result_df()
 
-            
+        
+        
+        ##############################################
+                       #RESULTS
+        #############################################
+    
+    
         def check_fit_result(self):
             try:
                 self.params

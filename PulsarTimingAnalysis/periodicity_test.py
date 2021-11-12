@@ -39,7 +39,14 @@ class PeriodicityTest():
 
     def __init__(self,pulsar_phases):
             self.apply_all_tests(pulsar_phases)
-        
+    
+    
+    
+    
+   ##############################################
+                       #EXECUTION
+   ############################################# 
+    
     def apply_all_tests(self,pulsar_phases):
             #Apply chi square test using Lightcurve Class
             self.chisqr_res=pulsar_phases.histogram.chi_sqr_pulsar_test()
@@ -101,7 +108,12 @@ class PeriodicityTest():
         
         return(self.Htest_res)
     
-        
+     
+   ##############################################
+                       #RESULTS
+   ############################################# 
+
+
     def show_Pstats(self):
             return(pd.DataFrame(data={'Chi_square_test':self.chisqr_res,'Zn_test':self.Zntest_res,'H_test':self.Htest_res},index=["Statistic", "p-value", "Number of $\sigma$"]))
            

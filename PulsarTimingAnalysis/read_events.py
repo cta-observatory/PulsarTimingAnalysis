@@ -109,8 +109,14 @@ class ReadLSTFile():
              
             
         def calculate_tobs(self):
+            diff=np.array(self.info['dragon_time'].to_list()[1:])-np.array(self.info['dragon_time'].to_list()[0:-1])
+            diff=diff[diff<3600]
+            return(sum(diff)/3600)
+            '''
             dataframe=add_delta_t_key(self.info)
             return(get_effective_time(dataframe)[1].value/3600)
+            '''
+        
         
         
         def run(self,pulsarana):

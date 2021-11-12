@@ -17,6 +17,7 @@ from .phasebinning import PhaseBinning
 from .penergy_analysis import PEnergyAnalysis
 from .filter_object import FilterPulsarAna
 from .read_events import ReadFermiFile,ReadLSTFile, ReadList
+import pickle
 
 
 pd.options.mode.chained_assignment = None
@@ -66,7 +67,7 @@ class PulsarAnalysis():
         Information abot the fitting used for the peaks
     '''
     
-    def __init__(self, filename=None, nbins=50, binned=True, do_fit=False,model='dgaussian'):
+    def __init__(self, filename=None, nbins=50, tint=3600,binned=True,model='dgaussian'):
         
         if filename is not None:
             if 'fits' in filename:
@@ -81,19 +82,18 @@ class PulsarAnalysis():
             else:
                 ValueError('FIle has no valid format')
         else:
-            self.setTimeInterval(tint=3600)
+            self.setTimeInterval(tint=tint)
     
             
         #Define default parameters for the binning
-        self.setBinning(nbins=50)
+        self.setBinning(nbins=nbins)
                   
         #Define default parameters for the fitting
-        self.setFittingParams(model,binned,do_fit=do_fit)
+        self.setFittingParams(model,binned,do_fit=False)
         
         #Define default parameters for the cuts
         self.setParamCuts()
 
-        
        
     ##############################################
                        #SETTINGS
@@ -108,10 +108,10 @@ class PulsarAnalysis():
         else:
             raise ValueError('No FITS file given for Fermi-LAT data')  
     
-    def setListsInput(self,plist,tlist):
+    def setListsInput(self,plist,tlist,tel='MAGIC',energy_units='GeV'):
         self.r=ReadList(plist,tlist)
-        self.telescope='MAGIC'
-        self.energy_units='GeV'
+        self.telescope=tel
+        self.energy_units=energy_units
             
     
     def setLSTInputFile(self,filename=None,dirname=None,src_dep=False):
@@ -146,6 +146,7 @@ class PulsarAnalysis():
         
     def setTimeInterval(self,tint):
         self.tint=tint
+        self.TimeEv=PulsarTimeAnalysis(tint=self.tint)
         
     def setBackgroundLimits(self,OFF_limits):
         self.OFF_limits=OFF_limits
@@ -234,13 +235,12 @@ class PulsarAnalysis():
         
         #Initialize the regions object
         self.init_regions()
-        
-        
-        
+         
+            
     def execute_stats(self,tobs):
         
         #Update the information every 1 hour and store final values
-        self.TimeEv=PulsarTimeAnalysis(self,self.nbins,tint=self.tint)
+        self.TimeEv.run(self)
         
         #COmpute P1/P2 ratio
         self.regions.calculate_P1P2()
@@ -249,36 +249,48 @@ class PulsarAnalysis():
         self.tobs=tobs
         
         #Fit the histogram using PeakFitting class. If binned is False, an Unbinned Likelihood method is used for the fitting
-        try:
-            if self.do_fit==True:
+        if self.do_fit==True:
+            print('Fitting the data to the set model...')
+            try:
                 self.fitting.run(self)
-        except:
-            print('No fit could be done')
+            except:
+                print('No fit could be done')
+        else:
+            print('No fit has been done since no fit parameters has been set')
         
         
     def run(self):
         #Initializa
+        print('Initializing...')
         self.initialize()
         
         #Excute stats
+        print('Calculating statistics...')
         self.execute_stats(self.r.tobs)
-       
+        
         #Execute stats in energy bins
         try:
-            self.EnergyAna.run(self)
+            print('\n'+'Performing energy-dependent analysis...')
+            self.EnergyAna.run(self) 
         except:
-            print('No Energy Analysis has been done')
-        
-            
-
+            print('No Energy Analysis was performed. Check that you set the right energy params')
            
-        
+        print('FINISHED')
 
+ 
     ##############################################
                        #RESULTS
     #############################################
     
-
+    def check_energyana(self):
+        try:
+            self.EnergyAna
+        except:
+            print('No energy-dependent analysis has been done')
+            return(False)
+        return(True)
+            
+        
     def draw_phaseogram(self,phase_limits=[0,2],stats='short',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True):
         #Plot histogram from 0 to 1 and from 1 to 2 (2 periods)
         fig=plt.figure(figsize=(15,5))
@@ -297,82 +309,121 @@ class PulsarAnalysis():
         print('\n \n'+'RESULTS FOR THE PERIODICITY SEARCH:'+'\n')
         print(rstats)
         
-        
-    def show_EnergyPresults(self):
-        self.EnergyAna.show_EnergyPresults()
+        return rpeaks,rstats
+      
         
     def show_fit_results(self):
-        print(self.fitting.show_result())
+        fresult=self.fitting.show_result()
+        print(fresult)
+        return fresult
+     
         
     def show_timeEvolution(self):
-        self.TimeEv.show_results()
-        self.TimeEv.compare_Peaksig()
+        fig1=self.TimeEv.show_results()
+        fig2=self.TimeEv.compare_Peaksig()
+        return fig1,fig2
     
     
     def show_EnergyAna(self):
-        fig = plt.figure(figsize=(15,4))
-            
-        if self.regions.P1 is None or self.regions.P2 is None:
-            nplots=2
-        else:
-            nplots=3
-         
-            plt.subplot(1,nplots, 3)
-            self.EnergyAna.P1P2VsEnergy()
-            
-            
-        plt.subplot(1,nplots, 1)
-        self.EnergyAna.PSigVsEnergy()
+        if self.check_energyana():
+            fig = plt.figure(figsize=(15,4))
+            if self.regions.P1 is None or self.regions.P2 is None:
+                nplots=2
+            else:
+                nplots=3
+                plt.subplot(1,nplots, 3)
+                self.EnergyAna.P1P2VsEnergy()
 
-        
-        plt.subplot(1,nplots, 2)
-        self.EnergyAna.FWHMVsEnergy()
-        
-        
-        plt.tight_layout()
-        return(fig)
-        
-        
+            plt.subplot(1,nplots, 1)
+            self.EnergyAna.PSigVsEnergy()
+
+            plt.subplot(1,nplots, 2)
+            self.EnergyAna.FWHMVsEnergy()
+
+            plt.tight_layout()
+            return(fig)
+    
+    
+    def show_EnergyPresults(self):
+        if self.check_energyana():
+            peak_stat,p_stat=self.EnergyAna.show_EnergyPresults()
+            return peak_stat,p_stat
+    
+    
+    def show_EnergyFitresults(self):
+        if self.check_energyana():
+            fit_results=self.EnergyAna.show_Energy_fitresults()
+            return fit_results
+    
     
     def show_meanVsEnergy(self):
-        self.EnergyAna.MeanVsEnergy()
-        plt.show()
-        
+        if self.check_energyana():
+            fig=self.EnergyAna.MeanVsEnergy()
+            return(fig)
+    
+    
     def show_FWHMVsEnergy(self):
-        self.EnergyAna.FWHMVsEnergy()
-        plt.show()
+        if self.check_energyana():
+            fig=plt.figure()
+            self.EnergyAna.FWHMVsEnergy()
+            return(fig)
+    
     
     def show_SigVsEnergy(self):
-        self.EnergyAna.PSigVsEnergy()
-        plt.show()
-
+        if self.check_energyana():
+            fig=plt.figure()
+            self.EnergyAna.PSigVsEnergy()
+            return(fig)
+    
+    
     def show_P1P2VsEnergy(self):
-        self.EnergyAna.P1P2VsEnergy()
-        plt.show()
-   
+        if self.check_energyana():
+            fig=plt.figure()
+            self.EnergyAna.P1P2VsEnergy()
+            return(fig)
+    
+    
     def show_lcVsEnergy(self):
-        self.EnergyAna.show_Energy_lightcurve()
-        
+        if self.check_energyana():
+            fig_array=self.EnergyAna.show_Energy_lightcurve()   
+            return (fig_array)
+    
+    
     def show_all_lc(self,ylimits=None):
-        self.EnergyAna.show_joined_Energy_lightcurve(ylimits=ylimits)
-      
+        if self.check_energyana():
+            fig=self.EnergyAna.show_joined_Energy_lightcurve(ylimits=ylimits)
+            return(fig)
+    
+    
     def show_all_fits(self):
-        self.EnergyAna.show_joined_Energy_fits()
-        
-    def save_df(self,output_dir):
-        self.info.to_hdf(output_dir,key='dl2/event/telescope/parameters/LST_LSTCam')
+        if self.check_energyana():
+            fig=self.EnergyAna.show_joined_Energy_fits()
+            return(fig)
     
     
+    def save_df(self,output_file):
+        self.info.to_hdf(output_file,key='dl2/event/telescope/parameters/LST_LSTCam')
     
-    def save_results(self,output_dir):
-        with PdfPages('prueba.pdf') as pdf:
+    
+    def save_results(self,output_file):
+        with PdfPages(output_file) as pdf:
             pdf.savefig(self.draw_phaseogram(phase_limits=[0,2],stats='long',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True),bbox_inches='tight',pad_inches=1)
             pdf.savefig(self.TimeEv.PsigVsTime())
             pdf.savefig(self.TimeEv.PexVsTime())
             pdf.savefig(self.TimeEv.StatsVsTime())
-
-            fig2=plt.figure()
+            try:
+                pdf.savefig(self.draw_phaseogram(phase_limits=[0,2],stats='long',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=True,hline=True),bbox_inches='tight',pad_inches=1)
+            except:
+                pass  
+            try:
+                pdf.savefig(self.EnergyAna.show_Energy_lightcurve())
+                pdf.savefig(self.show_EnergyAna())
+            except:
+                pass
+      
+    def save_object(self,output_file):
+        with open(output_file, 'wb') as file:
+            pickle.dump(self, file)
+            file.close()
             
-            plt.text
-
     

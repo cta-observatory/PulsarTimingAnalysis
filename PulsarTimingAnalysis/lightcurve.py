@@ -33,18 +33,14 @@ class Lightcurve():
     '''
     
     def __init__(self, pulsar_phases,binning):
-        self.create_histogram(pulsar_phases,binning) #Create the histogram
-        
+        self.lc=np.histogram(pulsar_phases.phases, bins=binning.edges) #Create the histogram
     
     
+   ##############################################
+                       #EXECUTION
+   ############################################# 
     
-    def create_histogram(self,pulsar_phases,binning):
-        self.lc=np.histogram(pulsar_phases.phases, bins=binning.edges)
-
-        
-        
-        
-        
+    
     def chi_sqr_pulsar_test(self):
         
         #Calculate chi_sqr test
@@ -56,10 +52,10 @@ class Lightcurve():
     
     
     
-   
-    
-    
-    
+   ##############################################
+                       #RESULTS
+   ############################################# 
+
     def draw_stats(self,pulsar_phases,phase_limits,stats='short'): 
         text_towrite=''
         count=0
@@ -94,10 +90,7 @@ class Lightcurve():
                 plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[2],pulsar_phases.regions.dic[name].limits[3],150), 0, 1600500,facecolor=color,color=color,alpha=0.2)
                 plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[2]+1,pulsar_phases.regions.dic[name].limits[3]+1,150), 0, 1600500,facecolor=color,color=color,alpha=0.2)
             
-        
-        
-        
-        
+ 
     def draw_background(self,pulsar_phases,color,hline=True):
         
         #Draw the background region
@@ -108,8 +101,6 @@ class Lightcurve():
         #Add hline for background level reference (default True)
         if hline==True:
             plt.hlines(y=np.mean((self.lc[0][(self.lc[1][:-1]>(pulsar_phases.regions.OFF.limits[0])) & (self.lc[1][1:]<(pulsar_phases.regions.OFF.limits[1]))])),xmin=0,xmax=2,linestyle='dashed',color=color) 
-    
-    
     
     
     
@@ -144,7 +135,7 @@ class Lightcurve():
         if label is not None:
             plt.plot(x,y,color=color,label=label)
         else:
-            plt.plot(x,y,color=color,label='Fitted distribution')
+            plt.plot(x,y,color=color,label='Fit')
             
         plt.plot(x+1,y,color=color)
         plt.plot(x-1,y,color=color)
@@ -152,9 +143,7 @@ class Lightcurve():
         #Add labels
         plt.xlabel('Pulsar phase',fontsize=10)
         
-        
-        
-        
+  
     
     def draw_density_hist(self,phase_limits,colorhist,label=None,fill=True):
         
@@ -171,9 +160,7 @@ class Lightcurve():
         #Set limits in axis
         plt.ylim(max(min(height_norm)-3*np.sqrt(min(height_norm)),0),max(height_norm)+np.sqrt(max(height_norm)))
         plt.xlim(phase_limits[0],phase_limits[1])
-        
-       
-    
+
     
     
     def draw_histogram(self,phase_limits,colorhist):
@@ -193,9 +180,7 @@ class Lightcurve():
         plt.ylim(max(min(self.lc[0])-3*np.sqrt(min(self.lc[0])),0),max(self.lc[0])+2*np.sqrt(max(self.lc[0])))
         plt.xlim(phase_limits[0],phase_limits[1])
         
-    
-    
-    
+
     
     def show_phaseogram(self,pulsar_phases,phase_limits=[0,1],stats='short',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True,time_label=True):
         
@@ -223,9 +208,6 @@ class Lightcurve():
         if time_label==True:
             plt.annotate(f'Tobs={pulsar_phases.tobs:.1f} h'+'\n'+f'Entries={len(pulsar_phases.phases)}', xy=(0.11, 1.3), xytext=(0.11,1.3), fontsize=15, xycoords='axes fraction', textcoords='offset points', color='k',bbox=dict(facecolor='white', edgecolor='k',alpha=0.8),horizontalalignment='left', verticalalignment='top')
             
-            
-
-        
         #Add legend
         plt.legend(loc=2,bbox_to_anchor=(-0.01, 1.37),fontsize=15)
     

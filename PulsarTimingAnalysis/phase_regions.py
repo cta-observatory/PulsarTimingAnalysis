@@ -36,7 +36,10 @@ class PhaseRegions():
         #Create the peaks in the previosly defined null regions
         self.create_dic(P1_object,P2_object,P1P2_object,P3_object)
         
-        
+   ##############################################
+                       #EXECUTION
+   ############################################# 
+
     def create_dic(self,P1_object=None,P2_object=None,P1P2_object=None,P3_object=None):
         
             if P1_object is not None:
@@ -91,7 +94,11 @@ class PhaseRegions():
         else:
             self.P1P2_ratio=None     
             self.P1P2_ratio_error=None
-      
+    
+    
+   ##############################################
+                       #RESULTS
+   ############################################# 
     
     def show_peak_results(self):
         peak_results=pd.DataFrame(data={'P1':[0,0,0,0,0,0,0]},index=["Significance","Nex","Nex_error","Number","noff","sign_t_ratio","s/n ratio"])
@@ -166,7 +173,10 @@ class PulsarPeak():
             for i in range(1,len(self.limits),2):
                 self.deltaP=self.deltaP+(self.limits[i]-self.limits[i-1])
         
-        
+    ##############################################
+                       #EXECUTION
+    #############################################     
+    
     def fillPeak(self,phases):
         self.phases=np.array([])
         if len(self.limits) % 2 == 0:

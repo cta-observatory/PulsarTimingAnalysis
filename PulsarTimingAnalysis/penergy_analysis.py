@@ -69,7 +69,11 @@ class PEnergyAnalysis():
         self.energy_edges=np.array(energy_edges)
         self.energy_centres=(self.energy_edges[1:]+self.energy_edges[:-1])/2
 
-        
+    
+   ##############################################
+                       #EXECUTION
+   ############################################# 
+
     def run(self,pulsarana):
         self.energy_units=pulsarana.energy_units
         self.tobs=pulsarana.tobs
@@ -80,24 +84,38 @@ class PEnergyAnalysis():
             dataframe=pulsarana.info
             di=dataframe[(dataframe['energy']>self.energy_edges[i]) & (dataframe['energy']<self.energy_edges[i+1])]
             
+            print('Creating object in '+f'energy range ('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}')
             self.Parray.append(copy.copy(pulsarana))
             self.Parray[i].phases=np.array(di['pulsar_phase'].to_list())
             self.Parray[i].info=di
             self.Parray[i].init_regions()
-            self.Parray[i].setFittingParams(self.Parray[i].fit_model,self.Parray[i].binned)
+            
+            if self.Parray[i].do_fit==True:
+                self.Parray[i].setFittingParams(self.Parray[i].fit_model,self.Parray[i].binned)
             
             #Update the information every 1 hour and store final values
+            print('Calculating statistics...')
             self.Parray[i].execute_stats(self.tobs)
 
     
     
+    
+    
+   ##############################################
+                       #RESULTS
+   ############################################# 
+    
     def show_Energy_lightcurve(self):
+        fig_array=[]
         for i in range(0,len(self.Parray)):
             #Plot histogram from 0 to 1 and from 1 to 2 (2 periods)
-            plt.figure(figsize=(15,5))
+            fig=plt.figure(figsize=(15,5))
             self.Parray[i].histogram.show_phaseogram(self.Parray[i],[0,2],fit=True)
             plt.annotate(f'ENERGY RANGE ('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}', xy=(0.1, 0.9), xytext=(0.31,0.9), fontsize=15, xycoords='axes fraction', textcoords='offset points', color='k',bbox=dict(facecolor='white', edgecolor='k',alpha=0.8),horizontalalignment='left', verticalalignment='top')
+            fig_array.append(fig)
             plt.show()
+  
+        return fig_array
 
    
     
@@ -105,30 +123,23 @@ class PEnergyAnalysis():
         
         for i in range(0,len(self.Parray)):
             if self.Parray[i].fitting.check_fit_result()==True:
-                plt.figure(figsize=(17,8))
+                fig=plt.figure(figsize=(17,8))
                 break
             elif i==len(self.Parray)-1 and self.Parray[i].fitting.check_fit_result()==False:
                 print('No fit available for any energy bin')
-                return
-                
-                
+                return     
         for i in range(0,len(self.Parray)):
             if self.Parray[i].fitting.check_fit_result()==True:
                 
-                self.Parray[i].histogram.draw_fitting(self.Parray[i],color=colorh[i],density=True,label=f'Energies('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}')
-                        
+                self.Parray[i].histogram.draw_fitting(self.Parray[i],color=colorh[i],density=True,label=f'Energies('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}')                
         plt.xlim(2*self.Parray[0].fitting.shift,1+2*self.Parray[i].fitting.shift)
         plt.legend(fontsize=20)
-        plt.show()
-            
+        return(fig)   
 
-           
-         
-
-    
+  
     def show_joined_Energy_lightcurve(self,colorh=['tab:red','tab:purple','tab:blue','tab:brown','tab:cyan','tab:olive','tab:pink'],colorP=['orange','green','purple'],ylimits=None):
         
-        plt.figure(figsize=(17,8))
+        fig=plt.figure(figsize=(17,8))
         
         for i in range(0,len(self.Parray)):
             self.Parray[i].histogram.draw_density_hist([0.7,1.7],colorhist=colorh[i],label=f'Energies('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}',fill=False)
@@ -144,17 +155,37 @@ class PEnergyAnalysis():
         if ylimits is not None:
             plt.ylim(ylimits)
             
-        plt.show()
+        return(fig)
         
         
         
     def show_EnergyPresults(self):
+        peak_stat=[0]*(len(self.energy_edges)-1)
+        p_stat=[0]*(len(self.energy_edges)-1)
+        
         for i in range(0,len(self.energy_edges)-1):
             print(f'ENERGY RANGE ('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}'+'\n')
-            self.Parray[i].show_Presults()
+            peak_stat[i],p_stat[i]=self.Parray[i].show_Presults()
             print('\n \n')
             print('-------------------------------------------------------------------')
    
+        return peak_stat,p_stat
+
+
+    def show_Energy_fitresults(self):
+        fit_results=[0]*(len(self.energy_edges)-1)
+        
+        for i in range(0,len(self.energy_edges)-1):
+            print(f'ENERGY RANGE ('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}'+'\n')
+            if self.Parray[i].fitting.check_fit_result()==True:
+                fit_results[i]=self.Parray[i].show_fit_results()
+            else:
+                print('No fit available for this energy range')
+            print('\n \n')
+            print('-------------------------------------------------------------------')
+   
+        return fit_results
+
 
 
     def PSigVsEnergy(self):
@@ -170,7 +201,6 @@ class PEnergyAnalysis():
             if self.Parray[i].regions.dic['P1+P2'] is not None:
                 P1P2_s.append(self.Parray[i].regions.P1P2.sign)
                 
-        
         if len(P1P2_s)>0:
             plt.plot(self.energy_centres,P1P2_s,'o-',color='tab:red',label='P1+P2')
             
@@ -179,12 +209,9 @@ class PEnergyAnalysis():
             
         if len(P2_s)>0:
             plt.plot(self.energy_centres,P2_s,'o-',color='tab:green',label='P2')
-            
-       
-            
+                
         plt.ylabel('Significance($\sigma$)')
         plt.xlabel('Enegy ('+ str(self.energy_units)+')')
-        
         plt.legend()
         plt.tight_layout()
         plt.grid(which='both')
@@ -200,9 +227,8 @@ class PEnergyAnalysis():
             for i in range(0,len(self.energy_centres)):
                 P1P2E.append(self.Parray[i].regions.P1P2_ratio)
                 P1P2E_error.append(self.Parray[i].regions.P1P2_ratio_error)
-            
-            plt.errorbar(self.energy_centres,P1P2E,yerr=P1P2E_error,fmt='o-',color='tab:blue')
-                                                
+
+            plt.errorbar(self.energy_centres,P1P2E,yerr=P1P2E_error,fmt='o-',color='tab:blue')                                 
             plt.ylabel('P1/P2')
             plt.xlabel('Enegy ('+ str(self.energy_units)+')')
             plt.tight_layout()
@@ -212,6 +238,7 @@ class PEnergyAnalysis():
         else:
             print('Cannot calculate P1/P2 since one of the peaks is not defined')
      
+        
     
     def FWHMVsEnergy(self):
         FP1=[]
@@ -243,8 +270,7 @@ class PEnergyAnalysis():
                         FP2_err.append(0) 
                 except:
                     pass
-      
-                
+           
         else:
             if self.Parray[0].fitting.model=='dgaussian':
                 prefactor=2.35482      
@@ -276,13 +302,13 @@ class PEnergyAnalysis():
                 except:
                     pass
       
+        
         if len(FP1)>0:
             plt.errorbar(energies_F1,FP1,yerr=FP1_err,fmt='o-',color='tab:orange',label='P1')
         if len(FP2)>0:
             plt.errorbar(energies_F2,FP2,yerr=FP2_err,fmt='o-',color='tab:green',label='P2')                                        
         if len(FP1)<=0 and len(FP2)<=0:
-            plt.annotate('Plot not available', xy=(0.6,0.6), xytext=(0.6,0.6), fontsize=15, xycoords='axes fraction', textcoords='offset points', color='k',bbox=dict(facecolor='white',alpha=0.8),horizontalalignment='right', verticalalignment='top')
-            
+            plt.annotate('Plot not available', xy=(0.6,0.6), xytext=(0.6,0.6), fontsize=15, xycoords='axes fraction', textcoords='offset points', color='k',bbox=dict(facecolor='white',alpha=0.8),horizontalalignment='right', verticalalignment='top')  
         else:
             plt.ylabel('FWHM')
             plt.xlabel('Enegy ('+ str(self.energy_units)+')')
@@ -293,14 +319,12 @@ class PEnergyAnalysis():
 
         
     def MeanVsEnergy(self):
-
         M1=[]
         M2=[]
         M1_err=[]
         M2_err=[]
         energies_M1=[]
         energies_M2=[]
-        
         
         if self.Parray[0].fitting.model=='asym_dgaussian':
             for i in range(0,len(self.energy_centres)):
@@ -324,7 +348,6 @@ class PEnergyAnalysis():
                 except:
                     pass
 
-        
         elif self.Parray[0].fitting.model=='dgaussian' or self.Parray[0].fitting.model=='lorentzian':
             for i in range(0,len(self.energy_centres)):
                 try:
@@ -346,9 +369,7 @@ class PEnergyAnalysis():
                         M2_err.append(0) 
                 except:
                     pass
-
-                
-        
+           
         if len(M1)==0 and len(M2)==0:
             print('No fit available for plotting')
             return
@@ -356,8 +377,7 @@ class PEnergyAnalysis():
             nplots=2
         else:
             nplots=1
-            
-            
+                 
         fig = plt.figure(figsize=(10,5))
         if len(M1)>0:   
             plt.subplot(nplots,1,1)
@@ -368,8 +388,7 @@ class PEnergyAnalysis():
             plt.tight_layout()
             plt.grid(which='both')
             plt.xscale('log')
-
-        
+            
         if len(M2)>0:
             plt.subplot(nplots,1,nplots)
             plt.errorbar(energies_M2,M2,yerr=M2_err,fmt='o-',color='tab:green')
@@ -380,12 +399,12 @@ class PEnergyAnalysis():
             plt.grid(which='both')
             plt.xscale('log')
 
+        return(fig)
     
     def PeaksVsEnergy(self):
    
         fig = plt.figure(figsize=(15,4))
     
-        
         plt.subplot(1,3, 1)
         self.PSigVsEnergy()
 
