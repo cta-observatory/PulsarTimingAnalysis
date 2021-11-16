@@ -233,7 +233,10 @@ class PulsarAnalysis():
         
     def initialize(self):
         #Read the data and filter
-        self.r.run(self)
+        try:
+            self.r.run(self)
+        except:
+            self.r.run()
         
         #Extract each attribute
         self.phases=np.array(self.r.info['pulsar_phase'].to_list()) 
