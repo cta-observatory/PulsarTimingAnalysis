@@ -5,7 +5,7 @@ import argparse
 import numpy as np
 import os
 import warnings
-from PulsarPhaseogram.cphase.pulsarphase_cal import calphase
+from pulsarphase_cal import calphase
     
 
 def main():
@@ -15,6 +15,8 @@ def main():
 	parser.add_argument('--ephem','-ephem',action='store',type=str,dest='ephem',default=None)
 	parser.add_argument('--output','-out',action='store',type=str,dest='dir_output',default=None)
 	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
+	parser.add_argument('--run_number','-r',action='store',type=str,dest='run',default=False)
+    
     
 	args = parser.parse_args()
 
@@ -22,7 +24,7 @@ def main():
 	output_dir=args.dir_output
 	pickle=args.pickle
 	in_file=args.in_file
-
+	run=args.run
     
 	dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
 	pd.set_option("display.precision", 10)
@@ -41,11 +43,13 @@ def main():
 		for x in os.listdir(args.directory):
 			rel_dir = os.path.relpath(args.directory)
 			rel_file = os.path.join(rel_dir, x)
-			filelist.append(rel_file)
-    
+			if run in rel_file:
+				filelist.append(rel_file)
+                
+		filelist.sort()
 		for i in range(0,len(filelist)):
 			#Calculate the phases
-			calphase(filelist[i],ephem,output_dir,pickle,ft2_file)
+			calphase(filelist[i],ephem,output_dir,pickle)
 		
 	else:
 		if in_file is not None:

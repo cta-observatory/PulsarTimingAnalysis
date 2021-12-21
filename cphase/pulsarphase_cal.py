@@ -10,11 +10,12 @@ from pint.observatory.satellite_obs import get_satellite_observatory
 from lstchain.reco import dl1_to_dl2
 import pint.toa as toa
 import time
-from lstchain.io.io import dl2_params_src_dep_lstcam_key, write_dataframe
+from lstchain.io import global_metadata, write_metadata
+from lstchain.io.io import dl2_params_src_dep_lstcam_key, write_dataframe, write_dl2_dataframe
 from pint.fits_utils import read_fits_event_mjds
 from pint.fermi_toas import *
 from pint.scripts import *
-from .utils import  add_mjd,dl2time_totim, model_fromephem
+from utils import  add_mjd,dl2time_totim, model_fromephem
 import pint.models as models
 
 __all__=['fermi_calphase','calphase']
@@ -101,7 +102,7 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
 
 
     
-def calphase(file,ephem,output_dir,pickle):
+def calphase(file,ephem,output_dir,pickle=False):
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
 
@@ -132,24 +133,38 @@ def calphase(file,ephem,output_dir,pickle):
     #Read the file
     print('Input file:'+str(file))
     df_i=pd.read_hdf(file,key=dl2_params_lstcam_key,float_precision=20)
-    df_i_src=pd.read_hdf(file,key=dl2_params_src_dep_lstcam_key,float_precision=20)
     add_mjd(df_i)
 
+    try:     
+        df_i_src=pd.read_hdf(file,key=dl2_params_src_dep_lstcam_key,float_precision=20)
+        src_dep=True
+    except:
+        src_dep=False
+        
+        
     #Create the .tim file
     timelist=df_i.mjd_time.tolist()
-    barycent_toas,phase=get_phase_list(timelist,ephem)
-
+    timname=str(os.path.basename(file).replace('.h5',''))+'.tim'
+    barycent_toas,phase=get_phase_list(timname,timelist,ephem,pickle)
             
     #Write if dir given
     if output_dir is not None:
         print('Generating new columns in DL2 DataFrame')
         df_i['mjd_barycenter_time']=barycent_toas
         df_i['pulsar_phase']=phase.frac
-        dir_output=output_dir+str(os.path.basename(file).replace('.h5',''))+'_pulsar.h5'
-        print('Writing outputfile in'+str(dir_output))
-        df_i.to_hdf(dir_output,key='dl2/event/telescope/parameters/LST_LSTCam')
-        write_dataframe(df_i_src, dir_output, dl2_params_src_dep_lstcam_key)
+        output_file=output_dir+str(os.path.basename(file).replace('.h5',''))+'_pulsar.h5'
+        print('Writing outputfile in'+str(output_file))
         
+        metadata = global_metadata()
+        write_metadata(metadata, output_file)
+    
+        if src_dep==False:
+            write_dl2_dataframe(dl2, output_file, config=config, meta=metadata)
+
+        else:
+            write_dl2_dataframe(df_i, output_file,meta=metadata)
+            write_dataframe(df_i_src, output_file, dl2_params_src_dep_lstcam_key,meta=metadata)
+            
         print('Finished')
  
     else:
@@ -157,9 +172,7 @@ def calphase(file,ephem,output_dir,pickle):
     
 
 
-def get_phase_list(timelist,ephem):
-    timname=str(os.path.basename(file).replace('.h5',''))+'.tim'
-    
+def get_phase_list(timname,timelist,ephem,pickle=False):
     dl2time_totim(timelist,name=timname)
         
     t= toa.get_TOAs(timname, usepickle=pickle)
