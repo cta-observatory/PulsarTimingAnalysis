@@ -1,13 +1,3 @@
-##################################################################################
-
-# This code is part of the PulsarTimingAnalysis package developed for the high level 
-# analysis of Pulsar at Very High Energy.
-
-# Author: Alvaro Mas Aguilar (alvmas@ucm.es)
-# Last modification: 12/11/2021
-#####################################################################################
-
-
 import math
 import astropy as ast
 import matplotlib.pyplot as plt

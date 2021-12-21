@@ -1,13 +1,3 @@
-##################################################################################
-
-# This code is part of the PulsarTimingAnalysis package developed for the high level 
-# analysis of Pulsar at Very High Energy.
-
-# Author: Alvaro Mas Aguilar (alvmas@ucm.es)
-# Last modification: 12/11/2021
-#####################################################################################
-
-
 import pandas as pd
 import math
 import astropy as ast
@@ -96,14 +86,16 @@ class PEnergyAnalysis():
             
             print('Creating object in '+f'energy range ('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}')
             self.Parray.append(copy.copy(pulsarana))
-	    self.Parray[i].setTimeInterval(self.Parray[i].tint)
+            self.Parray[i].setTimeInterval(self.Parray[i].tint)
             self.Parray[i].phases=np.array(di['pulsar_phase'].to_list())
             self.Parray[i].info=di
+
             self.Parray[i].init_regions()
-            
+
             if self.Parray[i].do_fit==True:
-                self.Parray[i].setFittingParams(self.Parray[i].fit_model,self.Parray[i].binned)
-            
+                self.Parray[i].setFittingParams(self.Parray[i].fit_model,self.Parray[i].binned,peak=self.Parray[i].peak)
+
+                
             #Update the information every 1 hour and store final values
             print('Calculating statistics...')
             self.Parray[i].execute_stats(self.tobs)

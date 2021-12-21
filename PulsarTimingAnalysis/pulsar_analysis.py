@@ -1,12 +1,3 @@
-##################################################################################
-
-# This code is part of the PulsarTimingAnalysis package developed for the high level 
-# analysis of Pulsar at Very High Energy.
-
-# Author: Alvaro Mas Aguilar (alvmas@ucm.es)
-# Last modification: 12/11/2021
-#####################################################################################
-
 import pandas as pd
 import math
 import astropy as ast
@@ -145,12 +136,13 @@ class PulsarAnalysis():
         
         if model in model_list:
             self.fit_model=model
+            self.peak=peak
             self.binned=binned
             self.do_fit=do_fit
         else:
             raise ValueError ('Model given is not defined')
     
-        self.fitting=PeakFitting(self.binned,self.fit_model,peak=peak)
+        self.fitting=PeakFitting(self.binned,self.fit_model,peak=self.peak)
         self.fitting.check_model()
         
     def setTimeInterval(self,tint):
@@ -210,9 +202,9 @@ class PulsarAnalysis():
            
         if len(self.P1P2_limits)>0:
             p1p2ob=PulsarPeak(peak_limits=self.P1P2_limits,peaktype='signal')
-        
+
         self.regions=PhaseRegions(OFF_object=OFFob,P1_object=p1ob,P2_object=p2ob,P1P2_object=p1p2ob,P3_object=p3ob)
-                     
+        
      
     def update_info(self):
         #Fill the background regions

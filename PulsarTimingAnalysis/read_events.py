@@ -1,14 +1,3 @@
-##################################################################################
-
-# This code is part of the PulsarTimingAnalysis package developed for the high level 
-# analysis of Pulsar at Very High Energy.
-
-# Author: Alvaro Mas Aguilar (alvmas@ucm.es)
-# Last modification: 12/11/2021
-#####################################################################################
-
-
-
 import pandas as pd
 import math
 import astropy as ast
@@ -86,33 +75,39 @@ class ReadLSTFile():
             self.src_dependent=src_dependent
             
             
-        def read_LSTfile(self,fname):
+        def read_LSTfile(self,fname,df_type='short'):
             
             if self.src_dependent==False:
                 df=pd.read_hdf(fname,key=dl2_params_lstcam_key)
             
             elif self.src_dependent==True:
                 srcindep_df=pd.read_hdf(fname,key=dl2_params_lstcam_key,float_precision=20)
-                srcindep_df=srcindep_df[["mjd_time","pulsar_phase", "dragon_time","alt_tel"]]
-                
                 srcdep_df=pd.read_hdf(fname,key=dl2_params_src_dep_lstcam_key)
                 srcdep_df.columns = pd.MultiIndex.from_tuples([tuple(col[1:-1].replace('\'', '').replace(' ','').split(",")) for col in srcdep_df.columns])
                 
-                df= pd.concat([srcindep_df, srcdep_df['on']], axis=1)
-            
-            if 'alpha' in df and 'theta2' in df:
-                df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","theta2","alt_tel"]]
-            elif 'alpha' in df and 'theta2' not in df:
-                df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","alt_tel"]]
-            elif 'theta2' in df and 'alpha' not in df:
-                df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","theta2","alt_tel"]]
+                srcdep_keys = srcdep_df['on'].keys()
+                srcdep_keys = srcdep_keys.drop(['alpha', 'expected_src_x', 'expected_src_y', 'dist', 'time_gradient_from_source', 'skewness_from_source'])
+                srcindep_df = srcindep_df.drop(srcdep_keys, axis=1)
+                df = pd.concat([srcindep_df, srcdep_df['on']], axis=1)
+
+                
+            if df_type=='short':
+                if 'alpha' in df and 'theta2' in df:
+                    df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","theta2","alt_tel"]]
+                elif 'alpha' in df and 'theta2' not in df:
+                    df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","alt_tel"]]
+                elif 'theta2' in df and 'alpha' not in df:
+                    df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","theta2","alt_tel"]]
+                else:
+                    df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","alt_tel"]]
+
+                try:
+                    df_filtered['energy']=df['reco_energy']
+                except:
+                    df_filtered['energy']=df['energy']
             else:
-                df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","alt_tel"]]
-            
-            try:
+                df_filtered=df
                 df_filtered['energy']=df['reco_energy']
-            except:
-                df_filtered['energy']=df['energy']
             
             return(df_filtered)
 
@@ -130,11 +125,11 @@ class ReadLSTFile():
         
         
         
-        def run(self,pulsarana):
+        def run(self,pulsarana,df_type='long'):
             if isinstance(self.fname,list):
                 info_list=[]
                 for name in self.fname:
-                    info_file=self.read_LSTfile(name)
+                    info_file=self.read_LSTfile(name,df_type)
                     self.info=info_file
                     pulsarana.cuts.apply_fixed_cut(self)
                     info_list.append(self.info)
@@ -143,7 +138,7 @@ class ReadLSTFile():
                 self.tobs=self.calculate_tobs()
                 
             else:
-                self.info=self.read_LSTfile(self.fname)
+                self.info=self.read_LSTfile(self.fname,df_type)
                 self.tobs=self.calculate_tobs()
                 pulsarana.cuts.apply_fixed_cut(self)
                 
