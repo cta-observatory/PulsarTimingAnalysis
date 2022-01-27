@@ -8,7 +8,7 @@ from astropy import units as u
 from astropy.io import fits
 import warnings
 from lstchain.reco.utils import get_effective_time,add_delta_t_key
-from lstchain.io.io import dl2_params_lstcam_key,dl2_params_src_dep_lstcam_key
+from lstchain.io.io import dl2_params_lstcam_key,dl2_params_src_dep_lstcam_key, get_srcdep_params
 import os
 
 class ReadFermiFile():
@@ -82,13 +82,15 @@ class ReadLSTFile():
             
             elif self.src_dependent==True:
                 srcindep_df=pd.read_hdf(fname,key=dl2_params_lstcam_key,float_precision=20)
-                srcdep_df=pd.read_hdf(fname,key=dl2_params_src_dep_lstcam_key)
-                srcdep_df.columns = pd.MultiIndex.from_tuples([tuple(col[1:-1].replace('\'', '').replace(' ','').split(",")) for col in srcdep_df.columns])
+                on_df_srcdep=get_srcdep_params(fname,'on')
                 
-                srcdep_keys = srcdep_df['on'].keys()
-                srcdep_keys = srcdep_keys.drop(['alpha', 'expected_src_x', 'expected_src_y', 'dist', 'time_gradient_from_source', 'skewness_from_source'])
-                srcindep_df = srcindep_df.drop(srcdep_keys, axis=1)
-                df = pd.concat([srcindep_df, srcdep_df['on']], axis=1)
+                if 'reco_energy' in srcindep_df.keys():
+                    srcindep_df.drop(['reco_energy'])
+                    
+                if 'gammaness' in srcindep_df.keys():
+                    srcindep_df.drop(['gammaness'])
+                    
+                df = pd.concat([srcindep_df, on_df_srcdep], axis=1)
 
                 
             if df_type=='short':
@@ -106,8 +108,7 @@ class ReadLSTFile():
                 except:
                     df_filtered['energy']=df['energy']
             else:
-                df_filtered=df
-                df_filtered['energy']=df['reco_energy']
+                df_filtered = df
             
             return(df_filtered)
 
@@ -129,11 +130,13 @@ class ReadLSTFile():
             if isinstance(self.fname,list):
                 info_list=[]
                 for name in self.fname:
-                    info_file=self.read_LSTfile(name,df_type)
-                    self.info=info_file
-                    pulsarana.cuts.apply_fixed_cut(self)
-                    info_list.append(self.info)
-                    
+                    try:
+                        info_file=self.read_LSTfile(name,df_type)
+                        self.info=info_file
+                        pulsarana.cuts.apply_fixed_cut(self)
+                        info_list.append(self.info)
+                    except:
+                        print(name)
                 self.info=pd.concat(info_list)
                 self.tobs=self.calculate_tobs()
                 

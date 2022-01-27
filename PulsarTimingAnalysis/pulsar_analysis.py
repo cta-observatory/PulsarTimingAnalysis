@@ -229,6 +229,7 @@ class PulsarAnalysis():
             self.r.run(self)
         except:
             self.r.run()
+            print
         
         #Extract each attribute
         self.phases=np.array(self.r.info['pulsar_phase'].to_list()) 
