@@ -7,13 +7,11 @@ from .phase_regions import PhaseRegions, PulsarPeak
 from .periodicity_test import PeriodicityTest
 from .ptime_analysis import PulsarTimeAnalysis
 from .filter_object import FilterPulsarAna
-from . import cphase
 from .read_events import ReadFermiFile,ReadLSTFile, ReadList
 
 
 
 __all__ = [
-    'cphase',
     'PEnergyAnalysis',
     'PulsarAnalysis',
     'FilterPulsarAna',

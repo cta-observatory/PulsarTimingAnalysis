@@ -179,9 +179,7 @@ class PulsarTimeAnalysis():
         fig.set_figwidth(12)
         
         #####################################
-        
         #First plot: P1Sig vs Time
-        
         if len(self.P1sTime)>1:
             ax1.plot(np.array(self.t)/3600,self.P1sTime,'o-',color='tab:orange',label='P1')
             ax1.grid()

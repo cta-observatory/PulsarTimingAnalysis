@@ -8,7 +8,7 @@ def get_model_list():
 
 
 
-kwd = {"parallel": True, "fastmath": True}
+kwd = {"parallel": False, "fastmath": True}
 
 @nb.njit(**kwd)
 def gaussian(x, mu, sigma,A,B):
