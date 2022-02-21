@@ -1,5 +1,11 @@
+#####################
+###Author: Alvaro Mas Aguilar (alvmas)
+#mail: alvmas@ucm.es
+#Using modules from PINT-pulsar and lstchain to calculate phases and add them to the input files.
+###################3
+
+
 import sys
-sys.path.append('/fefs/home/alvaro.mas/Pulsar_analysis/Notebooks')
 import pandas as pd
 import argparse
 import numpy as np

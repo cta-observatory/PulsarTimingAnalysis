@@ -1,3 +1,11 @@
+
+#####################
+###Author: Alvaro Mas Aguilar (alvmas)
+#mail: alvmas@ucm.es
+#Using modules from PINT-pulsar and lstchain to calculate phases and add them to the input files.
+###################3
+
+
 import pandas as pd
 import csv
 import os
@@ -145,8 +153,9 @@ def calphase(file,ephem,output_dir,pickle=False):
     #Create the .tim file
     timelist=df_i.mjd_time.tolist()
     timname=str(os.path.basename(file).replace('.h5',''))+'.tim'
-    barycent_toas,phase=get_phase_list(timname,timelist,ephem,pickle)
-            
+    parname=str(os.path.basename(file).replace('.h5',''))+'.par'
+    barycent_toas,phase=get_phase_list(timname,timelist,ephem,parname,pickle)
+    os.remove(str(os.getcwd())+'/'+parname)        
     #Write if dir given
     if output_dir is not None:
         print('Generating new columns in DL2 DataFrame')
@@ -172,12 +181,12 @@ def calphase(file,ephem,output_dir,pickle=False):
     
 
 
-def get_phase_list(timname,timelist,ephem,pickle=False):
+def get_phase_list(timname,timelist,ephem,parname,pickle=False):
     dl2time_totim(timelist,name=timname)
         
     t= toa.get_TOAs(timname, usepickle=pickle)
     #Create model from ephemeris
-    model=model_fromephem(timelist,ephem)
+    model=model_fromephem(timelist,ephem,parname)
 
     #Upload TOAs and model
     m=models.get_model(model)

@@ -1,3 +1,13 @@
+
+#####################
+###Author: Alvaro Mas Aguilar (alvmas)
+#mail: alvmas@ucm.es
+#Using modules from PINT-pulsar and lstchain to calculate phases and add them to the input files.
+###################3
+
+
+
+
 import pandas as pd
 import csv
 import numpy as np
@@ -81,7 +91,7 @@ def dl2time_totim(times, name='times.tim',obs='lst'):
         timFile.close()
 
     
-def model_fromephem(times,ephem):
+def model_fromephem(times,ephem,model_name):
 
     '''
     Creates a .par file using the parameters from the ephemeris associated with the arrival time range from TOAs
@@ -181,7 +191,7 @@ def model_fromephem(times,ephem):
 
     #Create the .par file
     tm.as_parfile()
-    name="tm.par"
+    name=model_name
     f=open(name,"w+")
     f.write(tm.as_parfile())
     f.close()
