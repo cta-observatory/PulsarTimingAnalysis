@@ -108,8 +108,8 @@ class PulsarAnalysis():
         else:
             raise ValueError('No FITS file given for Fermi-LAT data')  
     
-    def setListsInput(self,plist,tlist,elist,tel='MAGIC',energy_units='GeV'):
-        self.r=ReadList(plist,tlist,elist)
+    def setListsInput(self,plist,tlist,tel='MAGIC',energy_units='GeV'):
+        self.r=ReadList(plist,tlist)
         self.telescope=tel
         self.energy_units=energy_units
             
@@ -123,8 +123,9 @@ class PulsarAnalysis():
         self.nbins=nbins
         self.binning=PhaseBinning(nbins,xmin,xmax)
     
-    def setParamCuts(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None):
-        self.cuts=FilterPulsarAna(gammaness_cut,alpha_cut,theta2_cut,zd_cut)
+    def setParamCuts(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None,energy_binning_cut=None):
+        self.cuts=FilterPulsarAna(gammaness_cut,alpha_cut,theta2_cut,zd_cut,energy_binning_cut)
+
     
     def setEnergybinning(self,energy_edges):
         self.energy_edges=energy_edges

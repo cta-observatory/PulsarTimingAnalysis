@@ -109,7 +109,7 @@ class ReadLSTFile():
                     df_filtered['energy']=df['energy']
             else:
                 df_filtered = df
-            
+                df_filtered['energy']=df['reco_energy']
             return(df_filtered)
 
                 
@@ -144,6 +144,9 @@ class ReadLSTFile():
                 self.info=self.read_LSTfile(self.fname,df_type)
                 self.tobs=self.calculate_tobs()
                 pulsarana.cuts.apply_fixed_cut(self)
+                
+                if pulsarana.cuts.energy_binning_cut is not None:
+                    pulsarana.cuts.apply_energydep_cuts(self)
                 
             
 
@@ -226,14 +229,13 @@ class ReadtxtFile():
                 
 class ReadList():
     
-        def __init__(self, phases_list, time_list,energy_list):
+        def __init__(self, phases_list, time_list):
             self.plist=phases_list
             self.tlist=time_list
-            self.elist=energy_list/1000
             
             
         def create_df_from_info(self):
-            dataframe = pd.DataFrame({"mjd_time":self.tlist,"pulsar_phase":self.plist,"dragon_time":self.tlist*3600*24,"energy":self.elist})
+            dataframe = pd.DataFrame({"mjd_time":self.tlist,"pulsar_phase":self.plist,"dragon_time":self.tlist*3600*24})
             dataframe=dataframe.sort_values(by=['mjd_time'])
             self.info=dataframe
         

@@ -5,13 +5,15 @@ import numpy as np
 
 class FilterPulsarAna():
     
-    def __init__(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None):
+    def __init__(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None,energy_binning_cut=None):
         self.gammaness_cut=gammaness_cut
         self.alpha_cut=alpha_cut
         self.theta2_cut=theta2_cut
         self.zd_cut=zd_cut
+        self.energy_binning_cut=energy_binning_cut
         
-        self.check_cuts()
+        if self.energy_binning_cut is None:
+            self.check_cuts()
         
             
     def apply_fixed_cut(self,events):
@@ -34,7 +36,7 @@ class FilterPulsarAna():
     
     
     def check_cuts(self):
-        if self.gammaness_cut is not None:
+        if self.gammaness_cut is not None: 
             if isinstance(self.gammaness_cut, (float,int)):
                 if self.gammaness_cut>=1 or self.gammaness_cut<0:
                     raise ValueError('Gammaness cut no valid')
@@ -79,6 +81,29 @@ class FilterPulsarAna():
                 
           
             
+    def apply_energydep_cuts(self,events):
+        dataframe_energy=[]
+        dataframe=events.info
+
+        for i in range(0,len(self.energy_binning_cut)-1):
+            if isinstance(self.gammaness_cut, list):
+                mask_gammaness=(dataframe.gammaness>self.gammaness_cut[i]) & (dataframe['energy']>self.energy_binning_cut[i]) & (dataframe['energy']<self.energy_binning_cut[i+1])
+                
+                global_mask=mask_gammaness
+                
+            if isinstance(self.alpha_cut, list):
+                mask_alpha=(dataframe.alpha<self.alpha_cut[i]) & (dataframe['energy']>self.energy_binning_cut[i]) & (dataframe['energy']<self.energy_binning_cut[i+1])
             
+                global_mask=global_mask & mask_alpha
+                
+            if isinstance(self.theta2_cut, list):
+                mask_theta2=(dataframe.theta2<self.theta2_cut[i]) & (dataframe['energy']>self.energy_binning_cut[i]) & (dataframe['energy']<self.energy_binning_cut[i+1])
+                
+                global_mask=global_mask & mask_theta2
+             
+            dataframe_energy.append(dataframe[global_mask])
+        
+        events.info=pd.concat(dataframe_energy)
             
+        
         
