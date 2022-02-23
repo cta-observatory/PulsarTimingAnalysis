@@ -249,7 +249,7 @@ def calphase_interpolated(file,ephem,output_dir,pickle=False):
         write_metadata(metadata, output_file)
 
         if src_dep==False:
-            write_dl2_dataframe(dl2, output_file, config=config, meta=metadata)
+            write_dl2_dataframe(df_i, output_file, config=config, meta=metadata)
 
         else:
             write_dl2_dataframe(df_i, output_file,meta=metadata)
