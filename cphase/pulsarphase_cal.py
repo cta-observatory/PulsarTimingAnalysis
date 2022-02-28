@@ -18,7 +18,7 @@ from pint.observatory.satellite_obs import get_satellite_observatory
 from lstchain.reco import dl1_to_dl2
 import pint.toa as toa
 import time
-from lstchain.io import global_metadata, write_metadata
+from lstchain.io import global_metadata, write_metadata, standard_config,srcdep_config 
 from lstchain.io.io import dl2_params_src_dep_lstcam_key, write_dataframe, write_dl2_dataframe
 from pint.fits_utils import read_fits_event_mjds
 from pint.fermi_toas import *
@@ -168,7 +168,7 @@ def calphase(file,ephem,output_dir,pickle=False):
         write_metadata(metadata, output_file)
     
         if src_dep==False:
-            write_dl2_dataframe(df_i, output_file, config=config, meta=metadata)
+            write_dl2_dataframe(df_i, output_file, meta=metadata)
 
         else:
             write_dl2_dataframe(df_i, output_file,meta=metadata)
@@ -179,7 +179,7 @@ def calphase(file,ephem,output_dir,pickle=False):
     else:
         ('Finished. Not output directory given so the output is not saved')
     
-def calphase_interpolated(file,ephem,output_dir,pickle=False):
+def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None):
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
 
@@ -249,10 +249,18 @@ def calphase_interpolated(file,ephem,output_dir,pickle=False):
         write_metadata(metadata, output_file)
 
         if src_dep==False:
+            if custom_config==None:
+                config=standard_config
+            else:
+                config=custom_config
             write_dl2_dataframe(df_i, output_file, config=config, meta=metadata)
 
         else:
-            write_dl2_dataframe(df_i, output_file,meta=metadata)
+            if custom_config==None:
+                config=srcdep_config
+            else:
+                config=custom_config
+            write_dl2_dataframe(df_i, output_file,config=config,meta=metadata)
             write_dataframe(df_i_src, output_file, dl2_params_src_dep_lstcam_key,meta=metadata)
 
         print('Finished')
