@@ -11,7 +11,7 @@ import argparse
 import numpy as np
 import os
 import warnings
-from pulsarphase_cal import calphase_interpolated
+from .pulsarphase_cal import calphase_interpolated
     
 
 def main():
