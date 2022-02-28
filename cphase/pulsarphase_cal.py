@@ -215,6 +215,7 @@ def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None)
     try:
         df_i_src=pd.read_hdf(file,key=dl2_params_src_dep_lstcam_key,float_precision=20)
         src_dep=True
+        print('Using source-dependent analysis files')
     except:
         src_dep=False
 
