@@ -11,6 +11,7 @@ from lstchain.reco.utils import get_effective_time,add_delta_t_key
 from lstchain.io.io import dl2_params_lstcam_key,dl2_params_src_dep_lstcam_key, get_srcdep_params
 import os
 
+                
 class ReadFermiFile():
     
         def __init__(self, file):
@@ -110,20 +111,17 @@ class ReadLSTFile():
             else:
                 df_filtered = df
                 df_filtered['energy']=df['reco_energy']
-                
+             
+            df_filtered=add_delta_t_key(df_filtered)
             return(df_filtered)
 
                 
              
             
         def calculate_tobs(self):
-            diff=np.array(self.info['dragon_time'].to_list()[1:])-np.array(self.info['dragon_time'].to_list()[0:-1])
-            diff=diff[diff<3600]
-            return(sum(diff)/3600)
-            '''
             dataframe=add_delta_t_key(self.info)
             return(get_effective_time(dataframe)[1].value/3600)
-            '''
+           
         
         
         
@@ -149,6 +147,8 @@ class ReadLSTFile():
             else:
                 self.info=self.read_LSTfile(self.fname,df_type)
                 self.tobs=self.calculate_tobs()
+                
+                print('Total time is'+str(self.tobs))
                 pulsarana.cuts.apply_fixed_cut(self)
                 
                 if pulsarana.cuts.energy_binning_cut is not None:

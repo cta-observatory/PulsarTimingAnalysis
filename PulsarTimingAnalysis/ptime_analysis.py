@@ -89,6 +89,13 @@ class PulsarTimeAnalysis():
         except: 
             pass
         
+        if 'delta_t' in pulsar_phases.info:
+            from lstchain.reco.utils import get_effective_time
+            self.t.append(get_effective_time(pulsar_phases.info)[1].value)
+        else:
+            diff=abs(pulsar_phases.info.dragon_time.values[1:]-pulsar_phases.info.dragon_time.values[:-1])
+            self.t.append(sum(diff))
+            
         pulsar_phases.tobs=self.t[-1]/3600
         
         #Calculate stats 
@@ -117,14 +124,12 @@ class PulsarTimeAnalysis():
                 
                 #Update information when tobs>=tint
                 if s>self.tint:
-                    self.t.append(self.t[-1]+s)
                     pulse_df_partial=dataframe[dataframe['dragon_time']<dataframe.dragon_time.values[i+1]]
                     self.update_tinfo(pulsar_phases,pulse_df_partial)
                     s=0
                 
                 #Update last interval
                 elif i==(len(diff)-1):
-                    self.t.append(sum(diff))
                     self.update_tinfo(pulsar_phases,dataframe)  
 
             else:
