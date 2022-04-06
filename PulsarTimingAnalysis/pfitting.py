@@ -33,7 +33,6 @@ class PeakFitting():
         def run(self,pulsar_phases):
             #Estimate initial values 
             self.est_initial_values(pulsar_phases)
-
             #Do the fitting 
             if self.binned==True:
                 self.fit_Binned(pulsar_phases.histogram)
@@ -89,43 +88,53 @@ class PeakFitting():
         #Unbinned fitting            
         def fit_ULmodel(self,pulsar_phases):  
             self.check_model()
-            
+
             #Shift the phases if one of the peak is near the interval edge
             shift_phases=pulsar_phases.phases
             if self.shift!=0:
                 for i in range(0,len(shift_phases)):
                     if shift_phases[i]<self.shift:
                         shift_phases[i]=shift_phases[i]+1
-            
+
             if self.model=='dgaussian':
                 unbinned_likelihood = UnbinnedLH(double_gaussian, np.array(shift_phases))
                 minuit = Minuit(unbinned_likelihood,mu=self.init[0], sigma=self.init[1],mu_2=self.init[2],sigma_2=self.init[3],A=self.init[4],B=self.init[5],C=self.init[6])
+                self.parnames=['mu', 'sigma','mu_2','sigma_2','A','B','C']
                 
             elif self.model=='asym_dgaussian':
                 unbinned_likelihood = UnbinnedLH(assymetric_double_gaussian, np.array(shift_phases))
                 minuit = Minuit(unbinned_likelihood, mu=self.init[0], sigma1=self.init[1],sigma2=self.init[2],mu_2=self.init[3],sigma1_2=self.init[4],sigma2_2=self.init[5],A=self.init[6],B=self.init[7],C=self.init[8])
+                self.parnames=['mu', 'sigma1','sigma2','mu_2','sigma1_2','sigma2_2','A','B','C']
 
                 
             elif self.model=='lorentzian':
                 unbinned_likelihood = UnbinnedLH(double_lorentz, np.array(shift_phases))
                 minuit = Minuit(unbinned_likelihood, mu_1=self.init[0], gamma_1=self.init[1],mu_2=self.init[2],gamma_2=self.init[3],A=self.init[4],B=self.init[5],C=self.init[6])
+                self.parnames=['mu_1', 'gamma_1','mu_2','gamma_2','A','B','C']
 
               
             elif self.model=='gaussian':
                 unbinned_likelihood = UnbinnedLH(gaussian, np.array(shift_phases))
                 minuit = Minuit(unbinned_likelihood, mu=self.init[0], sigma=self.init[1],A=self.init[2],B=self.init[3])
-                
+                self.parnames=['mu', 'sigma','A','B']
+
             minuit.errordef=0.5
             minuit.migrad()
-                
+
             #Store results as minuit object
             self.minuit=minuit
             self.unbinned_lk=unbinned_likelihood
             
             #Store the result of params and errors
-            self.parnames=self.minuit.parameters
-            self.params=self.minuit.values.values()
-            self.errors=self.minuit.errors.values()
+            self.params=[]
+            self.errors=[]
+            for name in self.parnames:
+                self.params.append(self.minuit.values[name])
+                self.errors.append(self.minuit.errors[name])
+                
+            print(self.errors)
+
+ 
             self.create_result_df()
     
     
@@ -144,7 +153,7 @@ class PeakFitting():
             
             if self.model=='dgaussian':
                 self.params,pcov_l=curve_fit(double_gaussian,bin_centres,histogram.lc[0],p0=self.init)
-                self.parnames=['mu', 'sigma','mu_2','sigma_2','A','B','C','Area1','Area2']
+                self.parnames=['mu', 'sigma','mu_2','sigma_2','A','B','C']
                 
                    
             elif self.model=='asym_dgaussian':

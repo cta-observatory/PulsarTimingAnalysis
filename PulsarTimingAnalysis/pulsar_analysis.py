@@ -230,7 +230,6 @@ class PulsarAnalysis():
             self.r.run(self)
         except:
             self.r.run()
-            print
         
         #Extract each attribute
         self.phases=np.array(self.r.info['pulsar_phase'].to_list()) 
@@ -241,13 +240,15 @@ class PulsarAnalysis():
         
         #Initialize the regions object
         self.init_regions()
+        
+
          
             
     def execute_stats(self,tobs):
         
         #Update the information every 1 hour and store final values
         self.TimeEv.run(self)
-        
+
         #COmpute P1/P2 ratio
         self.regions.calculate_P1P2()
         

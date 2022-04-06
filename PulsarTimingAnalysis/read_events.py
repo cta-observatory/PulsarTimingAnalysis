@@ -110,6 +110,7 @@ class ReadLSTFile():
             else:
                 df_filtered = df
                 df_filtered['energy']=df['reco_energy']
+                
             return(df_filtered)
 
                 
@@ -133,10 +134,15 @@ class ReadLSTFile():
                     try:
                         info_file=self.read_LSTfile(name,df_type)
                         self.info=info_file
+                        self.tobs=self.calculate_tobs()
                         pulsarana.cuts.apply_fixed_cut(self)
+                        if pulsarana.cuts.energy_binning_cut is not None:
+                            pulsarana.cuts.apply_energydep_cuts(self)
+
                         info_list.append(self.info)
                     except:
-                        print(name)
+                        print('Failing when reading:'+ str(name))
+                        
                 self.info=pd.concat(info_list)
                 self.tobs=self.calculate_tobs()
                 

@@ -79,12 +79,11 @@ class PulsarTimeAnalysis():
             
             
     def update_tinfo(self,pulsar_phases,dataframe):
-        
         #Update info in the main object
         pulsar_phases.phases=np.array(dataframe.pulsar_phase.to_list())
         pulsar_phases.times=np.array(dataframe.dragon_time.to_list())
         pulsar_phases.info=dataframe
-        
+
         try:
             pulsar_phases.mjd_times=np.array(dataframe.mjd_time.to_list())
         except: 

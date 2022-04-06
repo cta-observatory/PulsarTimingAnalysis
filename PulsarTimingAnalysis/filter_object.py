@@ -87,7 +87,7 @@ class FilterPulsarAna():
 
         for i in range(0,len(self.energy_binning_cut)-1):
             if isinstance(self.gammaness_cut, list):
-                mask_gammaness=(dataframe.gammaness>self.gammaness_cut[i]) & (dataframe['energy']>self.energy_binning_cut[i]) & (dataframe['energy']<self.energy_binning_cut[i+1])
+                mask_gammaness=(dataframe['gammaness']>self.gammaness_cut[i]) & (dataframe['energy']>self.energy_binning_cut[i]) & (dataframe['energy']<self.energy_binning_cut[i+1])
                 
                 global_mask=mask_gammaness
                 
@@ -100,10 +100,13 @@ class FilterPulsarAna():
                 mask_theta2=(dataframe.theta2<self.theta2_cut[i]) & (dataframe['energy']>self.energy_binning_cut[i]) & (dataframe['energy']<self.energy_binning_cut[i+1])
                 
                 global_mask=global_mask & mask_theta2
-             
+                
             dataframe_energy.append(dataframe[global_mask])
+
         
         events.info=pd.concat(dataframe_energy)
+        events.info=events.info.sort_values(by=['dragon_time'])
+
             
         
         
