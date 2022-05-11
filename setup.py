@@ -30,6 +30,7 @@ setup(
         'numba',
         'numpy',
         'pandas',
+        'probfit',
         'pyirf~=0.6.0',
         'scipy',
         'tables',
