@@ -109,7 +109,7 @@ class PulsarAnalysis():
             raise ValueError('No FITS file given for Fermi-LAT data')  
     
     def setListsInput(self,plist,tlist=None,elist=None,tel='MAGIC',energy_units='GeV'):
-        self.r=ReadList(plist,tlist)
+        self.r=ReadList(plist,tlist,elist,tel)
         self.telescope=tel
         self.energy_units=energy_units
             
