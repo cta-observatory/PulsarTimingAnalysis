@@ -235,7 +235,7 @@ class ReadtxtFile():
                 
 class ReadList():
     
-        def __init__(self, phases_list, time_list=None,energy_list=None):
+        def __init__(self, phases_list, time_list=None,energy_list=None,tel='LST'):
             self.plist=phases_list
             self.tlist=time_list
             self.elist=energy_list
@@ -247,8 +247,13 @@ class ReadList():
         
         
         def calculate_tobs(self):
-            diff=np.array(self.info['mjd_time'].to_list()[1:])-np.array(self.info['mjd_time'].to_list()[0:-1])
-            return(sum(diff)*24)
+            if tel=='LST' or tel=='MAGIC':
+                dataframe=add_delta_t_key(self.info)
+                return(get_effective_time(dataframe)[1].value/3600)
+            elif tel='fermi':
+                diff=np.array(self.info['mjd_time'].to_list()[1:])-np.array(self.info['mjd_time'].to_list()[0:-1])
+                diff[diff>5/24]=0
+                return(sum(diff)*24)
         
         
         def run(self):
