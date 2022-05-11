@@ -131,9 +131,6 @@ class PeakFitting():
             for name in self.parnames:
                 self.params.append(self.minuit.values[name])
                 self.errors.append(self.minuit.errors[name])
-                
-            print(self.errors)
-
  
             self.create_result_df()
     
