@@ -239,6 +239,7 @@ class ReadList():
             self.plist=phases_list
             self.tlist=time_list
             self.elist=energy_list
+            self.tel=tel
             
         def create_df_from_info(self):
             dataframe = pd.DataFrame({"mjd_time":self.tlist,"pulsar_phase":self.plist,"dragon_time":self.tlist*3600*24,"energy":self.elist})
@@ -247,11 +248,11 @@ class ReadList():
         
         
         def calculate_tobs(self):
-            if tel=='LST' or tel=='MAGIC':
+            if self.tel=='LST' or self.tel=='MAGIC':
                 dataframe=add_delta_t_key(self.info)
                 return(get_effective_time(dataframe)[1].value/3600)
               
-            elif tel=='fermi':
+            elif self.tel=='fermi':
                 diff=np.array(self.info['mjd_time'].to_list()[1:])-np.array(self.info['mjd_time'].to_list()[0:-1])
                 diff[diff>5/24]=0
                 return(sum(diff)*24)
