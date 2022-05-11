@@ -235,13 +235,13 @@ class ReadtxtFile():
                 
 class ReadList():
     
-        def __init__(self, phases_list, time_list):
+        def __init__(self, phases_list, time_list=None,energy_list=None):
             self.plist=phases_list
             self.tlist=time_list
-            
+            self.elist=energy_list
             
         def create_df_from_info(self):
-            dataframe = pd.DataFrame({"mjd_time":self.tlist,"pulsar_phase":self.plist,"dragon_time":self.tlist*3600*24})
+            dataframe = pd.DataFrame({"mjd_time":self.tlist,"pulsar_phase":self.plist,"dragon_time":self.tlist*3600*24,"energy":self.elist})
             dataframe=dataframe.sort_values(by=['mjd_time'])
             self.info=dataframe
         
