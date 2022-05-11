@@ -20,7 +20,7 @@ docs_require = [
 ]
 
 setup(
-    use_scm_version={"write_to":os.path.join("pulsar-timing-ana","_version.py")},
+    use_scm_version={"write_to":os.path.join("ptiming_ana","_version.py")},
     packages=find_packages(),
     install_requires=[
         'astropy>=4.0.5,<5',
