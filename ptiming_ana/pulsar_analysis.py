@@ -246,7 +246,7 @@ class PulsarAnalysis():
             
     def execute_stats(self,tobs):
         
-        #Update the information every 1 hour and store final values
+        #Update the information at a certain interval of time and store final values
         self.TimeEv.run(self)
 
         #COmpute P1/P2 ratio
@@ -274,7 +274,7 @@ class PulsarAnalysis():
         self.initialize()
         
         #Excute stats
-        print('--> Calculating statistics every'+str(self.tint)+'seconds...')
+        print('--> Calculating statistics every '+str(self.tint/60)+' minutes...')
         self.execute_stats(self.r.tobs)
         
         #Execute stats in energy bins
