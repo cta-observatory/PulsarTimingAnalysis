@@ -257,32 +257,32 @@ class PulsarAnalysis():
         
         #Fit the histogram using PeakFitting class. If binned is False, an Unbinned Likelihood method is used for the fitting
         if self.do_fit==True:
-            print('Fitting the data to the set model...')
+            print('--> Fitting the data to the set model...')
             try:
                 self.fitting.run(self)
             except:
-                print('No fit could be done')
+                print('    No fit could be done')
         else:
             print('No fit has been done since no fit parameters has been set')
         
         
     def run(self):
         #Initializa
-        print('Initializing...')
+        print('--> Initializing...')
         self.initialize()
         
         #Excute stats
-        print('Calculating statistics...')
+        print('--> Calculating statistics...')
         self.execute_stats(self.r.tobs)
         
         #Execute stats in energy bins
         try:
-            print('\n'+'Performing energy-dependent analysis...')
+            print('\n'+'--> Performing energy-dependent analysis...')
             self.EnergyAna.run(self) 
         except:
             print('No Energy Analysis was performed. Check that you set the right energy params')
            
-        print('FINISHED')
+        print('\n'+ 'FINISHED')
 
  
     ##############################################
