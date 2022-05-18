@@ -157,12 +157,13 @@ class ReadLSTFile():
                 if pulsarana.cuts.energy_binning_cut is not None:
                     pulsarana.cuts.apply_energydep_cuts(self)
                 
-                print('    Finishing filtering events'+'\n')
-                print('      gammaness cut:'+str(pulsarana.cuts.gammaness_cut))
-                print('      alpha cut:'+str(pulsarana.cuts.alpha_cut))
-                print('      theta2 cut:'+str(pulsarana.cuts.theta2_cut))
-                print('      zd cut:'+str(pulsarana.cuts.zd_cut))
-                print('      energy binning for the cuts:'+str(pulsarana.cuts.energy_binning_cut))
+                print('    Finishing filtering events:')
+                print('        gammaness cut:'+str(pulsarana.cuts.gammaness_cut))
+                print('        alpha cut:'+str(pulsarana.cuts.alpha_cut))
+                print('        theta2 cut:'+str(pulsarana.cuts.theta2_cut))
+                print('        zd cut:'+str(pulsarana.cuts.zd_cut))
+                print('        energy binning for the cuts:'+str(pulsarana.cuts.energy_binning_cut))
+                print('\n')
 
             
 class ReadtxtFile():
