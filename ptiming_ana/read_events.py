@@ -40,11 +40,11 @@ class ReadFermiFile():
             return(sum(diff)*24)
         
         def run(self):
-            print('   Reading Fermi-LAT data file')
+            print('    Reading Fermi-LAT data file')
             ftable=self.read_file()
             self.create_df_from_info(ftable)
             self.tobs=self.calculate_tobs()
-            print('   Finishing reading. Total time is '+str(self.tobs)+' h'+'\n')
+            print('    Finishing reading. Total time is '+str(self.tobs)+' h'+'\n')
             
 
             
@@ -128,7 +128,7 @@ class ReadLSTFile():
         
         
         def run(self,pulsarana,df_type='long'):
-            print('Reading LST-1 data file')
+            print('    Reading LST-1 data file')
             if isinstance(self.fname,list):
                 info_list=[]
                 for name in self.fname:
@@ -151,13 +151,13 @@ class ReadLSTFile():
                 self.info=self.read_LSTfile(self.fname,df_type)
                 self.tobs=self.calculate_tobs()
                 
-                print('   Finishing reading. Total time is '+str(self.tobs)+' h')
+                print('    Finishing reading. Total time is '+str(self.tobs)+' h')
                 pulsarana.cuts.apply_fixed_cut(self)
             
                 if pulsarana.cuts.energy_binning_cut is not None:
                     pulsarana.cuts.apply_energydep_cuts(self)
                 
-                print('   Finishing filtering events'+'\n')
+                print('    Finishing filtering events'+'\n')
 
             
             
@@ -234,7 +234,7 @@ class ReadtxtFile():
             self.create_df_from_info(data)
             self.tobs=self.calculate_tobs()
             
-            print('   Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
+            print('    Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
                 
 
                 
@@ -266,6 +266,6 @@ class ReadList():
         def run(self):
             self.create_df_from_info()
             self.tobs=self.calculate_tobs()
-            print('   Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
+            print('    Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
                 
                 
