@@ -43,6 +43,7 @@ class ReadFermiFile():
             ftable=self.read_file()
             self.create_df_from_info(ftable)
             self.tobs=self.calculate_tobs()
+            print('  Finishing reading.Total time is '+str(self.tobs)+' s'+'\n')
             
 
             
@@ -148,13 +149,13 @@ class ReadLSTFile():
                 self.info=self.read_LSTfile(self.fname,df_type)
                 self.tobs=self.calculate_tobs()
                 
-                print('Total time is'+str(self.tobs))
+                print('  Finishing reading.Total time is '+str(self.tobs)+' s'+'\n')
                 pulsarana.cuts.apply_fixed_cut(self)
-                
+            
                 if pulsarana.cuts.energy_binning_cut is not None:
                     pulsarana.cuts.apply_energydep_cuts(self)
                 
-            
+                print('   Finsihing filtering events')
 
             
             
@@ -230,6 +231,8 @@ class ReadtxtFile():
             self.check_format()
             self.create_df_from_info(data)
             self.tobs=self.calculate_tobs()
+            
+            print('  Finishing reading.Total time is '+str(self.tobs)+' s'+'\n')
                 
 
                 
@@ -261,5 +264,6 @@ class ReadList():
         def run(self):
             self.create_df_from_info()
             self.tobs=self.calculate_tobs()
+            print('  Finishing reading.Total time is '+str(self.tobs)+' s'+'\n')
                 
                 
