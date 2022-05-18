@@ -132,7 +132,7 @@ class PulsarAnalysis():
         self.EnergyAna=PEnergyAnalysis(self.energy_edges)
         
         
-    def setFittingParams(self,model,binned,peak='both',do_fit=True):
+    def setFittingParams(self,model,binned=False,peak='both',do_fit=True):
         model_list=get_model_list()
         
         if model in model_list:
@@ -257,7 +257,9 @@ class PulsarAnalysis():
         
         #Fit the histogram using PeakFitting class. If binned is False, an Unbinned Likelihood method is used for the fitting
         if self.do_fit==True:
-            print('--> Fitting the data to the set model...')
+            print('--> Fitting the data to the given model...')
+            print('    Fit model:'+self.fit_model)
+            print('    Binned fitting:'+self.binned)
             try:
                 self.fitting.run(self)
             except:
@@ -272,7 +274,7 @@ class PulsarAnalysis():
         self.initialize()
         
         #Excute stats
-        print('--> Calculating statistics...')
+        print('--> Calculating statistics every'+str(self.tint)+'seconds...')
         self.execute_stats(self.r.tobs)
         
         #Execute stats in energy bins
