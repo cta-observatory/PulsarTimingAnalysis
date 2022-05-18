@@ -258,8 +258,8 @@ class PulsarAnalysis():
         #Fit the histogram using PeakFitting class. If binned is False, an Unbinned Likelihood method is used for the fitting
         if self.do_fit==True:
             print('--> Fitting the data to the given model...')
-            print('    Fit model:'+self.fit_model)
-            print('    Binned fitting:'+self.binned)
+            print('    Fit model: '+self.fit_model)
+            print('    Binned fitting: '+str(self.binned))
             try:
                 self.fitting.run(self)
             except:
