@@ -120,8 +120,7 @@ def calphase(file,ephem,output_dir,pickle=False):
     DL2 input file with the arrival times
     
     ephem: string
-    Ephemeris to be used (.txt file or similar)
-    
+    Ephemeris to be used (.par or .txt file or similar)
     
     output_dir:string
     Directory of the the output file
@@ -149,13 +148,32 @@ def calphase(file,ephem,output_dir,pickle=False):
     except:
         src_dep=False
         
-        
     #Create the .tim file
     timelist=df_i.mjd_time.tolist()
     timname=str(os.path.basename(file).replace('.h5',''))+'.tim'
-    parname=str(os.path.basename(file).replace('.h5',''))+'.par'
-    barycent_toas,phase=get_phase_list(timname,timelist,ephem,parname,pickle)
-    os.remove(str(os.getcwd())+'/'+parname)        
+    
+    print('Creating .tim file')
+    dl2time_totim(timelist,name=timname)
+    
+    print('Setting the .par file')
+    if ephem.endswith('.par'):
+        model=ephem
+    elif ephem.endswith('.gro'):
+        print('No .par file given. Creating .par file from .gro file...')
+        #Create model from ephemeris
+        parname=str(os.path.basename(file).replace('.h5',''))+'.par'
+        model=model_fromephem(timelist,ephem,parname)
+
+    #Calculate phases
+    barycent_toas,phase=get_phase_list(timname,model,pickle)
+    
+    #Removing tim file
+    os.remove(str(os.getcwd())+'/'+timname)
+    
+    #Removing .par file if it was created during execution
+    if ephem.endswith('.gro'):
+        os.remove(str(os.getcwd())+'/'+parname)  
+    
     #Write if dir given
     if output_dir is not None:
         print('Generating new columns in DL2 DataFrame')
@@ -178,7 +196,8 @@ def calphase(file,ephem,output_dir,pickle=False):
  
     else:
         ('Finished. Not output directory given so the output is not saved')
-    
+
+        
 def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None):
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
@@ -228,12 +247,29 @@ def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None)
     if timelist_n[-1]!=timelist[-1]:
         timelist_n.append(timelist[-1])
 
+    print('Creating .tim file')
     timname=str(os.path.basename(file).replace('.h5',''))+'.tim'
-    parname=str(os.path.basename(file).replace('.h5',''))+'.par'
+    dl2time_totim(timelist_n,name=timname)
     
-    #Calculate the barycent times and phases for reference
-    barycent_toas_sample,phase_sample=get_phase_list(timname,timelist_n,ephem,parname,pickle)
-    os.remove(str(os.getcwd())+'/'+parname)
+    print('Setting the .par file')
+    if ephem.endswith('.par'):
+        model=ephem
+    elif ephem.endswith('.gro'):
+        print('No .par file given. Creating .par file from .gro file...')
+        #Create model from ephemeris
+        parname=str(os.path.basename(file).replace('.h5',''))+'.par'
+        model=model_fromephem(timelist_n,ephem,parname)
+
+    #Calculate phases
+    barycent_toas_sample,phase_sample=get_phase_list(timname,model,pickle)
+    
+    #Removing tim file
+    os.remove(str(os.getcwd())+'/'+timname)
+    
+    #Removing .par file if it was created during execution
+    if ephem.endswith('.gro'):
+        os.remove(str(os.getcwd())+'/'+parname)  
+   
 
     #Interpolate to all values of times
     barycent_toas,phase=interpolate_phase(timelist,timelist_n,barycent_toas_sample,phase_sample.frac)
@@ -282,23 +318,19 @@ def interpolate_phase(timelist,timelist_sample,barycent_toas_sample,phase_sample
 
     return(barycent_toas,phase)
 
-def get_phase_list(timname,timelist,ephem,parname,pickle=False):
-    print('Creating tim file')
-    dl2time_totim(timelist,name=timname)
+
+def get_phase_list(timname,model,pickle=False):
+    
     print('creating TOA list')
-
     t= toa.get_TOAs(timname, usepickle=pickle)
-    #Create model from ephemeris
-    model=model_fromephem(timelist,ephem,parname)
-
+    
     #Upload TOAs and model
     m=models.get_model(model)
-
+    print(m)
+    
     #Calculate the phases
     print('Calculating barycentric time and absolute phase')
     barycent_toas=m.get_barycentric_toas(t)
     phase=m.phase(t,abs_phase=True)
-    
-    os.remove(str(os.getcwd())+'/'+timname)
     
     return(barycent_toas,phase)
