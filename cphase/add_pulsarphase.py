@@ -17,11 +17,11 @@ from pulsarphase_cal import calphase
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--dir', '-d', action='store',type=str,dest='directory',default=None)
-	parser.add_argument('--in_file', '-f', action='store',type=str,dest='in_file',default=None)
+	parser.add_argument('--in-file', '-f', action='store',type=str,dest='in_file',default=None)
 	parser.add_argument('--ephem','-ephem',action='store',type=str,dest='ephem',default=None)
 	parser.add_argument('--output','-out',action='store',type=str,dest='dir_output',default=None)
 	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
-	parser.add_argument('--run_number','-r',action='store',type=str,dest='run',default=False)
+	parser.add_argument('--run-number','-r',action='store',type=str,dest='run',default=False)
     
     
 	args = parser.parse_args()
