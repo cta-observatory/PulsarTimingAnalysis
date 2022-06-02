@@ -4,7 +4,8 @@ The intention of this repository is to present a package with all the tools need
 
 
 # Installation
+The easiest way to install the package is by cloning the repository:
 
-git clone 
-cd 
+git clone https://github.com/alvmas/PulsarTimingAnalysis.git
+cd PulsarTimingAnalysis
 pip install .
