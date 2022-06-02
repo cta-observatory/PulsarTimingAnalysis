@@ -34,6 +34,7 @@ setup(
         'scipy',
         'tables',
         'toml',
+        'pint-pulsar'
         'traitlets~=5.0.5',
         'setuptools_scm',
     ],
