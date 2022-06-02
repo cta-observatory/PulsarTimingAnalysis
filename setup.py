@@ -6,8 +6,8 @@ import os
 
 entry_points = {}
 entry_points["console_scripts"] = [
-    "add_phase_interp = cphase.add_phase_interp:main",
-    "add_pulsarphase = cphase.add_pulsarphase:main",
+    "add_phase_interp = ptiming_ana.cphase.add_phase_interp:main",
+    "add_pulsarphase = ptiming_ana.cphase.add_pulsarphase:main",
 ]
 
 docs_require = [
@@ -31,7 +31,6 @@ setup(
         'numpy',
         'pandas',
         'probfit',
-        'pyirf~=0.6.0',
         'scipy',
         'tables',
         'toml',
