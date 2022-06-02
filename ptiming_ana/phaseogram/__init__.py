@@ -1,4 +1,4 @@
-from .pular_analysis import PulsarAnalysis
+from .pulsar_analysis import PulsarAnalysis
 from .penergy_analysis import PEnergyAnalysis
 from .pfitting import PeakFitting
 from .phasebinning import PhaseBinning
