@@ -3,6 +3,6 @@ from . import phaseogram
 
 
 __all__=[
-	"cphase"
+	"cphase",
 	"phaseogram"
 ]
