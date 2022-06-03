@@ -115,7 +115,7 @@ class PulsarAnalysis():
             
     
     def setLSTInputFile(self,filename=None,dirname=None,src_dep=False):
-        self.r=ReadLSTFile(file=filename,directory=dirname,file_phase=file_phase,dir_phase=dir_phase,src_dependent=src_dep)
+        self.r=ReadLSTFile(file=filename,directory=dirname,src_dependent=src_dep)
         self.telescope='lst'
         self.energy_units='TeV'
     
