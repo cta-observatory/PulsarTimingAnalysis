@@ -75,8 +75,13 @@ class ReadLSTFile():
                         self.fname.sort()
                 
             self.info=None
+            self.fphase=file_phase
+            self.dphase=dir_phase
             self.src_dependent=src_dependent
             
+        def add_phases(self):
+            dphase=pd.read_hdf(pfile,key=dl2_params_lstcam_key)
+            self.info['pulsar_phase']=dphase['pulsar_phase']
             
         def read_LSTfile(self,fname,df_type='short'):
             
@@ -119,7 +124,7 @@ class ReadLSTFile():
 
                 
              
-            
+      
         def calculate_tobs(self):
             dataframe=add_delta_t_key(self.info)
             return(get_effective_time(dataframe)[1].value/3600)
@@ -135,6 +140,9 @@ class ReadLSTFile():
                     try:
                         info_file=self.read_LSTfile(name,df_type)
                         self.info=info_file
+                        if not self.info['pulsar_phase']:
+                            self.add_phases()
+                            
                         self.tobs=self.calculate_tobs()
                         pulsarana.cuts.apply_fixed_cut(self)
                         if pulsarana.cuts.energy_binning_cut is not None:
