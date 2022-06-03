@@ -114,13 +114,11 @@ class PulsarAnalysis():
         self.energy_units=energy_units
             
     
-    def setLSTInputFile(self,filename=None,dirname=None,file_phase=None,dir_phase=None,src_dep=False):
+    def setLSTInputFile(self,filename=None,dirname=None,src_dep=False):
         self.r=ReadLSTFile(file=filename,directory=dirname,file_phase=file_phase,dir_phase=dir_phase,src_dependent=src_dep)
         self.telescope='lst'
         self.energy_units='TeV'
     
-    def setPhaseFile(self,filename=None,dirname=None):
-        self.p=ReadPhases(file=filename,directory=dirname,src_dependent=src_dep)
 
     def setBinning(self,nbins,xmin=None,xmax=None):
         self.nbins=nbins
