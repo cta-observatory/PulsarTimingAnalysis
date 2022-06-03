@@ -179,6 +179,7 @@ def calphase(file,ephem,output_dir,pickle=False):
         print('Generating new columns in DL2 DataFrame')
         df_i['mjd_barycenter_time']=barycent_toas
         df_i['pulsar_phase']=phase.frac
+        df_i=df_i[['obs_id','event_id','mjd_barycenter_time','pulsar_phase']]
         output_file=output_dir+str(os.path.basename(file).replace('.h5',''))+'_pulsar.h5'
         print('Writing outputfile in'+str(output_file))
         
