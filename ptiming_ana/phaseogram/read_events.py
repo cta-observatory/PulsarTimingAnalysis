@@ -73,14 +73,28 @@ class ReadLSTFile():
                     if 'h5' in rel_file:
                         self.fname.append(rel_file)
                         self.fname.sort()
+            
+            if file_phase is not None:
+                if 'h5' not in file:
+                    raise ValueError('No hdf5 file provided for LST data')
+                else:
+                    self.fname_phase=file
+            elif dir_phase is not None:
+                self.dphase=dir_phase
+                self.fname_phase=[]
+                for x in os.listdir(self.dphase):
+                    rel_dir = os.path.relpath(self.dphase)
+                    rel_file = os.path.join(rel_dir, x)
+                    if 'h5' in rel_file:
+                        self.fname_phase.append(rel_file)
+                        self.fname_phase.sort()
                 
+                        
             self.info=None
-            self.fphase=file_phase
-            self.dphase=dir_phase
             self.src_dependent=src_dependent
             
-        def add_phases(self):
-            dphase=pd.read_hdf(pfile,key=dl2_params_lstcam_key)
+        def add_phases(self,pname):
+            dphase=pd.read_hdf(pname,key=dl2_params_lstcam_key)
             self.info['pulsar_phase']=dphase['pulsar_phase']
             
         def read_LSTfile(self,fname,df_type='short'):
@@ -136,12 +150,15 @@ class ReadLSTFile():
             print('    Reading LST-1 data file')
             if isinstance(self.fname,list):
                 info_list=[]
-                for name in self.fname:
+                for i in range(0,len(self.fname)):
+                    name=self.fname[i]
+                    phase_name=self.fname_phase[i]
                     try:
                         info_file=self.read_LSTfile(name,df_type)
                         self.info=info_file
+                        
                         if not self.info['pulsar_phase']:
-                            self.add_phases()
+                            self.add_phases(phase_name)
                             
                         self.tobs=self.calculate_tobs()
                         pulsarana.cuts.apply_fixed_cut(self)
