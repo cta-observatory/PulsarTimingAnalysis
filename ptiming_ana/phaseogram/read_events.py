@@ -52,7 +52,7 @@ class ReadFermiFile():
                 
 class ReadLSTFile():
     
-        def __init__(self, file=None, directory=None,src_dependent=False):
+        def __init__(self, file=None, directory=None,file_phase=None,dir_phase=None,src_dependent=False):
             
             if file==None and directory==None:
                 raise ValueError('No file provided')
