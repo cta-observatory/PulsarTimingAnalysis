@@ -1,4 +1,4 @@
-from .utils import  add_mjd,dl2time_totim, model_fromephem
+from .utils import  add_mjd,dl2time_totim,merge_dl2_pulsar, model_fromephem
 from .pulsarphase_cal import calphase,fermi_calphase
 
 
