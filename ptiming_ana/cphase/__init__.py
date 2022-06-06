@@ -4,7 +4,7 @@ from .pulsarphase_cal import calphase,fermi_calphase
 
 __all__=[
         'dl2time_totim',
-        'model_fromepehm',
+        'model_fromephem',
         'add_mjd',
         'fermi_calphase',
         'calphase',
