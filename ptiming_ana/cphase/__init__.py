@@ -8,5 +8,6 @@ __all__=[
         'add_mjd',
         'fermi_calphase',
         'calphase',
+        'merge_dl2_pulsar',
         ]
 

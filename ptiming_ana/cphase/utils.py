@@ -25,16 +25,56 @@ import astropy.units as u
 import pint.toa as toa
 import decimal
 import time
-from lstchain.io.io import dl2_params_src_dep_lstcam_key, write_dataframe
-
-
+import os
+import pandas as pd
+from lstchain.io import global_metadata, write_metadata, standard_config,srcdep_config 
+from lstchain.io.io import write_dataframe, dl2_params_src_dep_lstcam_key,write_dl2_dataframe,dl2_params_lstcam_key
 
 __all__=[
         'read_ephemfile',
         'dl2time_totim',
         'model_fromepehm',
         'add_mjd',
+        'merge_dl2_pulsar'
         ]
+
+
+def merge_dl2_pulsar(directory,run_number,output_dirc,src_dep=False):
+    filelist=[]
+    for x in os.listdir(directory):
+        p_dir = os.path.relpath(directory)
+        p_file = os.path.join(directory, x)
+        if run_number in p_file:
+            filelist.append(p_file)
+    filelist.sort()
+    
+    #Read the Dl2 events 
+    df_list=[]
+    df_src_list=[]
+    for file in filelist:
+        df_i=pd.read_hdf(file,key=dl2_params_lstcam_key)
+        df_list.append(df_i)
+
+        if src_dep==True:
+            df_i_src=pd.read_hdf(file,key=dl2_params_src_dep_lstcam_key,float_precision=20)
+            df_src_list.append(df_i_src)
+
+    df = pd.concat(df_list)
+    if src_dep==True:
+        df_src=pd.concat(df_src_list)
+
+
+    output_file=output_dir+str(os.path.basename(filelist[0]).replace('0000_pulsar.h5',''))+'pulsar.h5'
+    metadata = global_metadata()
+    write_metadata(metadata, output_file)
+
+    if src_dep==False:
+        write_dl2_dataframe(df_i, output_file, meta=metadata)
+
+    else:
+        write_dl2_dataframe(df_i, output_file,meta=metadata)
+        write_dataframe(df_i_src, output_file, dl2_params_src_dep_lstcam_key,meta=metadata)
+
 
 
 
