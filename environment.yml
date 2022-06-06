@@ -21,6 +21,7 @@ dependencies:
   - numba
   - numpy>=1.17
   - numpydoc
+  - protozfits=2.0
   - pandas
   - pre-commit
   - psutil
