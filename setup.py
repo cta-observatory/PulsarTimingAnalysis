@@ -31,5 +31,4 @@ setup(
         'setuptools_scm',
     ],
     entry_points=entry_points,
-    },
 )
