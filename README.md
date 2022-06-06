@@ -11,5 +11,7 @@ The easiest way to install the package is by cloning the repository:
 ```
 git clone https://github.com/alvmas/PulsarTimingAnalysis.git
 cd PulsarTimingAnalysis
+conda env create -n magic-lst1 -f environment.yml
+conda activate magic-lst1
 pip install .
 ```
