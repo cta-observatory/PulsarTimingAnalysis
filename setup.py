@@ -26,6 +26,7 @@ setup(
         'pandas',
         'scipy',
         'tables',
+        'protobuf=3.20',
         'toml',
         'pint-pulsar',
         'setuptools_scm',
