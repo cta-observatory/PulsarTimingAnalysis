@@ -12,15 +12,6 @@ entry_points["console_scripts"] = [
     
 ]
 
-docs_require = [
-    "sphinx~=4.2",
-    "sphinx-automodapi",
-    "sphinx_argparse",
-    "sphinx_rtd_theme",
-    "numpydoc",
-    "nbsphinx",
-]
-
 setup(
     use_scm_version={"write_to":os.path.join("ptiming_ana","_version.py")},
     packages=find_packages(),
@@ -39,8 +30,5 @@ setup(
         'setuptools_scm',
     ],
     entry_points=entry_points,
-    extras_require={
-        "all":  docs_require,
-        "docs": docs_require,
     },
 )
