@@ -67,7 +67,7 @@ def merge_dl2_pulsar(directory,run_number,output_dir,src_dep=False):
         df_src=pd.concat(df_src_list)
 
     #Write the new merged dataframe into a file
-    output_file=output_dir+str(os.path.basename(filelist[0]).replace('0000_pulsar.h5',''))+'pulsar.h5'
+    output_file=output_dir+str(os.path.basename(filelist[0]).replace('.0000_pulsar.h5',''))+'_pulsar.h5'
     metadata = global_metadata()
     write_metadata(metadata, output_file)
 
