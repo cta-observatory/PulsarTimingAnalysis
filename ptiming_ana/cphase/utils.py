@@ -33,7 +33,7 @@ from lstchain.io.io import write_dataframe, dl2_params_src_dep_lstcam_key,write_
 __all__=[
         'read_ephemfile',
         'dl2time_totim',
-        'model_fromepehm',
+        'model_fromephem',
         'add_mjd',
         'merge_dl2_pulsar'
         ]
