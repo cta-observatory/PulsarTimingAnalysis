@@ -25,6 +25,7 @@ setup(
         'numpy',
         'pandas',
         'scipy',
+        'probfit',
         'tables',
         'protobuf~=3.20.0',
         'toml',
