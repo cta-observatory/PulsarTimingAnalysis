@@ -23,6 +23,7 @@ dependencies:
   - numpydoc
   - protozfits=2.0
   - protobuf=3.20
+  - probfit
   - pandas
   - pre-commit
   - psutil
