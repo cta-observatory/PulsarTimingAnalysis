@@ -178,7 +178,9 @@ def model_fromephem(times,ephem,model_name):
 
     tm = TimingModel("pulsar_test", component_instances)
 
-    #Add second derivative of the frequency
+    #Add first and second derivative of the frequency
+    f1 = p.prefixParameter(parameter_type="float", name="F1", value=0.0, units=u.Hz / (u.s), longdouble=True)
+    
     f2 = p.prefixParameter(
         parameter_type="float",
         name="F2",
@@ -186,17 +188,8 @@ def model_fromephem(times,ephem,model_name):
         units=u.Hz / (u.s) ** 2,
         longdouble=True,
     )
-
+    tm.components["Spindown"].add_param(f1, setup=True)
     tm.components["Spindown"].add_param(f2, setup=True)
-
-    #Add START and FINISH parameters
-    tm.add_param_from_top(
-            p.MJDParameter(name="START", description="Start MJD for fitting"), ""
-        )
-    tm.add_param_from_top(
-            p.MJDParameter(name="FINISH", description="End MJD for fitting"), ""
-    )
-    
         
     f1=float(str(df_ephem['F1'][i].replace('D','E')))
     f2=float(str(df_ephem['F2'][i].replace('D','E')))
