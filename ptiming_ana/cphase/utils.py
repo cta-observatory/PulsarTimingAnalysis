@@ -39,7 +39,9 @@ __all__=[
         ]
 
 
-def merge_dl2_pulsar(directory,run_number,output_dirc,src_dep=False):
+def merge_dl2_pulsar(directory,run_number,output_dir,src_dep=False):
+        
+    #Read the DL2 subrun files for the given run number
     filelist=[]
     for x in os.listdir(directory):
         p_dir = os.path.relpath(directory)
@@ -48,13 +50,14 @@ def merge_dl2_pulsar(directory,run_number,output_dirc,src_dep=False):
             filelist.append(p_file)
     filelist.sort()
     
-    #Read the Dl2 events 
+    #Read the Dl2 events and concatenate the dataframes
     df_list=[]
     df_src_list=[]
     for file in filelist:
         df_i=pd.read_hdf(file,key=dl2_params_lstcam_key)
         df_list.append(df_i)
-
+        
+        #Include source dependent information if it is the case
         if src_dep==True:
             df_i_src=pd.read_hdf(file,key=dl2_params_src_dep_lstcam_key,float_precision=20)
             df_src_list.append(df_i_src)
@@ -63,7 +66,7 @@ def merge_dl2_pulsar(directory,run_number,output_dirc,src_dep=False):
     if src_dep==True:
         df_src=pd.concat(df_src_list)
 
-
+    #Write the new merged dataframe into a file
     output_file=output_dir+str(os.path.basename(filelist[0]).replace('0000_pulsar.h5',''))+'pulsar.h5'
     metadata = global_metadata()
     write_metadata(metadata, output_file)
