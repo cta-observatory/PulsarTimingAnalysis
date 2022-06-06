@@ -72,11 +72,11 @@ def merge_dl2_pulsar(directory,run_number,output_dir,src_dep=False):
     write_metadata(metadata, output_file)
 
     if src_dep==False:
-        write_dl2_dataframe(df_i, output_file, meta=metadata)
+        write_dl2_dataframe(df, output_file, meta=metadata)
 
     else:
-        write_dl2_dataframe(df_i, output_file,meta=metadata)
-        write_dataframe(df_i_src, output_file, dl2_params_src_dep_lstcam_key,meta=metadata)
+        write_dl2_dataframe(df, output_file,meta=metadata)
+        write_dataframe(df_src, output_file, dl2_params_src_dep_lstcam_key,meta=metadata)
 
 
 
