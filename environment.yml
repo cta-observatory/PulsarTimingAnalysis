@@ -23,7 +23,6 @@ dependencies:
   - numpydoc
   - protozfits=2.0
   - protobuf=3.20
-  - probfit
   - pandas
   - pre-commit
   - psutil
@@ -43,4 +42,5 @@ dependencies:
   - conda-forge::eventio>=1.5.0
   - pip:
       - lstchain~=0.9.6
+      - probfit=1.2.0
       - pint-pulsar~=0.8.8
