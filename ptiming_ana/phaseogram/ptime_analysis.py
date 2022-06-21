@@ -130,6 +130,7 @@ class PulsarTimeAnalysis():
                 
                 #Update last interval
                 elif i==(len(diff)-1):
+                    print('Hola')
                     self.update_tinfo(pulsar_phases,dataframe)  
 
             else:
