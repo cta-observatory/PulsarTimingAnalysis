@@ -26,7 +26,7 @@ class ReadFermiFile():
             return(fits_table)
                 
         def create_df_from_info(self,fits_table):
-            time=fits_table['BARYCENTRIC_TIME'].byteswap().newbyteorder()
+            time=fits_table['BARY_TIME'].byteswap().newbyteorder()
             phases=fits_table['PULSE_PHASE'].byteswap().newbyteorder()
             energies=fits_table['ENERGY'].byteswap().newbyteorder()
             dataframe = pd.DataFrame({"mjd_time":time,"pulsar_phase":phases,"dragon_time":time*3600*24,"energy":energies/1000})
