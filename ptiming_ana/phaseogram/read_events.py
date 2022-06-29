@@ -125,7 +125,6 @@ class ReadLSTFile():
                     df_filtered['energy']=df['energy']
             else:
                 df_filtered = df
-                print(df)
                 df_filtered['energy']=df['reco_energy']
              
             df_filtered=add_delta_t_key(df_filtered)
