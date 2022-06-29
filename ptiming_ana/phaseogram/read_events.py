@@ -87,7 +87,6 @@ class ReadLSTFile():
             if self.src_dependent==False:
                 df=pd.read_hdf(fname,key=dl2_params_lstcam_key)
                 df_pos=pd.read_hdf(fname, "source_position")
-                print(df)
                 
                 coma_correction = 1.0466
                 nominal_focal_length = 28
@@ -126,6 +125,7 @@ class ReadLSTFile():
                     df_filtered['energy']=df['energy']
             else:
                 df_filtered = df
+                print(df)
                 df_filtered['energy']=df['reco_energy']
              
             df_filtered=add_delta_t_key(df_filtered)
