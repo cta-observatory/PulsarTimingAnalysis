@@ -92,7 +92,7 @@ class ReadLSTFile():
                 coma_correction = 1.0466
                 nominal_focal_length = 28
                 
-                theta_meters = np.hypot(reco_src_x/coma_correction - src_x, reco_src_y/coma_correction - src_y)
+                theta_meters = np.hypot(df['reco_src_x']/coma_correction - df_pos['src_x'],df['reco_src_y']/coma_correction - df_pos['src_y'])
                 theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
                 df['theta2']=np.power(theta,2)
 
