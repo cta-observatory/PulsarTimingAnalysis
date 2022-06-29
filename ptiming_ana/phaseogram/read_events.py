@@ -87,6 +87,7 @@ class ReadLSTFile():
             if self.src_dependent==False:
                 df=pd.read_hdf(fname,key=dl2_params_lstcam_key)
                 df_pos=pd.read_hdf(fname, "source_position")
+                print(df)
                 
                 coma_correction = 1.0466
                 nominal_focal_length = 28
