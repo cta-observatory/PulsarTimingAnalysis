@@ -147,6 +147,7 @@ class ReadLSTFile():
             if isinstance(self.fname,list):
                 info_list=[]
                 for name in self.fname:
+                    print(name)
                     try:
                         info_file=self.read_LSTfile(name,df_type)
                         self.info=info_file    
