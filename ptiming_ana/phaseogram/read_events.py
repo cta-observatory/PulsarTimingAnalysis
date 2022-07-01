@@ -100,7 +100,7 @@ class ReadLSTFile():
 
                     df['theta2']=np.power(theta,2)
                 except:
-                    continue
+                    print('No theta2 computed')
                 
 
             
