@@ -97,7 +97,10 @@ class ReadLSTFile():
                 
                 df['theta2']=theta
                     
-                plt.hist(theta_meters,bins=np.linspace(0,0.5,50))
+                plt.hist(theta,bins=np.linspace(0,10,100))
+                plt.show()
+                
+                plt.hist(theta,bins=np.linspace(0,0.5,50))
                 plt.show()
 
             
