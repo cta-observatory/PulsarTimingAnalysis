@@ -87,14 +87,18 @@ class ReadLSTFile():
             if self.src_dependent==False:
                 df=pd.read_hdf(fname,key=dl2_params_lstcam_key)
                 
-                df_pos=pd.read_hdf(fname, "source_position")
-                
-                coma_correction = 1.0466
-                nominal_focal_length = 28
-                
-                theta_meters = np.hypot(df['reco_src_x']/coma_correction - df_pos['src_x'],df['reco_src_y']/coma_correction - df_pos['src_y'])
-                theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
-                df['theta2']=np.power(theta,2)
+                if not df['theta2']:
+                    df_pos=pd.read_hdf(fname, "source_position")
+
+                    coma_correction = 1.0466
+                    nominal_focal_length = 28
+
+                    theta_meters = np.hypot(df['reco_src_x']/coma_correction - df_pos['src_x'],df['reco_src_y']/coma_correction - df_pos['src_y'])
+                    theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
+                    df['theta2']=np.power(theta,2)
+                    
+                    plt.hist(df['theta2'],bins=np.linspace(0,0.5,50))
+                    plt.show()
 
             
             elif self.src_dependent==True:
