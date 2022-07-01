@@ -96,7 +96,7 @@ class ReadLSTFile():
                 theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
                 df['theta2']=theta
                     
-                plt.hist(df['theta2'],bins=np.linspace(0,0.5,50))
+                plt.hist(theta_meters,bins=np.linspace(0,0.5,50))
                 plt.show()
 
             
