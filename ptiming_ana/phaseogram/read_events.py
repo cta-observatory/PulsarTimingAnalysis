@@ -86,23 +86,22 @@ class ReadLSTFile():
             
             if self.src_dependent==False:
                 df_or=pd.read_hdf(fname,key=dl2_params_lstcam_key)
-                df=df_or[df_or['event_type']==32]
-              
-                df_pos=pd.read_hdf(fname, "source_position")
-                df_pos=df_pos[df_or['event_type']==32]
-                
-                coma_correction = 1.0466
-                nominal_focal_length = 28
+                try:
+                    df=df_or[df_or['event_type']==32]
 
-                theta_meters = np.sqrt(np.power(df['reco_src_x'] - df_pos['src_x'],2)+np.power(df['reco_src_y'] - df_pos['src_y'],2))
-                theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
+                    df_pos=pd.read_hdf(fname, "source_position")
+                    df_pos=df_pos[df_or['event_type']==32]
+
+                    coma_correction = 1.0466
+                    nominal_focal_length = 28
+
+                    theta_meters = np.sqrt(np.power(df['reco_src_x'] - df_pos['src_x'],2)+np.power(df['reco_src_y'] - df_pos['src_y'],2))
+                    theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
+
+                    df['theta2']=np.power(theta,2)
+                except:
+                  continue
                 
-                df['theta2']=np.power(theta,2)
-                    
-                plt.hist(df['theta2'],bins=np.linspace(0,10,100))
-                plt.show()
-                
-                print(df_pos['src_x'])
 
             
             elif self.src_dependent==True:
