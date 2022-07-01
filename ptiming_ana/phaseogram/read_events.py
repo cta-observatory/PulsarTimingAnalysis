@@ -95,13 +95,12 @@ class ReadLSTFile():
                 theta_meters = np.hypot(df['reco_src_x']/coma_correction - df_pos['src_x'], df['reco_src_y']/coma_correction - df_pos['src_y'])
                 theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
                 
-                df['theta2']=theta
+                df['theta2']=np.power(theta,2)
                     
-                plt.hist(theta,bins=np.linspace(0,10,100))
+                plt.hist(df['theta2'],bins=np.linspace(0,10,100))
                 plt.show()
                 
-                plt.hist(theta,bins=np.linspace(0,0.5,50))
-                plt.show()
+                print(df_pos['src_x'])
 
             
             elif self.src_dependent==True:
