@@ -117,7 +117,7 @@ class ReadLSTFile():
                     srcindep_df.drop(['gammaness'])
                     
                 df = pd.concat([srcindep_df, on_df_srcdep], axis=1)
-
+                df=df[df.event_type==32]
                 
             if df_type=='short':
                 if 'alpha' in df and 'theta2' in df:
