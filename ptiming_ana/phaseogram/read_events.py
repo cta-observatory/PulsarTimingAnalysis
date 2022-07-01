@@ -86,6 +86,7 @@ class ReadLSTFile():
             
             if self.src_dependent==False:
                 df=pd.read_hdf(fname,key=dl2_params_lstcam_key)
+                df=df[df['event_type'==32]]
               
                 df_pos=pd.read_hdf(fname, "source_position")
 
