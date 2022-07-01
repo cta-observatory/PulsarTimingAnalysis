@@ -85,11 +85,12 @@ class ReadLSTFile():
         def read_LSTfile(self,fname,df_type='short'):
             
             if self.src_dependent==False:
-                df=pd.read_hdf(fname,key=dl2_params_lstcam_key)
-                df=df[df['event_type'==32]]
+                df_or=pd.read_hdf(fname,key=dl2_params_lstcam_key)
+                df=df_or[df_or['event_type']==32]
               
                 df_pos=pd.read_hdf(fname, "source_position")
-
+                df_pos=df_pos[df_or['event_type']==32]
+                
                 coma_correction = 1.0466
                 nominal_focal_length = 28
 
