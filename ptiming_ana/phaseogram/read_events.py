@@ -88,7 +88,7 @@ class ReadDL3File():
                 print('    Reading DL3 data files') 
                 info_list=[]
                 for obs_id in self.ids:
-                    print(obs_id)
+                    print('          Reading run number'+str(obs_id)')
                     try:
                         info_file=self.read_DL3file(obs_id)
                         info_list.append(info_file)
