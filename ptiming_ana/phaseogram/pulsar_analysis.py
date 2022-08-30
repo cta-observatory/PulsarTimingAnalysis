@@ -16,7 +16,7 @@ from .models import get_model_list
 from .phasebinning import PhaseBinning
 from .penergy_analysis import PEnergyAnalysis
 from .filter_object import FilterPulsarAna
-from .read_events import ReadFermiFile,ReadLSTFile, ReadList
+from .read_events import ReadDL3File,ReadFermiFile,ReadLSTFile, ReadList
 import pickle
 
 
@@ -113,7 +113,11 @@ class PulsarAnalysis():
         self.telescope=tel
         self.energy_units=energy_units
             
-    
+    def setDL3InputFile(self,dirname=None,target_radec=None):
+        self.r=ReadDL3File(directory=dirname,target_radec=target_radec)
+        self.telescope='lst'
+        self.energy_units='TeV'
+
     def setLSTInputFile(self,filename=None,dirname=None,src_dep=False):
         self.r=ReadLSTFile(file=filename,directory=dirname,src_dependent=src_dep)
         self.telescope='lst'

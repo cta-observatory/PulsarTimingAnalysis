@@ -10,7 +10,9 @@ import warnings
 from lstchain.reco.utils import get_effective_time,add_delta_t_key
 from lstchain.io.io import dl2_params_lstcam_key,dl2_params_src_dep_lstcam_key, get_srcdep_params
 import os
-
+from gammapy.data import DataStore, EventList, Observation, Observations
+from gammapy.utils.regions import SphericalCircleSkyRegion
+from astropy.coordinates import SkyCoord,Angle
                 
 class ReadFermiFile():
     
@@ -47,9 +49,59 @@ class ReadFermiFile():
             print('    Finishing reading. Total time is '+str(self.tobs)+' h'+'\n')
             
 
+class ReadDL3File():
+        def __init__(self, directory=None,target_radec=None):
+            if directory is not None:
+                self.direc=directory
+                self.datastore = DataStore.from_dir(self.direc)
+                self.target_radec=target_radec           
+            self.info=None
+            self.ids=self.datastore.obs_table["OBS_ID"].data
+         
+        def read_DL3file(self,obs_id):
+            obs = self.datastore.get_observations([obs_id], required_irf=None)
+            pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
+            on_radius = 0.2 * u.deg
+            on_region = SphericalCircleSkyRegion(pos_target, on_radius)
+            self.events = obs[0].events.select_region(on_region).table
+            info=self.create_dataframe()
+            return(info)
+
+        def calculate_tobs(self):
+            dataframe=add_delta_t_key(self.info)
+            return(get_effective_time(dataframe)[1].value/3600) 
+        
+        def create_dataframe(self):
+            df = self.events.to_pandas()
+            df=df.sort_values('TIME')
+
+            lst=Time("2018-10-01",scale='utc')
+            time_orig=df['TIME']
+
+            time=time_orig+lst.to_value(format='unix')
+            timelist=list(Time(time,format='unix').to_value('mjd'))
+       
+            info=pd.DataFrame({'gammaness':df['GAMMANESS'].to_list(),'mjd_time':df['BARYCENT_TIME'].to_list(),'dragon_time':list(time),'energy':df['ENERGY'].to_list(),'pulsar_phase':df['PHASE'].to_list()})
+            return(info)
+
+        def run(self,pulsarana):
+                print('    Reading DL3 data files') 
+                info_list=[]
+                for obs_id in self.ids:
+                    print(obs_id)
+                    try:
+                        info_file=self.read_DL3file(obs_id)
+                        info_list.append(info_file)
+                    except:
+                        raise ValueError('Failing when reading:'+ str(obs_id))
+
+                self.info=pd.concat(info_list)
+                self.tobs=self.calculate_tobs()  
             
-             
-                
+
+
+
+
 class ReadLSTFile():
     
         def __init__(self, file=None, directory=None,src_dependent=False):
@@ -166,8 +218,17 @@ class ReadLSTFile():
                         info_list.append(self.info)
                     except:
                         raise ValueError('Failing when reading:'+ str(name))
-                        
-                self.info=pd.concat(info_list)
+                
+                info=pd.DataFrame()
+                while len(info_list)>0:
+                   if len(info_list)>=10:
+                       chunk_df=pd.concat(info_list[:10])
+                       info_list=info_list[10:]
+                   else:
+                       chunk_df=pd.concat(info_list)
+                   info=pd.concat([info,chunk_df])
+        
+                self.info=info
                 self.tobs=self.calculate_tobs()
                 
             else:
@@ -294,5 +355,4 @@ class ReadList():
             self.create_df_from_info()
             self.tobs=self.calculate_tobs()
             print('    Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
-                
                 
