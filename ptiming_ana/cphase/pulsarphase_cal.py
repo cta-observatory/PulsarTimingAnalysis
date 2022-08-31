@@ -24,8 +24,10 @@ from lstchain.io.io import dl2_params_src_dep_lstcam_key, write_dataframe, write
 from pint.fits_utils import read_fits_event_mjds
 from pint.fermi_toas import *
 from pint.scripts import *
-from .utils import  add_mjd,dl2time_totim, model_fromephem
+from utils import  add_mjd,dl2time_totim, model_fromephem,read_ephemfile
 import pint.models as models
+from pint.models import parameter as p
+from pint.models.timing_model import (TimingModel, Component,)
 
 __all__=['fermi_calphase','calphase']
 
