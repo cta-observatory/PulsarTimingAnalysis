@@ -18,9 +18,14 @@ from .penergy_analysis import PEnergyAnalysis
 from .filter_object import FilterPulsarAna
 from .read_events import ReadDL3File,ReadFermiFile,ReadLSTFile, ReadList
 import pickle
-
+import logging
 
 pd.options.mode.chained_assignment = None
+level=logging.INFO
+color='\x1b[38;21m'
+format=color+'%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+handlers=[logging.FileHandler('phaseogram.log'),logging.StreamHandler()]
+logging.basicConfig(level=level,format=format,handlers=handlers)
 
 
 class PulsarAnalysis():
@@ -262,36 +267,37 @@ class PulsarAnalysis():
         
         #Fit the histogram using PeakFitting class. If binned is False, an Unbinned Likelihood method is used for the fitting
         if self.do_fit==True:
-            print('--> Fitting the data to the given model...')
-            print('    Fit model: '+self.fit_model)
-            print('    Binned fitting: '+str(self.binned))
+            logging.info('PERFORMING FITTING')
+            logging.info('Fitting the data to the given model...')
+            logging.info('Fit model: '+self.fit_model)
+            logging.info('Binned fitting: '+str(self.binned))
             try:
                 self.fitting.run(self)
             except:
-                print('    No fit could be done')
+                logging.info('No fit could be done')
         else:
-            print('No fit has been done since no fit parameters has been set')
+            logging.info('No fit has been done since no fit parameters has been set')
         
         
     def run(self):
         #Initializa
-        print('--> Initializing...')
+        logging.info('INITIALIZING...')
         self.initialize()
         
         #Excute stats
-        print('--> Calculating statistics every '+str(self.tint/60)+' minutes...')
+        logging.info('COMPUTING STATISTICS...')
+        logging.info('Calculating statistics every '+str(self.tint/60)+' minutes...')
         self.execute_stats(self.r.tobs)
         
         #Execute stats in energy bins
         try:
-            print('\n'+'--> Performing energy-dependent analysis...')
+            logging.info('Performing energy-dependent analysis...')
             self.EnergyAna.run(self) 
         except:
-            print('No Energy Analysis was performed. Check that you set the right energy params')
-           
-        print('\n'+ 'FINISHED')
-
- 
+            logging.info('No Energy Analysis was performed. Check that you set the right energy params')
+        
+        logging.info('FINSIHED')
+       
     ##############################################
                        #RESULTS
     #############################################
@@ -300,7 +306,7 @@ class PulsarAnalysis():
         try:
             self.EnergyAna
         except:
-            print('No energy-dependent analysis has been done')
+            logging.info('No energy-dependent analysis has been done')
             return(False)
         return(True)
             

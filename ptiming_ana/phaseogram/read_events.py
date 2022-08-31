@@ -13,7 +13,17 @@ import os
 from gammapy.data import DataStore, EventList, Observation, Observations
 from gammapy.utils.regions import SphericalCircleSkyRegion
 from astropy.coordinates import SkyCoord,Angle
-                
+import logging
+from astropy.io.fits.verify import VerifyWarning
+
+
+level=logging.INFO
+color= '\x1b[38;21m'
+format=color+'%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
+handlers=[logging.FileHandler('phaseogram.log'),logging.StreamHandler()]
+logging.basicConfig(level=level,format=format,handlers=handlers)
+
+ 
 class ReadFermiFile():
     
         def __init__(self, file):
@@ -52,20 +62,23 @@ class ReadFermiFile():
 class ReadDL3File():
         def __init__(self, directory=None,target_radec=None):
             if directory is not None:
-                self.direc=directory
-                self.datastore = DataStore.from_dir(self.direc)
-                self.target_radec=target_radec           
+                    self.direc=directory
+                    self.datastore = DataStore.from_dir(self.direc)
+                    self.target_radec=target_radec           
+                    self.info=None
+                    self.ids=self.datastore.obs_table["OBS_ID"].data
             self.info=None
-            self.ids=self.datastore.obs_table["OBS_ID"].data
-         
+
         def read_DL3file(self,obs_id):
-            obs = self.datastore.get_observations([obs_id], required_irf=None)
-            pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
-            on_radius = 0.2 * u.deg
-            on_region = SphericalCircleSkyRegion(pos_target, on_radius)
-            self.events = obs[0].events.select_region(on_region).table
-            info=self.create_dataframe()
-            return(info)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', VerifyWarning)
+                obs = self.datastore.get_observations([obs_id], required_irf=None)
+                pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
+                on_radius = 0.2 * u.deg
+                on_region = SphericalCircleSkyRegion(pos_target, on_radius)
+                self.events = obs[0].events.select_region(on_region).table
+                info=self.create_dataframe()
+                return(info)
 
         def calculate_tobs(self):
             dataframe=add_delta_t_key(self.info)
@@ -85,10 +98,10 @@ class ReadDL3File():
             return(info)
 
         def run(self,pulsarana):
-                print('    Reading DL3 data files') 
+                logging.info('Reading DL3 files') 
                 info_list=[]
+                logging.info('Reading run number ids'+ str(self.ids))
                 for obs_id in self.ids:
-                    print('          Reading run number'+str(obs_id))
                     try:
                         info_file=self.read_DL3file(obs_id)
                         info_list.append(info_file)
@@ -135,7 +148,6 @@ class ReadLSTFile():
             self.info['pulsar_phase']=dphase['pulsar_phase']
             
         def read_LSTfile(self,fname,df_type='short'):
-            
             if self.src_dependent==False:
                 df_or=pd.read_hdf(fname,key=dl2_params_lstcam_key)
                 try:
@@ -149,18 +161,12 @@ class ReadLSTFile():
 
                     theta_meters = np.sqrt(np.power(df['reco_src_x'] - df_pos['src_x'],2)+np.power(df['reco_src_y'] - df_pos['src_y'],2))
                     theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
+                except:    
+                    logging.info('No theta2 computed')
 
-                    df['theta2']=np.power(theta,2)
-                except:
-                    print('No theta2 computed')
-                
-
-            
             elif self.src_dependent==True:
                 srcindep_df=pd.read_hdf(fname,key=dl2_params_lstcam_key,float_precision=20)
                 on_df_srcdep=get_srcdep_params(fname,'on')
-                
-                
                 if 'reco_energy' in srcindep_df.keys():
                     srcindep_df.drop(['reco_energy'])
                     
@@ -202,11 +208,11 @@ class ReadLSTFile():
         
         
         def run(self,pulsarana,df_type='long'):
-            print('    Reading LST-1 data file')
+            logging.info('Reading LST-1 DL2 data file')
             if isinstance(self.fname,list):
                 info_list=[]
                 for name in self.fname:
-                    print(name)
+                    logging.info('Reading run number'+str(name))
                     try:
                         info_file=self.read_LSTfile(name,df_type)
                         self.info=info_file    
@@ -235,19 +241,18 @@ class ReadLSTFile():
                 self.info=self.read_LSTfile(self.fname,df_type)
                 self.tobs=self.calculate_tobs()
                 
-                print('    Finishing reading. Total time is '+str(self.tobs)+' h')
+                logging.info('Finishing reading. Total time is '+str(self.tobs)+' h')
                 pulsarana.cuts.apply_fixed_cut(self)
             
                 if pulsarana.cuts.energy_binning_cut is not None:
                     pulsarana.cuts.apply_energydep_cuts(self)
                 
-                print('    Finishing filtering events:')
-                print('        gammaness cut:'+str(pulsarana.cuts.gammaness_cut))
-                print('        alpha cut:'+str(pulsarana.cuts.alpha_cut))
-                print('        theta2 cut:'+str(pulsarana.cuts.theta2_cut))
-                print('        zd cut:'+str(pulsarana.cuts.zd_cut))
-                print('        energy binning for the cuts:'+str(pulsarana.cuts.energy_binning_cut))
-                print('\n')
+                logging.info('Finishing filtering events:')
+                logging.info('        gammaness cut:'+str(pulsarana.cuts.gammaness_cut))
+                logging.info('        alpha cut:'+str(pulsarana.cuts.alpha_cut))
+                logging.info('        theta2 cut:'+str(pulsarana.cuts.theta2_cut))
+                logging.info('        zd cut:'+str(pulsarana.cuts.zd_cut))
+                logging.info('        energy binning for the cuts:'+str(pulsarana.cuts.energy_binning_cut))
 
             
 class ReadtxtFile():
@@ -354,5 +359,5 @@ class ReadList():
         def run(self):
             self.create_df_from_info()
             self.tobs=self.calculate_tobs()
-            print('    Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
+            log.info('    Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
                 
