@@ -11,6 +11,16 @@ from lstchain.reco.utils import get_effective_time,add_delta_t_key
 from lstchain.io.io import dl2_params_lstcam_key,dl2_params_src_dep_lstcam_key, get_srcdep_params
 import os
 
+
+
+def compute_theta(reco_src_x,reco_src_y,src_x,src_y):
+            coma_correction = 1.0466
+            nominal_focal_length = 28
+
+            theta_meters = np.sqrt(reco_src_x - src_x,2)+np.power(reco_src_y -src_y,2))
+            theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
+            return(np.power(theta,2))
+
                 
 class ReadFermiFile():
     
@@ -81,26 +91,19 @@ class ReadLSTFile():
         def add_phases(self,pname):
             dphase=pd.read_hdf(pname,key=dl2_params_lstcam_key)
             self.info['pulsar_phase']=dphase['pulsar_phase']
-            
+
         def read_LSTfile(self,fname,df_type='short'):
             
             if self.src_dependent==False:
                 df_or=pd.read_hdf(fname,key=dl2_params_lstcam_key)
-                try:
-                    df=df_or[df_or['event_type']==32]
-
-                    df_pos=pd.read_hdf(fname, "source_position")
-                    df_pos=df_pos[df_or['event_type']==32]
-
-                    coma_correction = 1.0466
-                    nominal_focal_length = 28
-
-                    theta_meters = np.sqrt(np.power(df['reco_src_x'] - df_pos['src_x'],2)+np.power(df['reco_src_y'] - df_pos['src_y'],2))
-                    theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
-
-                    df['theta2']=np.power(theta,2)
-                except:
-                    print('No theta2 computed')
+                df=df_or[df_or['event_type']==32]
+                if 'theta2' not in df.columns:
+                    try:
+                        df_pos=pd.read_hdf(fname, "source_position")
+                        df_pos=df_pos[df_or['event_type']==32]                 
+                        df['theta2']=compute_theta2(df['reco_src_x'],df['reco_src_y'],df_pos['src_x'],df_pos['src_y'])
+                    except:
+                        print('No theta2 computed')
                 
 
             
@@ -147,8 +150,15 @@ class ReadLSTFile():
             return(get_effective_time(dataframe)[1].value/3600)
            
         
-        
-        
+        def save_memory(self):
+            for column in self.info.columns:
+               if colnumn=='dragon_time' or column=='delta_t' or column=='mjd_barycenter_time':
+                   continue
+               if (self.info[column].dtype!='float64') & (self.info[column].dtype!='float128'):
+                   continue
+               self.info[column]=self.info[column].astype('float32')
+
+
         def run(self,pulsarana,df_type='long'):
             print('    Reading LST-1 data file')
             if isinstance(self.fname,list):
@@ -162,12 +172,21 @@ class ReadLSTFile():
                         pulsarana.cuts.apply_fixed_cut(self)
                         if pulsarana.cuts.energy_binning_cut is not None:
                             pulsarana.cuts.apply_energydep_cuts(self)
-
+                        self.save_memory()
                         info_list.append(self.info)
                     except:
                         raise ValueError('Failing when reading:'+ str(name))
-                        
-                self.info=pd.concat(info_list)
+                
+                self.info=pd.DataFrame()
+                while len(info_list)>0:
+                    if len(info_list)>=10:
+                        chunk_df=pd.concat(info_list[0:10])
+                        info_list=info_list[10:]
+                    else:
+                        chunk_df=pd.concat(info_list)
+                        info_list=[]
+
+                    self.info=pd.concat([self.info,chunk_df])    
                 self.tobs=self.calculate_tobs()
                 
             else:
