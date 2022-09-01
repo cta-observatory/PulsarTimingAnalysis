@@ -27,7 +27,7 @@ class FilterPulsarAna():
                 dataframe=dataframe[dataframe['alpha']<self.alpha_cut]
         if self.theta2_cut is not None:
             if isinstance(self.theta2_cut, float) or isinstance(self.theta2_cut, int):
-                dataframe=dataframe[dataframe['theta2']>self.theta2_cut]
+                dataframe=dataframe[dataframe['theta2']<self.theta2_cut]
         if self.zd_cut is not None:
             if isinstance(self.zd_cut, float) or isinstance(self.zd_cut, int):
                 dataframe=dataframe[(90-dataframe['alt_tel']*180/3.1416)<self.zd_cut]

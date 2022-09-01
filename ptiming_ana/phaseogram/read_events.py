@@ -13,11 +13,11 @@ import os
 
 
 
-def compute_theta(reco_src_x,reco_src_y,src_x,src_y):
+def compute_theta2(reco_src_x,reco_src_y,src_x,src_y):
             coma_correction = 1.0466
             nominal_focal_length = 28
 
-            theta_meters = np.sqrt(reco_src_x - src_x,2)+np.power(reco_src_y -src_y,2))
+            theta_meters = np.sqrt(np.power(reco_src_x - src_x,2)+np.power(reco_src_y -src_y,2))
             theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
             return(np.power(theta,2))
 
@@ -96,15 +96,17 @@ class ReadLSTFile():
             
             if self.src_dependent==False:
                 df_or=pd.read_hdf(fname,key=dl2_params_lstcam_key)
-                df=df_or[df_or['event_type']==32]
-                if 'theta2' not in df.columns:
-                    try:
-                        df_pos=pd.read_hdf(fname, "source_position")
-                        df_pos=df_pos[df_or['event_type']==32]                 
-                        df['theta2']=compute_theta2(df['reco_src_x'],df['reco_src_y'],df_pos['src_x'],df_pos['src_y'])
-                    except:
-                        print('No theta2 computed')
-                
+                if 'event_type' in df_or.columns:
+                    df=df_or[df_or['event_type']==32]
+                    if 'theta2' not in df.columns:
+                        try:
+                            df_pos=pd.read_hdf(fname, "source_position")
+                            df_pos=df_pos[df_or['event_type']==32]                 
+                            df['theta2']=compute_theta2(np.array(df['reco_src_x']),np.array(df['reco_src_y']),np.array(df_pos['src_x']),np.array(df_pos['src_y']))
+                        except:
+                            print('No theta2 computed')
+                else:
+                    df=df_or 
 
             
             elif self.src_dependent==True:
@@ -152,14 +154,14 @@ class ReadLSTFile():
         
         def save_memory(self):
             for column in self.info.columns:
-               if colnumn=='dragon_time' or column=='delta_t' or column=='mjd_barycenter_time':
+               if column=='dragon_time' or column=='delta_t' or column=='mjd_barycenter_time':
                    continue
                if (self.info[column].dtype!='float64') & (self.info[column].dtype!='float128'):
                    continue
                self.info[column]=self.info[column].astype('float32')
 
 
-        def run(self,pulsarana,df_type='long'):
+        def run(self,pulsarana,df_type='short'):
             print('    Reading LST-1 data file')
             if isinstance(self.fname,list):
                 info_list=[]
