@@ -10,12 +10,9 @@ import warnings
 from lstchain.reco.utils import get_effective_time,add_delta_t_key
 from lstchain.io.io import dl2_params_lstcam_key,dl2_params_src_dep_lstcam_key, get_srcdep_params
 import os
-<<<<<<< HEAD
 from gammapy.data import DataStore, EventList, Observation, Observations
 from gammapy.utils.regions import SphericalCircleSkyRegion
 from astropy.coordinates import SkyCoord,Angle
-=======
-
 
 
 def compute_theta2(reco_src_x,reco_src_y,src_x,src_y):
@@ -26,7 +23,6 @@ def compute_theta2(reco_src_x,reco_src_y,src_x,src_y):
             theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
             return(np.power(theta,2))
 
->>>>>>> DL2_srcindep
                 
 class ReadFermiFile():
     
@@ -235,18 +231,6 @@ class ReadLSTFile():
                     except:
                         raise ValueError('Failing when reading:'+ str(name))
                 
-<<<<<<< HEAD
-                info=pd.DataFrame()
-                while len(info_list)>0:
-                   if len(info_list)>=10:
-                       chunk_df=pd.concat(info_list[:10])
-                       info_list=info_list[10:]
-                   else:
-                       chunk_df=pd.concat(info_list)
-                   info=pd.concat([info,chunk_df])
-        
-                self.info=info
-=======
                 self.info=pd.DataFrame()
                 while len(info_list)>0:
                     if len(info_list)>=10:
@@ -257,7 +241,6 @@ class ReadLSTFile():
                         info_list=[]
 
                     self.info=pd.concat([self.info,chunk_df])    
->>>>>>> DL2_srcindep
                 self.tobs=self.calculate_tobs()
                 
             else:
