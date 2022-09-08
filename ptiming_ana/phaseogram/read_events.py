@@ -177,13 +177,13 @@ class ReadLSTFile():
                 
             if df_type=='short':
                 if 'alpha' in df and 'theta2' in df:
-                    df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","theta2","alt_tel"]]
+                    df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","theta2","alt_tel"]]
                 elif 'alpha' in df and 'theta2' not in df:
-                    df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","alt_tel"]]
+                    df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","alt_tel"]]
                 elif 'theta2' in df and 'alpha' not in df:
-                    df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","theta2","alt_tel"]]
+                    df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","theta2","alt_tel"]]
                 else:
-                    df_filtered=df[["mjd_time","pulsar_phase", "dragon_time","gammaness","alt_tel"]]
+                    df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","alt_tel"]]
 
                 try:
                     df_filtered['energy']=df['reco_energy']

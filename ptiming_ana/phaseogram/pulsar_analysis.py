@@ -128,8 +128,8 @@ class PulsarAnalysis():
         self.nbins=nbins
         self.binning=PhaseBinning(nbins,xmin,xmax)
     
-    def setParamCuts(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None,energy_binning_cut=None):
-        self.cuts=FilterPulsarAna(gammaness_cut,alpha_cut,theta2_cut,zd_cut,energy_binning_cut)
+    def setParamCuts(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None,int_cut=None,energy_binning_cut=None):
+        self.cuts=FilterPulsarAna(gammaness_cut,alpha_cut,theta2_cut,zd_cut,int_cut,energy_binning_cut)
 
     
     def setEnergybinning(self,energy_edges):
