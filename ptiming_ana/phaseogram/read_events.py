@@ -17,7 +17,10 @@ from astropy.coordinates import SkyCoord,Angle
 
 def compute_theta2(reco_src_x,reco_src_y,src_x,src_y):
             coma_correction = 1.0466
-            nominal_focal_length = 28
+            nominal_focal_length = 28 * coma_correction
+            
+            src_x *= coma_correction
+            src_y *= coma_correction
 
             theta_meters = np.sqrt(np.power(reco_src_x - src_x,2)+np.power(reco_src_y -src_y,2))
             theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
