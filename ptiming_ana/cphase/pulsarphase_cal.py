@@ -24,7 +24,7 @@ from lstchain.io.io import dl2_params_src_dep_lstcam_key, write_dataframe, write
 from pint.fits_utils import read_fits_event_mjds
 from pint.fermi_toas import *
 from pint.scripts import *
-from .utils import  add_mjd,dl2time_totim, model_fromephem,read_ephemfile
+from utils import  add_mjd,dl2time_totim, model_fromephem,read_ephemfile
 import pint.models as models
 from pint.models import parameter as p
 from pint.models.timing_model import (TimingModel, Component,)
@@ -289,10 +289,10 @@ def compute_phase_interpolation(timelist,ephem,timname,parname,pickle):
 
     #Search the line of the ephemeris at which the interval time of arrivals given belongs
     for i in range(0,len(df_ephem['START'])):
-    	if (times[0]>df_ephem['START'][i]) & (times[0]<df_ephem['FINISH'][i]):
+    	if (timelist[0]>df_ephem['START'][i]) & (timelist[0]<df_ephem['FINISH'][i]):
         	break
     P = 1/(df_ephem['F0'][i])
-        
+
     #Number of complete cicles(N):    
     phase_sam = np.array(phase_sample.frac) + 0.5
     N=(1/P)*(np.diff(btime_sample_sec)-P*(1+np.diff(phase_sam)))    
@@ -371,7 +371,7 @@ def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None)
     parname=str(os.path.basename(file).replace('.h5',''))+'.par'
     
     #Compute the phases using the interpolation method
-    barycent_toas,phase=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
+    phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
 
     #Write if dir given
     if output_dir is not None:
