@@ -111,6 +111,7 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
             
     print('Finished')
 
+    os.remove(str(os.getcwd())+'/'+timname)
 
 def DL3_calphase(file,ephem,output_dir,pickle=False):
     data = fits.open(file)
@@ -405,7 +406,7 @@ def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None)
     else:
         ('Finished. Not output directory given so the output is not saved')
 
-        
+    os.remove(str(os.getcwd())+'/'+timname)    
         
 def interpolate_phase(timelist,time_sample,phase_s):
     from scipy.interpolate import interp1d
