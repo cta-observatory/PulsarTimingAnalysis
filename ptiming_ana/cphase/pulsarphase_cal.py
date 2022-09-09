@@ -117,7 +117,7 @@ def DL3_calphase(file,ephem,output_dir,pickle=False):
     orig_table = data[1].data
     orig_cols = orig_table.columns
 
-    
+    #Extract the times from the dataframe and transform scales
     df = pd.DataFrame(data[1].data)
     df=df.sort_values('TIME')
     
@@ -127,67 +127,19 @@ def DL3_calphase(file,ephem,output_dir,pickle=False):
     time=time_orig+lst.to_value(format='unix')
     timelist=list(Time(time,format='unix').to_value('mjd'))
     
-    #Extraxting reference values of times for interpolation
-    timelist_n=timelist[0::1000]
-    if timelist_n[-1]!=timelist[-1]:
-        timelist_n.append(timelist[-1])
-    
+    #Get the name of the files
     timname=str(os.path.basename(file).replace('.fits',''))+'.tim'
     parname=str(os.path.basename(file).replace('.fits',''))+'.par'
     
-    dl2time_totim(timelist_n,name=timname)
-    model=model_fromephem(timelist_n,ephem,parname)
-
-    #Time in seconds:
-    timelist_s = np.array(timelist)*86400
-    timelist_ns = np.array(timelist_n)*86400    
+    #Compute the phases using the interpolation method
+    phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
     
-    #Calculate the barycent times and phases for reference
-    barycent_toas_sample,phase_sample=get_phase_list_from_tim(timname,model,pickle)
-    os.remove(str(os.getcwd())+'/'+parname)
-    
-    #Time of barycent_toas in seconds:
-    btime_sample_sec = np.array(barycent_toas_sample)*86400  
-  
-    #Getting the period:
-    colnames=['PSR', 'RAJ1','RAJ2','RAJ3', 'DECJ1','DECJ2','DECJ3', 'START', 'FINISH', 't0geo', 'F0', 'F1', 'F2', 'RMS','Observatory', 'EPHEM', 'PSR2']
-    df_ephem = pd.read_csv(ephem, delimiter='\s+',names=colnames,header=None)
-    for i in range(0,len(df_ephem['START'])):
-        if (timelist[0]>df_ephem['START'][i]) & (timelist[0]<df_ephem['FINISH'][i]):
-            break
-            
-    P=1/df_ephem['F0'][i]
-
-    #Number of complete cicles(N):    
-    phase_sam = np.array(phase_sample.frac) + 0.5
-    N=(1/P)*(np.diff(btime_sample_sec)-P*(1+np.diff(phase_sam)))    
-    N=np.round(N)
-    
-    #For having the same dimensions:
-    N = np.append([0], N)
-   
-    #The cumulative sum of N:
-    sN=np.cumsum(N)
-    
-    #Sum of phases:
-    sp = np.cumsum(phase_sam)
-    #Sum of complementary phases shifted by 1:
-    spc= np.append([0], np.cumsum(1-phase_sam)[:-1])
-    
-    #Adding sN + sp+ spc:
-    phase_s = sp+sN+spc
-    
-    #Interpolate to all values of times:    
-    barycent_toas = interpolate_btoas(timelist,timelist_n,barycent_toas_sample)
-    barycent_toas_sec = np.array(barycent_toas)*86400
-    phase=interpolate_phase(barycent_toas_sec,btime_sample_sec,phase_s)
-    phase = phase%1
-    phase = phase - 0.5
-    
+    #Shift phases
     for i in range(0,len(phase)):
         if phase[i]<0:
             phase[i]=phase[i]+1
 
+    #Generate needed columns
     cols_list=[]
     for j in range(0,len(orig_cols)):
         try:
@@ -197,10 +149,12 @@ def DL3_calphase(file,ephem,output_dir,pickle=False):
             cols_list.append(fits.Column(name=orig_cols[j].name, format=orig_cols[j].format,array=df[orig_cols[j].name]))                 
     orig_cols_sorted=fits.ColDefs(cols_list)
     
-    
+    #New columns to add to the DL3 files
     new_cols = fits.ColDefs([fits.Column(name='PHASE', format='D',array=phase),fits.Column(name='BARYCENT_TIME',format='D',array=barycent_toas)])
-    hdu = fits.BinTableHDU.from_columns(orig_cols_sorted + new_cols,header=data[1].header)
     
+    
+    #Create the files
+    hdu = fits.BinTableHDU.from_columns(orig_cols_sorted + new_cols,header=data[1].header)
     hdu_list=fits.HDUList([data[0],hdu,data[2],data[3],data[4],data[5]])
     
     output_file=output_dir+str(os.path.basename(file).replace('.fits',''))+'_pulsar.fits'
@@ -210,6 +164,13 @@ def DL3_calphase(file,ephem,output_dir,pickle=False):
 
     #Removing tim file
     os.remove(str(os.getcwd())+'/'+timname)
+
+    
+    
+    
+    
+    
+    
     
 def calphase(file,ephem,output_dir,pickle=False):
     '''
@@ -299,6 +260,68 @@ def calphase(file,ephem,output_dir,pickle=False):
         ('Finished. Not output directory given so the output is not saved')
 
 
+        
+def compute_phase_interpolation(timelist,ephem,timname,parname,pickle):
+    
+    #Extraxting reference values of times for interpolation
+    timelist_n=timelist[0::1000]
+    if timelist_n[-1]!=timelist[-1]:
+        timelist_n.append(timelist[-1])
+        
+    #Time in seconds:
+    timelist_s = np.array(timelist)*86400
+    timelist_ns = np.array(timelist_n)*86400   
+    
+    #Create the tim and par files
+    dl2time_totim(timelist_n,name=timname)
+    model=model_fromephem(timelist_n,ephem,parname)
+    
+    #Calculate the barycent times and phases for reference
+    barycent_toas_sample,phase_sample=get_phase_list_from_tim(timname,model,pickle)
+    os.remove(str(os.getcwd())+'/'+parname)
+    
+    #Time of barycent_toas in seconds:
+    btime_sample_sec = np.array(barycent_toas_sample)*86400  
+  
+    #Getting the period:
+    #Read the ephemeris txt file
+    df_ephem=read_ephemfile(ephem)
+
+    #Search the line of the ephemeris at which the interval time of arrivals given belongs
+    for i in range(0,len(df_ephem['START'])):
+    	if (times[0]>df_ephem['START'][i]) & (times[0]<df_ephem['FINISH'][i]):
+        	break
+    P = 1/(df_ephem['F0'][i])
+        
+    #Number of complete cicles(N):    
+    phase_sam = np.array(phase_sample.frac) + 0.5
+    N=(1/P)*(np.diff(btime_sample_sec)-P*(1+np.diff(phase_sam)))    
+    N=np.round(N)
+    
+    #For having the same dimensions:
+    N = np.append([0], N)
+   
+    #The cumulative sum of N:
+    sN=np.cumsum(N)
+    
+    #Sum of phases:
+    sp = np.cumsum(phase_sam)
+    #Sum of complementary phases shifted by 1:
+    spc= np.append([0], np.cumsum(1-phase_sam)[:-1])
+    
+    #Adding sN + sp+ spc:
+    phase_s = sp+sN+spc
+    
+    #Interpolate to all values of times:    
+    barycent_toas = interpolate_btoas(timelist,timelist_n,barycent_toas_sample)
+    barycent_toas_sec = np.array(barycent_toas)*86400
+    phase=interpolate_phase(barycent_toas_sec,btime_sample_sec,phase_s)
+    phase = phase%1
+    phase = phase - 0.5
+    
+    return(phase,barycent_toas)
+        
+        
 def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None):
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
@@ -344,65 +367,11 @@ def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None)
     #Create the .tim file
     timelist=df_i.mjd_time.tolist()   
 
-    
-    #Extraxting reference values of times for interpolation
-    timelist_n=timelist[0::1000]
-    if timelist_n[-1]!=timelist[-1]:
-        timelist_n.append(timelist[-1])
-
     timname=str(os.path.basename(file).replace('.h5',''))+'.tim'
     parname=str(os.path.basename(file).replace('.h5',''))+'.par'
     
-    #Time in seconds:
-    timelist_s = np.array(timelist)*86400
-    timelist_ns = np.array(timelist_n)*86400    
-    
-    #Calculate the barycent times and phases for reference
-    barycent_toas_sample,phase_sample=get_phase_list(timname,timelist_n,ephem,parname,pickle)
-    os.remove(str(os.getcwd())+'/'+parname)
-    
-    #Time of barycent_toas in seconds:
-    btime_sample_sec = np.array(barycent_toas_sample)*86400  
-  
-    
-    #Getting the period::
-    #Read the ephemeris txt file
-    df_ephem=read_ephemfile(ephem)
-
-    #Search the line of the ephemeris at which the interval time of arrivals given belongs
-    for i in range(0,len(df_ephem['START'])):
-    	if (times[0]>df_ephem['START'][i]) & (times[0]<df_ephem['FINISH'][i]):
-        	break
-    phase_ephem = df_ephem['F0'][i]
-    Period = 1/phase_ephem
-    P = np.mean(Period)
-    print(P)
-        
-    #Number of complete cicles(N):    
-    phase_sam = np.array(phase_sample.frac) + 0.5
-    N=(1/P)*(np.diff(btime_sample_sec)-P*(1+np.diff(phase_sam)))    
-    N=np.round(N)
-    
-    #For having the same dimensions:
-    N = np.append([0], N)
-   
-    #The cumulative sum of N:
-    sN=np.cumsum(N)
-    
-    #Sum of phases:
-    sp = np.cumsum(phase_sam)
-    #Sum of complementary phases shifted by 1:
-    spc= np.append([0], np.cumsum(1-phase_sam)[:-1])
-    
-    #Adding sN + sp+ spc:
-    phase_s = sp+sN+spc
-    
-    #Interpolate to all values of times:    
-    barycent_toas = interpolate_btoas(timelist,timelist_n,barycent_toas_sample)
-    barycent_toas_sec = np.array(barycent_toas)*86400
-    phase=interpolate_phase(barycent_toas_sec,btime_sample_sec,phase_s)
-    phase = phase%1
-    phase = phase - 0.5
+    #Compute the phases using the interpolation method
+    barycent_toas,phase=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
 
     #Write if dir given
     if output_dir is not None:
@@ -436,6 +405,8 @@ def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None)
     else:
         ('Finished. Not output directory given so the output is not saved')
 
+        
+        
 def interpolate_phase(timelist,time_sample,phase_s):
     from scipy.interpolate import interp1d
 
@@ -446,6 +417,8 @@ def interpolate_phase(timelist,time_sample,phase_s):
 
     return(phase)
 
+
+
 def interpolate_btoas(timelist,time_sample,barycent_toas_sample):
     from scipy.interpolate import interp1d
 
@@ -454,6 +427,7 @@ def interpolate_btoas(timelist,time_sample,barycent_toas_sample):
     barycent_toas=interp_function_mjd(timelist)
 
     return(barycent_toas)    
+
 
 def get_phase_list(timname,timelist,ephem,parname,pickle=False):
     print('Creating tim file')
@@ -475,6 +449,7 @@ def get_phase_list(timname,timelist,ephem,parname,pickle=False):
     os.remove(str(os.getcwd())+'/'+timname)
     
     return(barycent_toas,phase)
+
 
 def get_phase_list_from_tim(timname,model,pickle=False):
     
