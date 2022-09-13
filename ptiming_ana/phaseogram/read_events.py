@@ -18,10 +18,8 @@ from astropy.coordinates import SkyCoord,Angle
 def compute_theta2(reco_src_x,reco_src_y,src_x,src_y):
             coma_correction = 1.0466
             nominal_focal_length = 28 * coma_correction
-            
-            src_x *= coma_correction
-            src_y *= coma_correction
-
+            #src_x *= coma_correction
+            #src_y *= coma_correction
             theta_meters = np.sqrt(np.power(reco_src_x - src_x,2)+np.power(reco_src_y -src_y,2))
             theta = np.rad2deg(np.arctan2(theta_meters, nominal_focal_length))
             return(np.power(theta,2))
@@ -74,7 +72,7 @@ class ReadDL3File():
         def read_DL3file(self,obs_id):
             obs = self.datastore.get_observations([obs_id], required_irf=None)
             pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
-            on_radius = 0.2 * u.deg
+            on_radius = obs[0].rad_max
             on_region = SphericalCircleSkyRegion(pos_target, on_radius)
             self.events = obs[0].events.select_region(on_region).table
             info=self.create_dataframe()
@@ -156,8 +154,12 @@ class ReadLSTFile():
                     if 'theta2' not in df.columns:
                         try:
                             df_pos=pd.read_hdf(fname, "source_position")
-                            df_pos=df_pos[df_or['event_type']==32]                 
-                            df['theta2']=compute_theta2(np.array(df['reco_src_x']),np.array(df['reco_src_y']),np.array(df_pos['src_x']),np.array(df_pos['src_y']))
+                            df_pos=df_pos[df_or['event_type']==32] 
+                            if 'theta2' in df_pos.columns:
+                                print('Including theta2 column from source position table')
+                                df['theta2']=df_pos['theta2']
+                            else:                
+                                df['theta2']=compute_theta2(np.array(df['reco_src_x']),np.array(df['reco_src_y']),np.array(df_pos['src_x']),np.array(df_pos['src_y']))
                         except:
                             print('No theta2 computed')
                 else:
