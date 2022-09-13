@@ -29,6 +29,12 @@ import os
 import pandas as pd
 from lstchain.io import global_metadata, write_metadata, standard_config,srcdep_config 
 from lstchain.io.io import write_dataframe, dl2_params_src_dep_lstcam_key,write_dl2_dataframe,dl2_params_lstcam_key
+from astropy.coordinates import SkyCoord, AltAz
+from astropy.coordinates.erfa_astrom import ErfaAstromInterpolator,erfa_astrom
+from ctapipe.coordinates import CameraFrame, TelescopeFrame
+from lstchain.reco.utils import location
+
+
 
 __all__=[
         'read_ephemfile',
@@ -80,7 +86,46 @@ def merge_dl2_pulsar(directory,run_number,output_dir,src_dep=False):
 
 
 
-
+def add_source_info_dl2(file,source_name):
+    print('Adding source information in'+str(file))
+    
+    coma_factor=1.0466
+    focal=coma_factor*28*u.m
+    
+    df1=pd.read_hdf(file,key=dl2_params_lstcam_key)
+    
+    source_pos=SkyCoord.from_name(source_name)
+    
+    times=Time(df1['dragon_time'],format='unix',scale='utc')
+    tel_pos=SkyCoord(alt=np.array(df1['alt_tel'])*u.rad,az=np.array(df1['az_tel'])*u.rad,frame=AltAz(obstime=times,location=location))
+ 
+    with erfa_astrom.set(ErfaAstromInterpolator(5*u.min)):
+        camera_frame=CameraFrame(focal_length=focal,telescope_pointing=tel_pos,location=location,obstime=times)
+        source_campos=source_pos.transform_to(camera_frame)
+    
+    src_x=source_campos.data.x.value
+    src_y=source_campos.data.y.value
+    
+    reco_src_x=df1['reco_src_x']
+    reco_src_y=df1['reco_src_y']
+    
+    print('Computing theta2...')
+    theta_meters = np.sqrt(np.power(reco_src_x - src_x,2)+np.power(reco_src_y -src_y,2))
+    theta_on = np.rad2deg(np.arctan2(theta_meters, focal.value))
+    theta2=np.power(theta_on,2)
+    
+    theta_meters = np.sqrt(np.power(reco_src_x + src_x,2)+np.power(reco_src_y + src_y,2))
+    theta_off = np.rad2deg(np.arctan2(theta_meters, focal.value))
+    theta2_off=np.power(theta_off,2)
+    
+    print('Writing in new table...')
+    table_source=pd.DataFrame({'src_x':list(src_x),'src_y':list(src_y),'theta2':list(theta2),'theta2_off':list(theta2_off)})
+    table_source.to_hdf(file,key="source_position")
+    
+                             
+    
+    
+    
 def read_ephemfile(ephem):
 
     '''
