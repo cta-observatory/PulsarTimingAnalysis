@@ -24,7 +24,7 @@ from lstchain.io.io import dl2_params_src_dep_lstcam_key, write_dataframe, write
 from pint.fits_utils import read_fits_event_mjds
 from pint.fermi_toas import *
 from pint.scripts import *
-from utils import  add_mjd,dl2time_totim, model_fromephem,read_ephemfile
+from .utils import  add_mjd,dl2time_totim, model_fromephem,read_ephemfile
 import pint.models as models
 from pint.models import parameter as p
 from pint.models.timing_model import (TimingModel, Component,)
@@ -237,28 +237,11 @@ def calphase(file,ephem,output_dir,pickle=False):
     if ephem.endswith('.gro'):
         os.remove(str(os.getcwd())+'/'+parname)  
     
-    #Write if dir given
-    if output_dir is not None:
-        print('Generating new columns in DL2 DataFrame')
-        df_i['mjd_barycenter_time']=barycent_toas
-        df_i['pulsar_phase']=phase.frac
-        output_file=output_dir+str(os.path.basename(file).replace('.h5',''))+'_pulsar.h5'
-        print('Writing outputfile in'+str(output_file))
-        
-        metadata = global_metadata()
-        write_metadata(metadata, output_file)
-    
-        if src_dep==False:
-            write_dl2_dataframe(df_i, output_file, meta=metadata)
+    #Create new dataframe: 
+    df_phase=pd.DataFrame({'obs_id':df_i['obs_id'],'event_id':df_i['event_id'],'mjd_barycenter_time':barycent_toas,'pulsar_phase':phase})
+    df_phase.to_hdf(file,key='phase_info')
+    print('Finished')
 
-        else:
-            write_dl2_dataframe(df_i, output_file,meta=metadata)
-            write_dataframe(df_i_src, output_file, dl2_params_src_dep_lstcam_key,meta=metadata)
-            
-        print('Finished')
- 
-    else:
-        ('Finished. Not output directory given so the output is not saved')
 
 
         
@@ -323,7 +306,7 @@ def compute_phase_interpolation(timelist,ephem,timname,parname,pickle):
     return(phase,barycent_toas)
         
         
-def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None):
+def calphase_interpolated(file,ephem,pickle=False):
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
 
@@ -373,38 +356,11 @@ def calphase_interpolated(file,ephem,output_dir,pickle=False,custom_config=None)
     
     #Compute the phases using the interpolation method
     phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
-
-    #Write if dir given
-    if output_dir is not None:
-        print('Generating new columns in DL2 DataFrame')
-        df_i['mjd_barycenter_time']=barycent_toas
-        df_i['pulsar_phase']=phase
-        
-        output_file=output_dir+str(os.path.basename(file).replace('.h5',''))+'_pulsar.h5'
-        print('Writing outputfile in'+str(output_file))
-
-        metadata = global_metadata()
-        write_metadata(metadata, output_file)
-        
-        if src_dep==False:
-            if custom_config==None:
-                config=standard_config
-            else:
-                config=custom_config
-            write_dl2_dataframe(df_i, output_file, config=config, meta=metadata)
-
-        else:
-            if custom_config==None:
-                config=srcdep_config
-            else:
-                config=custom_config
-            write_dl2_dataframe(df_i, output_file,config=config,meta=metadata)
-            write_dataframe(df_i_src, output_file, dl2_params_src_dep_lstcam_key,meta=metadata)
-
-        print('Finished')
-
-    else:
-        ('Finished. Not output directory given so the output is not saved')
+    
+    #Create new dataframe: 
+    df_phase=pd.DataFrame({'obs_id':df_i['obs_id'],'event_id':df_i['event_id'],'mjd_barycenter_time':barycent_toas,'pulsar_phase':phase})
+    df_phase.to_hdf(file,key='phase_info')
+    print('Finished')
 
     os.remove(str(os.getcwd())+'/'+timname)    
         

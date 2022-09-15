@@ -19,7 +19,6 @@ def main():
 	parser.add_argument('--dir', '-d', action='store',type=str,dest='directory',default=None)
 	parser.add_argument('--in_file', '-f', action='store',type=str,dest='in_file',default=None)
 	parser.add_argument('--ephem','-ephem',action='store',type=str,dest='ephem',default=None)
-	parser.add_argument('--output','-out',action='store',type=str,dest='dir_output',default=None)
 	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
 	parser.add_argument('--run_number','-r',action='store',type=str,dest='run',default=False)
 	parser.add_argument('--include_theta','-t',action='store_true',dest='include_theta')
@@ -28,7 +27,6 @@ def main():
 	args = parser.parse_args()
 
 	ephem=args.ephem
-	output_dir=args.dir_output
 	pickle=args.pickle
 	in_file=args.in_file
 	run=args.run
@@ -37,8 +35,6 @@ def main():
 	dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
 	pd.set_option("display.precision", 10)
 
-	if output_dir is None:
-		warnings.warn("WARNING: No output directory is given so the output will not be saved")
 
 	if ephem is None:
       		raise ValueError('No ephemeris provided')
@@ -57,14 +53,14 @@ def main():
 		filelist.sort()
 		for i in range(0,len(filelist)):
 			#Calculate the phases
-			calphase_interpolated(filelist[i],ephem,output_dir,pickle)
+			calphase_interpolated(filelist[i],ephem,pickle)
 			if include_theta:
 				add_source_info_dl2(output_dir+str(os.path.basename(filelist[i]).replace('.h5',''))+'_pulsar.h5','Crab')
 		
 	else:
 		if in_file is not None:
 			#Calculate the phases
-			calphase_interpolated(in_file,ephem,output_dir,pickle)
+			calphase_interpolated(in_file,ephem,pickle)
 			if include_theta:
 				add_source_info_dl2(output_dir+str(os.path.basename(in_file).replace('.h5',''))+'_pulsar.h5','Crab')
 		else:

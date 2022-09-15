@@ -11,7 +11,7 @@ import argparse
 import numpy as np
 import os
 import warnings
-from .pulsarphase_cal import calphase
+from pulsarphase_cal import calphase
     
 
 def main():
@@ -19,7 +19,6 @@ def main():
 	parser.add_argument('--dir', '-d', action='store',type=str,dest='directory',default=None)
 	parser.add_argument('--in-file', '-f', action='store',type=str,dest='in_file',default=None)
 	parser.add_argument('--ephem','-ephem',action='store',type=str,dest='ephem',default=None)
-	parser.add_argument('--output','-out',action='store',type=str,dest='dir_output',default=None)
 	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
 	parser.add_argument('--run-number','-r',action='store',type=str,dest='run',default=False)
     
@@ -35,8 +34,6 @@ def main():
 	dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
 	pd.set_option("display.precision", 10)
 
-	if output_dir is None:
-		warnings.warn("WARNING: No output directory is given so the output will not be saved")
 
 	if ephem is None:
       		raise ValueError('No ephemeris provided')
@@ -55,12 +52,12 @@ def main():
 		filelist.sort()
 		for i in range(0,len(filelist)):
 			#Calculate the phases
-			calphase(filelist[i],ephem,output_dir,pickle)
+			calphase(filelist[i],ephem,pickle)
 		
 	else:
 		if in_file is not None:
 			#Calculate the phases
-			calphase(in_file,ephem,output_dir,pickle)
+			calphase(in_file,ephem,pickle)
 		else:
 			raise ValueError('No input file or directory given')
 
