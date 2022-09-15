@@ -149,9 +149,10 @@ class ReadLSTFile():
             
             if self.src_dependent==False:
                 df_or=pd.read_hdf(fname,key=dl2_params_lstcam_key)
-                df_pulsar=pd.read_hdf(fname,key="phase_info")
-                df_or['pulsar_phase'] = df_pulsar['pulsar_phase']
-                df_or['mjd_time']=df_pulsar['mjd_barycenter_time']
+                if 'pulsar_phase' not in df_or:
+                    df_pulsar=pd.read_hdf(fname,key="phase_info")
+                    df_or['pulsar_phase'] = df_pulsar['pulsar_phase']
+                    df_or['mjd_time']=df_pulsar['mjd_barycenter_time']
                 
                 if 'event_type' in df_or.columns:
                     df=df_or[df_or['event_type']==32]
@@ -177,9 +178,11 @@ class ReadLSTFile():
             elif self.src_dependent==True:
                 srcindep_df=pd.read_hdf(fname,key=dl2_params_lstcam_key,float_precision=20)
                 on_df_srcdep=get_srcdep_params(fname,'on')
-                df_pulsar=pd.read_hdf(fname,key="phase_info")
-                srcindep_df['pulsar_phase'] = df_pulsar['pulsar_phase']
-                srcindep_df['mjd_time']=df_pulsar['mjd_barycenter_time']
+                
+                if 'pulsar_phase' not in srcindep_df:
+                    df_pulsar=pd.read_hdf(fname,key="phase_info")
+                    srcindep_df['pulsar_phase'] = df_pulsar['pulsar_phase']
+                    srcindep_df['mjd_time']=df_pulsar['mjd_barycenter_time']
                 
                 if 'reco_energy' in srcindep_df.keys():
                     srcindep_df.drop(['reco_energy'])
