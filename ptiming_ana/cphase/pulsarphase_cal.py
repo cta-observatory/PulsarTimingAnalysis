@@ -24,7 +24,7 @@ from lstchain.io.io import dl2_params_src_dep_lstcam_key, write_dataframe, write
 from pint.fits_utils import read_fits_event_mjds
 from pint.fermi_toas import *
 from pint.scripts import *
-from ptiming.cphase.utils import  add_mjd,dl2time_totim, model_fromephem,read_ephemfile
+from ptiming_ana.cphase.utils import  add_mjd,dl2time_totim, model_fromephem,read_ephemfile
 import pint.models as models
 from pint.models import parameter as p
 from pint.models.timing_model import (TimingModel, Component,)
@@ -131,6 +131,9 @@ def DL3_calphase(file,ephem,output_dir,pickle=False):
     #Get the name of the files
     timname=str(os.path.basename(file).replace('.fits',''))+'.tim'
     parname=str(os.path.basename(file).replace('.fits',''))+'.par'
+    
+     
+    
     
     #Compute the phases using the interpolation method
     phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
@@ -258,8 +261,16 @@ def compute_phase_interpolation(timelist,ephem,timname,parname,pickle):
     
     #Create the tim and par files
     dl2time_totim(timelist_n,name=timname)
-    model=model_fromephem(timelist_n,ephem,parname)
     
+    
+    print('Setting the .par file')
+    if ephem.endswith('.par'):
+        model=ephem
+    elif ephem.endswith('.gro'):
+        print('No .par file given. Creating .par file from .gro file...')
+        #Create model from ephemeris
+        model=model_fromephem(timelist_n,ephem,parname)
+        
     #Calculate the barycent times and phases for reference
     barycent_toas_sample,phase_sample=get_phase_list_from_tim(timname,model,pickle)
     os.remove(str(os.getcwd())+'/'+parname)
