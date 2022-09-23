@@ -116,6 +116,33 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
     
     
 def DL3_calphase(file,ephem,output_dir,use_interpolation=False,pickle=False):
+    '''
+    Function that reads the DL3 files, calculates the phases and create a new DL3 file. The new DL3 file will have two new columns: 'PHASE' and 'BAYCENT_TIME'.
+    
+    Parameters:
+    ------------------
+    file: string 
+    path to the DL3 file in a .fits format
+    
+    ephem: string
+    path to the ephemeris file. It can be a .par file or a .gro file (for the case of Crab)
+
+    output_dir: string
+    path to the output directory where to store the modified DL3 file
+
+    use_interpolation: boolean
+    True if want to use the interpolation method (faster but loses some precision)
+
+    pickle: boolean
+    True if want to save a pickle file with the loaded TOAs
+
+    Returns:
+    -------------------------
+    A new DL3 file with two new columns: 'PHASE' and 'BAYCENT_TIME'. The name of the file will be {filename}_pulsar.fits
+   
+    '''
+
+
     data = fits.open(file)
     orig_table = data[1].data
     orig_cols = orig_table.columns
@@ -189,26 +216,21 @@ def DL3_calphase(file,ephem,output_dir,use_interpolation=False,pickle=False):
     
 def create_files(timelist,ephem,timname,parname):
     '''
-    Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
+    Creates the .tim and .par file needed for the use of PINT. 
 
     Parameters:
     -----------------
-    dl2file: string
-    DL2 input file with the arrival times
+    timelist: list 
+    Times of obervation in MJD
     
     ephem: string
-    Ephemeris to be used (.par or .txt file or similar)
+    Ephemeris to be used (.par or .gro). If given .par it will not create a new model.
     
-    output_dir:string
-    Directory of the the output file
+    timname:string
+    Name of the output timfile
     
-    pickle: boolean
-    True if want to save a pickle file with the loaded TOAs
-    
-    Returns:
-    --------
-    Returns same DL2 with two additional columns: 'mjd_barycenter_time' and 'pulsar_phase'
-    The name of this new file is dl2.....run_number_ON_Crab_pulsar.h5
+    parname: string
+    Name of the output parfile 
     
     '''
     
@@ -227,7 +249,7 @@ def create_files(timelist,ephem,timname,parname):
         
 
         
-def DL2_calphase(file,ephem,use_interpolation=False,pickle=False):
+def DL2_calphase(dl2file,ephem,use_interpolation=False,pickle=False):
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
 
@@ -237,34 +259,33 @@ def DL2_calphase(file,ephem,use_interpolation=False,pickle=False):
     DL2 input file with the arrival times
     
     ephem: string
-    Ephemeris to be used (.par or .txt file or similar)
+    Ephemeris to be used (.par or .gro file)
     
-    output_dir:string
-    Directory of the the output file
+    use_interpolation: boolean
+    True if want to use the interpolation method. False otherwise
     
     pickle: boolean
     True if want to save a pickle file with the loaded TOAs
     
     Returns:
     --------
-    Returns same DL2 with two additional columns: 'mjd_barycenter_time' and 'pulsar_phase'
-    The name of this new file is dl2.....run_number_ON_Crab_pulsar.h5
+    Returns same DL2 with a new table (key='phase_info')  with the phase information.
     
     '''
 
     dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
 
     #Read the file
-    print('Input file:'+str(file))
-    df_i=pd.read_hdf(file,key=dl2_params_lstcam_key,float_precision=20)
+    print('Input file:'+str(dl2file))
+    df_i=pd.read_hdf(dl2file,key=dl2_params_lstcam_key,float_precision=20)
     add_mjd(df_i)
         
     #Create the .tim file
     timelist=df_i.mjd_time.tolist()
     
     #Name of the files
-    timname=str(os.path.basename(file).replace('.h5',''))+'.tim'
-    parname=str(os.path.basename(file).replace('.h5',''))+'.par'
+    timname=str(os.path.basename(dl2file).replace('.h5',''))+'.tim'
+    parname=str(os.path.basename(dl2file).replace('.h5',''))+'.par'
     
     if use_interpolation==False:
         create_files(timelist,ephem,timname,parname)
@@ -283,7 +304,7 @@ def DL2_calphase(file,ephem,use_interpolation=False,pickle=False):
     
     #Create new dataframe: 
     df_phase=pd.DataFrame({'obs_id':df_i['obs_id'],'event_id':df_i['event_id'],'mjd_barycenter_time':barycent_toas,'pulsar_phase':phase})
-    df_phase.to_hdf(file,key='phase_info')
+    df_phase.to_hdf(dl2file,key='phase_info')
     print('Finished')
 
         
