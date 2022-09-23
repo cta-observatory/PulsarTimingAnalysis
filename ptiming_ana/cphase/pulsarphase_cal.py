@@ -113,7 +113,9 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
 
     os.remove(str(os.getcwd())+'/'+timname)
 
-def DL3_calphase(file,ephem,output_dir,pickle=False):
+    
+    
+def DL3_calphase(file,ephem,output_dir,use_interpolation=False,pickle=False):
     data = fits.open(file)
     orig_table = data[1].data
     orig_cols = orig_table.columns
@@ -132,11 +134,15 @@ def DL3_calphase(file,ephem,output_dir,pickle=False):
     timname=str(os.path.basename(file).replace('.fits',''))+'.tim'
     parname=str(os.path.basename(file).replace('.fits',''))+'.par'
     
-     
-    
-    
-    #Compute the phases using the interpolation method
-    phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
+    #Calculate phases
+    if use_interpolation==False:
+        create_files(timelist,ephem,timname,parname)
+        barycent_toas,phase=get_phase_list_from_tim(timname,parname,pickle)
+        phase=phase.frac
+    else:
+        print('Using interpolation...')
+        phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
+        
     
     #Shift phases
     for i in range(0,len(phase)):
@@ -168,6 +174,11 @@ def DL3_calphase(file,ephem,output_dir,pickle=False):
 
     #Removing tim file
     os.remove(str(os.getcwd())+'/'+timname)
+    
+    #Removing .par file if it was created during execution
+    if ephem.endswith('.gro'):
+        os.remove(str(os.getcwd())+'/'+parname) 
+  
 
     
     
@@ -176,7 +187,47 @@ def DL3_calphase(file,ephem,output_dir,pickle=False):
     
     
     
-def calphase(file,ephem,output_dir,pickle=False):
+def create_files(timelist,ephem,timname,parname):
+    '''
+    Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
+
+    Parameters:
+    -----------------
+    dl2file: string
+    DL2 input file with the arrival times
+    
+    ephem: string
+    Ephemeris to be used (.par or .txt file or similar)
+    
+    output_dir:string
+    Directory of the the output file
+    
+    pickle: boolean
+    True if want to save a pickle file with the loaded TOAs
+    
+    Returns:
+    --------
+    Returns same DL2 with two additional columns: 'mjd_barycenter_time' and 'pulsar_phase'
+    The name of this new file is dl2.....run_number_ON_Crab_pulsar.h5
+    
+    '''
+    
+    
+    
+    print('Creating .tim file')
+    dl2time_totim(timelist,name=timname)
+    
+    print('Setting the .par file')
+    if ephem.endswith('.par'):
+        model=ephem
+    elif ephem.endswith('.gro'):
+        print('No .par file given. Creating .par file from .gro file...')
+        #Create model from ephemeris
+        model=model_fromephem(timelist,ephem,parname)
+        
+
+        
+def DL2_calphase(file,ephem,use_interpolation=False,pickle=False):
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
 
@@ -207,32 +258,22 @@ def calphase(file,ephem,output_dir,pickle=False):
     print('Input file:'+str(file))
     df_i=pd.read_hdf(file,key=dl2_params_lstcam_key,float_precision=20)
     add_mjd(df_i)
-
-    try:     
-        df_i_src=pd.read_hdf(file,key=dl2_params_src_dep_lstcam_key,float_precision=20)
-        src_dep=True
-    except:
-        src_dep=False
         
     #Create the .tim file
     timelist=df_i.mjd_time.tolist()
+    
+    #Name of the files
     timname=str(os.path.basename(file).replace('.h5',''))+'.tim'
+    parname=str(os.path.basename(file).replace('.h5',''))+'.par'
     
-    print('Creating .tim file')
-    dl2time_totim(timelist,name=timname)
-    
-    print('Setting the .par file')
-    if ephem.endswith('.par'):
-        model=ephem
-    elif ephem.endswith('.gro'):
-        print('No .par file given. Creating .par file from .gro file...')
-        #Create model from ephemeris
-        parname=str(os.path.basename(file).replace('.h5',''))+'.par'
-        model=model_fromephem(timelist,ephem,parname)
-
-    #Calculate phases
-    barycent_toas,phase=get_phase_list_from_tim(timname,model,pickle)
-    
+    if use_interpolation==False:
+        create_files(timelist,ephem,timname,parname)
+        barycent_toas,phase=get_phase_list_from_tim(timname,parname,pickle)
+        phase=phase.frac
+    else:
+        print('Interpolating...')
+        phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
+                                                   
     #Removing tim file
     os.remove(str(os.getcwd())+'/'+timname)
     
@@ -244,8 +285,6 @@ def calphase(file,ephem,output_dir,pickle=False):
     df_phase=pd.DataFrame({'obs_id':df_i['obs_id'],'event_id':df_i['event_id'],'mjd_barycenter_time':barycent_toas,'pulsar_phase':phase})
     df_phase.to_hdf(file,key='phase_info')
     print('Finished')
-
-
 
         
 def compute_phase_interpolation(timelist,ephem,timname,parname,pickle):
@@ -259,35 +298,20 @@ def compute_phase_interpolation(timelist,ephem,timname,parname,pickle):
     timelist_s = np.array(timelist)*86400
     timelist_ns = np.array(timelist_n)*86400   
     
-    #Create the tim and par files
-    dl2time_totim(timelist_n,name=timname)
-    
-    
-    print('Setting the .par file')
-    if ephem.endswith('.par'):
-        model=ephem
-    elif ephem.endswith('.gro'):
-        print('No .par file given. Creating .par file from .gro file...')
-        #Create model from ephemeris
-        model=model_fromephem(timelist_n,ephem,parname)
+    #Create the files
+    create_files(timelist_n,ephem,timname,parname)
         
     #Calculate the barycent times and phases for reference
-    barycent_toas_sample,phase_sample=get_phase_list_from_tim(timname,model,pickle)
-    os.remove(str(os.getcwd())+'/'+parname)
+    barycent_toas_sample,phase_sample=get_phase_list_from_tim(timname,parname,pickle)
     
     #Time of barycent_toas in seconds:
     btime_sample_sec = np.array(barycent_toas_sample)*86400  
   
     #Getting the period:
-    #Read the ephemeris txt file
-    df_ephem=read_ephemfile(ephem)
-
-    #Search the line of the ephemeris at which the interval time of arrivals given belongs
-    for i in range(0,len(df_ephem['START'])):
-    	if (timelist[0]>df_ephem['START'][i]) & (timelist[0]<df_ephem['FINISH'][i]):
-        	break
-    P = 1/(df_ephem['F0'][i])
-
+    m=models.get_model(parname)
+    P=1/m['F0'].value
+    print('The period used for the interpolation is:'+str(P))
+    
     #Number of complete cicles(N):    
     phase_sam = np.array(phase_sample.frac) + 0.5
     N=(1/P)*(np.diff(btime_sample_sec)-P*(1+np.diff(phase_sam)))    
@@ -316,65 +340,7 @@ def compute_phase_interpolation(timelist,ephem,timname,parname,pickle):
     
     return(phase,barycent_toas)
         
-        
-def calphase_interpolated(file,ephem,pickle=False):
-    '''
-    Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
-
-    Parameters:
-    -----------------
-    dl2file: string
-    DL2 input file with the arrival times
     
-    ephem: string
-    Ephemeris to be used (.txt file or similar)
-    
-    
-    output_dir:string
-    Directory of the the output file
-    
-    pickle: boolean
-    True if want to save a pickle file with the loaded TOAs
-    
-    Returns:
-    --------
-    Returns same DL2 with two additional columns: 'mjd_barycenter_time' and 'pulsar_phase'
-    The name of this new file is dl2.....run_number_ON_Crab_pulsar.h5
-    
-    '''
-
-    dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
-
-    #Read the file
-    print('Input file:'+str(file))
-    df_i=pd.read_hdf(file,key=dl2_params_lstcam_key,float_precision=20)
-    add_mjd(df_i)
-    times=df_i.dragon_time.values
-
-    try:
-        df_i_src=pd.read_hdf(file,key=dl2_params_src_dep_lstcam_key,float_precision=20)
-        src_dep=True
-        print('Using source-dependent analysis files')
-    except:
-        src_dep=False    
-    
-    
-    #Create the .tim file
-    timelist=df_i.mjd_time.tolist()   
-
-    timname=str(os.path.basename(file).replace('.h5',''))+'.tim'
-    parname=str(os.path.basename(file).replace('.h5',''))+'.par'
-    
-    #Compute the phases using the interpolation method
-    phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
-    
-    #Create new dataframe: 
-    df_phase=pd.DataFrame({'obs_id':df_i['obs_id'],'event_id':df_i['event_id'],'mjd_barycenter_time':barycent_toas,'pulsar_phase':phase})
-    df_phase.to_hdf(file,key='phase_info')
-    print('Finished')
-
-    os.remove(str(os.getcwd())+'/'+timname)    
-        
 def interpolate_phase(timelist,time_sample,phase_s):
     from scipy.interpolate import interp1d
 

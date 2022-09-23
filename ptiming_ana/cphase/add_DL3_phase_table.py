@@ -11,7 +11,7 @@ import argparse
 import numpy as np
 import os
 import warnings
-from pulsarphase_cal import DL3_calphase
+from ptiming_ana.cphase.pulsarphase_cal import DL3_calphase
     
 
 def main():
@@ -22,6 +22,7 @@ def main():
 	parser.add_argument('--output','-out',action='store',type=str,dest='dir_output',default=None)
 	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
 	parser.add_argument('--run_number','-r',action='store',type=str,dest='run',default=False)
+	parser.add_argument('--interpolation','-interp',action='store_true',dest='interpolation')
     
     
 	args = parser.parse_args()
@@ -31,10 +32,8 @@ def main():
 	pickle=args.pickle
 	in_file=args.in_file
 	run=args.run
+	interpolation=args.interpolation
     
-	dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
-	pd.set_option("display.precision", 10)
-
 	if output_dir is None:
 		warnings.warn("WARNING: No output directory is given so the output will not be saved")
 
@@ -55,12 +54,12 @@ def main():
 		filelist.sort()
 		for i in range(0,len(filelist)):
 			#Calculate the phases
-			DL3_calphase(filelist[i],ephem,output_dir,pickle)
+			DL3_calphase(filelist[i],ephem,output_dir,interpolation,pickle)
 		
 	else:
 		if in_file is not None:
 			#Calculate the phases
-			DL3_calphase(in_file,ephem,output_dir,pickle)
+			DL3_calphase(in_file,ephem,output_dir,interpolation,pickle)
 		else:
 			raise ValueError('No input file or directory given')
 

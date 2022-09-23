@@ -1,7 +1,7 @@
 #####################
 ###Author: Alvaro Mas Aguilar (alvmas)
 #mail: alvmas@ucm.es
-#Using modules from PINT-pulsar and lstchain to calculate phases and add them to the input files.
+#Using modules from PINT-pulsar and lstchain to calculate phases and add them to the input files in a new table called phase_info
 ###################3
 
 
@@ -11,7 +11,7 @@ import argparse
 import numpy as np
 import os
 import warnings
-from pulsarphase_cal import calphase_interpolated
+from pulsarphase_cal import DL2_calphase
 from utils import add_source_info_dl2
 
 def main():
@@ -22,6 +22,7 @@ def main():
 	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
 	parser.add_argument('--run_number','-r',action='store',type=str,dest='run',default=False)
 	parser.add_argument('--include_theta','-t',action='store_true',dest='include_theta')
+	parser.add_argument('--interpolation','-interp',action='store_true',dest='interpolation')
     
     
 	args = parser.parse_args()
@@ -31,6 +32,7 @@ def main():
 	in_file=args.in_file
 	run=args.run
 	include_theta=args.include_theta
+	interpolation=args.interpolation
     
 	dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
 	pd.set_option("display.precision", 10)
@@ -53,14 +55,14 @@ def main():
 		filelist.sort()
 		for i in range(0,len(filelist)):
 			#Calculate the phases
-			calphase_interpolated(filelist[i],ephem,pickle)
+			DL2_calphase(filelist[i],ephem,interpolation,pickle)
 			if include_theta:
 				add_source_info_dl2(output_dir+str(os.path.basename(filelist[i]).replace('.h5',''))+'_pulsar.h5','Crab')
 		
 	else:
 		if in_file is not None:
 			#Calculate the phases
-			calphase_interpolated(in_file,ephem,pickle)
+			DL2_calphase(in_file,ephem,interpolation,pickle)
 			if include_theta:
 				add_source_info_dl2(output_dir+str(os.path.basename(in_file).replace('.h5',''))+'_pulsar.h5','Crab')
 		else:
