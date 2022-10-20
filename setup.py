@@ -27,7 +27,7 @@ setup(
         'scipy',
         'probfit',
         'tables',
-        'protobuf<=3.20.0',
+        'protobuf>=3.20.2',
         'toml',
         'pint-pulsar~=0.8.8',
         'setuptools_scm',
