@@ -151,10 +151,10 @@ def DL3_calphase(file,ephem,output_dir,use_interpolation=False,pickle=False):
     df = pd.DataFrame(data[1].data)
     df=df.sort_values('TIME')
     
-    lst=Time("2018-10-01",scale='utc')
+    lst_epoch=Time(data[1].header['MJDREFI'],data[1].header['MJDREFF'],format='mjd',scale=data[1].header['TIMESYS'].lower())
     time_orig=df['TIME']
 
-    time=time_orig+lst.to_value(format='unix')
+    time=time_orig+lst_epoch.to_value(format='unix')
     timelist=list(Time(time,format='unix').to_value('mjd'))
     
     #Get the name of the files

@@ -52,12 +52,12 @@ def main():
 		filelist.sort()
 		for i in range(0,len(filelist)):
 			#Calculate the phases
-			calphase(filelist[i],ephem,pickle)
+			DL2_calphase(filelist[i],ephem,pickle)
 		
 	else:
 		if in_file is not None:
 			#Calculate the phases
-			calphase(in_file,ephem,pickle)
+			DL2_calphase(in_file,ephem,pickle)
 		else:
 			raise ValueError('No input file or directory given')
 

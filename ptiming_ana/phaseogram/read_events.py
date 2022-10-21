@@ -61,18 +61,19 @@ class ReadFermiFile():
             
 
 class ReadDL3File():
-        def __init__(self, directory=None,target_radec=None):
+        def __init__(self, directory=None,target_radec=None,max_rad=0.2):
             if directory is not None:
                 self.direc=directory
                 self.datastore = DataStore.from_dir(self.direc)
                 self.target_radec=target_radec           
             self.info=None
             self.ids=self.datastore.obs_table["OBS_ID"].data
+            self.max_rad=max_rad
          
         def read_DL3file(self,obs_id):
             obs = self.datastore.get_observations([obs_id], required_irf=None)
             pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
-            on_radius = 0.2*u.deg
+            on_radius = self.max_rad*u.deg
             on_region = SphericalCircleSkyRegion(pos_target, on_radius)
             self.events = obs[0].events.select_region(on_region).table
             info=self.create_dataframe()

@@ -18,7 +18,7 @@ from .penergy_analysis import PEnergyAnalysis
 from .filter_object import FilterPulsarAna
 from .read_events import ReadDL3File,ReadFermiFile,ReadLSTFile, ReadList
 import pickle
-
+import yaml
 
 pd.options.mode.chained_assignment = None
 
@@ -113,8 +113,8 @@ class PulsarAnalysis():
         self.telescope=tel
         self.energy_units=energy_units
             
-    def setDL3InputFile(self,dirname=None,target_radec=None):
-        self.r=ReadDL3File(directory=dirname,target_radec=target_radec)
+    def setDL3InputFile(self,dirname=None,target_radec=None,max_rad=0.2):
+        self.r=ReadDL3File(directory=dirname,target_radec=target_radec,max_rad=max_rad)
         self.telescope='lst'
         self.energy_units='TeV'
 
@@ -160,6 +160,14 @@ class PulsarAnalysis():
     
     
     def setPeaklimits(self,P1_limits=None,P2_limits=None,P3_limits=None):
+        
+        if P1_limits == 'None':
+            P1_limits=None
+        if P2_limits == 'None':
+            P2_limits=None
+        if P3_limits == 'None':
+            P3_limits=None
+            
         P1P2_limits=[]
 
         if P1_limits is not None:
@@ -175,6 +183,68 @@ class PulsarAnalysis():
 
         
         
+        
+        
+    def set_config(self,configuration_file):
+        
+        # Read the configuration file
+        with open(configuration_file, "rb") as cfile:
+            conf = yaml.safe_load(cfile)
+        
+        
+        #Read files
+        if conf['flags']['DL2_format']== True:
+            self.setLSTInputFile(dirname=conf['pulsar_file_dir'],src_dep=conf['flags']['src_dependent'])
+            
+        elif conf['flags']['fits_format']==True:
+            self.setFermiInputFile(dirname=conf['pulsar_file_dir'])
+        
+        else:
+            self.setDL3InputFile(dirname=conf['pulsar_file_dir'],target_radec=[conf['target']['ra'],conf['target']['dec']],max_rad=conf['cuts']['max_rad'])
+        
+        #Set regions
+        self.setBackgroundLimits(conf['phase_regions']['Bkg'])
+        self.setPeaklimits(P1_limits=conf['phase_regions']['P1'],P2_limits=conf['phase_regions']['P2'],P3_limits=conf['phase_regions']['P3'])
+        
+        if conf['phase_binning']['custom_binning']==False:
+            self.setBinning(conf['phase_binning']['nbins'],xmin=conf['phase_binning']['xmin'],xmax=conf['phase_binning']['xmax'])
+        else:
+            self.setBinning(conf['phase_binning']['binning'])
+        
+        if conf['time_binning']['run_time_analysis']:
+            units_time=conf['time_binning']['units']
+            tint=conf['time_binning']['tint']* u.Unit(units_time)
+            
+            self.setTimeInterval(tint.to(u.s).value)
+            
+        if conf['energy_binning']['run_energy_analysis']:
+            units_energy=conf['energy_binning']['units']
+            nbins_energy=conf['energy_binning']['nbins']
+            emin=conf['energy_binning']['emin']* u.Unit(units_energy)
+            emax=conf['energy_binning']['emax']* u.Unit(units_energy)
+            
+            self.setEnergybinning(np.geomspace(emin.to(u.TeV).value,emax.to(u.TeV).value,nbins_energy))
+            
+        if conf['fitting']['run_fitting']:    
+            self.setFittingParams(model=conf['fitting']['model'],binned=conf['fitting']['binned'])
+        
+        
+        if conf['cuts']['include_extra_cuts']:
+            if conf['cuts']['energy_dependent']:
+                if conf['flags']['src_dependent']:
+                    self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],alpha_cut=conf['cuts']['extra_cuts']['alpha'],zd_cut=conf['cuts']['extra_cuts']['zd'],int_cut=conf['cuts']['extra_cuts']['intensity'],energy_binning_cut=conf['cuts']['extra_cuts']['energy_binning'])
+                else:
+                    self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],theta_cut=np.power(conf['cuts']['extra_cuts']['theta'],2),zd_cut=conf['cuts']['extra_cuts']['zd'],int_cut=conf['cuts']['extra_cuts']['intensity'],energy_binning_cut=conf['cuts']['extra_cuts']['energy_binning'])
+            else:
+                if conf['flags']['src_dependent']:
+                    self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],alpha_cut=conf['cuts']['extra_cuts']['alpha'],zd_cut=conf['cuts']['extra_cuts']['zd'],int_cut=conf['cuts']['extra_cuts']['intensity'])
+                else:
+                    self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],theta_cut=np.power(conf['cuts']['extra_cuts']['theta'],2),zd_cut=conf['cuts']['extra_cuts']['zd'],int_cut=conf['cuts']['extra_cuts']['intensity'])
+
+                    
+                    
+                    
+                    
     ##############################################
                        #EXECUTION
     #############################################
