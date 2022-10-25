@@ -254,7 +254,9 @@ def model_fromephem(times,ephem,model_name):
             "TZRMJD":(Time(df_ephem['t0geo'][i], format="mjd", scale="tdb"),),
             "TZRFRQ":(0.0*u.Hz,),
             "TZRSITE":('coe',),
+            "PLANET_SHAPIRO":'Y',
             }
+
 
 
     #Create the model using PINT
