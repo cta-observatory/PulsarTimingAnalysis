@@ -233,8 +233,12 @@ def model_fromephem(times,ephem,model_name):
         units=u.Hz / (u.s) ** 2,
         longdouble=True,
     )
+    
+    tres = p.floatParameter(parameter_type="float", name="TRES", value=0.0*u.ms, units="ms", longdouble=True)
+    
     tm.components["Spindown"].add_param(f1, setup=True)
     tm.components["Spindown"].add_param(f2, setup=True)
+    tm.components["Spindown"].add_param(tres, setup=True)
         
     f1=float(str(df_ephem['F1'][i].replace('D','E')))
     f2=float(str(df_ephem['F2'][i].replace('D','E')))
@@ -257,6 +261,7 @@ def model_fromephem(times,ephem,model_name):
             "T2CMETHOD":'IAU200B',
             "TIMEEPH": 'FB90',
             "PLANET_SHAPIRO":'Y',
+            "TRES": ((df_ephem['RMS'][i]*0.001/df_ephem['F0'][i]*1000000),),
             }
 
 
@@ -279,6 +284,8 @@ def model_fromephem(times,ephem,model_name):
     name=model_name
     f=open(name,"w+")
     f.write(tm.as_parfile())
+    
+    
     f.close()
     
     return(name)
