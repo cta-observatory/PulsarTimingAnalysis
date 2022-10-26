@@ -389,15 +389,14 @@ def get_phase_list(timname,timelist,ephem,parname,pickle=False):
     dl2time_totim(timelist,name=timname)
     print('creating TOA list')
 
-    t= toa.get_TOAs(timname, usepickle=pickle)
     
     #Create model from ephemeris
     model=model_fromephem(timelist,ephem,parname)
-
+    
     #Upload TOAs and model
-    m=models.get_model(model)
+    m, t = models.get_model_and_toas(model, timname, planets=True,usepickle=pickle)
 
-    t.compute_posvels(model,planets=True)
+    #t.compute_posvels(model,planets=True)
     #Calculate the phases
     print('Calculating barycentric time and absolute phase')
     barycent_toas=m.get_barycentric_toas(t)
@@ -411,12 +410,10 @@ def get_phase_list(timname,timelist,ephem,parname,pickle=False):
 def get_phase_list_from_tim(timname,model,pickle=False):
     
     print('creating TOA list')
-    t= toa.get_TOAs(timname, usepickle=pickle)
-    
     #Upload TOAs and model
-    m=models.get_model(model)
+    m, t = models.get_model_and_toas(model, timname, planets=True,usepickle=pickle)
+    
     print(m)
-    t.compute_posvels(model,planets=True) 
     #Calculate the phases
     print('Calculating barycentric time and absolute phase')
     barycent_toas=m.get_barycentric_toas(t)

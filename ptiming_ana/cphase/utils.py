@@ -254,6 +254,8 @@ def model_fromephem(times,ephem,model_name):
             "TZRMJD":(Time(df_ephem['t0geo'][i], format="mjd", scale="tdb"),),
             "TZRFRQ":(0.0*u.Hz,),
             "TZRSITE":('coe',),
+            "T2CMETHOD":'IAU200B',
+            "TIMEEPH": 'FB90',
             "PLANET_SHAPIRO":'Y',
             }
 
