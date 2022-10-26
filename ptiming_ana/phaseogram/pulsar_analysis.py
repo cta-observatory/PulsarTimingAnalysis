@@ -216,6 +216,8 @@ class PulsarAnalysis():
             tint=conf['time_binning']['tint']* u.Unit(units_time)
             
             self.setTimeInterval(tint.to(u.s).value)
+        else:
+            self.setTimeInterval(3600*300)
             
         if conf['energy_binning']['run_energy_analysis']:
             units_energy=conf['energy_binning']['units']

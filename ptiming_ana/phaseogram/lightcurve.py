@@ -82,25 +82,25 @@ class Lightcurve():
         
         #Draw first peak region
         if pulsar_phases.regions.dic[name] is not None:
-            plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[0],pulsar_phases.regions.dic[name].limits[1],150), 0, 1600500,facecolor=color,color=color,alpha=0.2,label=name)
-            plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[0]+1,pulsar_phases.regions.dic[name].limits[1]+1,150), 0, 1600500,facecolor=color,color=color,alpha=0.2)
+            plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[0],pulsar_phases.regions.dic[name].limits[1],150), 0, 1600500,facecolor=color,color=color,alpha=0.2,label=name,zorder=4)
+            plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[0]+1,pulsar_phases.regions.dic[name].limits[1]+1,150), 0, 1600500,facecolor=color,color=color,alpha=0.2,zorder=4)
             
             
             if len(pulsar_phases.regions.dic[name].limits)>2:
-                plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[2],pulsar_phases.regions.dic[name].limits[3],150), 0, 1600500,facecolor=color,color=color,alpha=0.2)
-                plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[2]+1,pulsar_phases.regions.dic[name].limits[3]+1,150), 0, 1600500,facecolor=color,color=color,alpha=0.2)
+                plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[2],pulsar_phases.regions.dic[name].limits[3],150), 0, 1600500,facecolor=color,color=color,alpha=0.2,zorder=4)
+                plt.fill_between(np.linspace(pulsar_phases.regions.dic[name].limits[2]+1,pulsar_phases.regions.dic[name].limits[3]+1,150), 0, 1600500,facecolor=color,color=color,alpha=0.2,zorder=4)
             
  
     def draw_background(self,pulsar_phases,color,hline=True):
         
         #Draw the background region
-        plt.fill_between(np.linspace(pulsar_phases.regions.OFF.limits[0],pulsar_phases.regions.OFF.limits[1],150), 0,1600500,facecolor=color,color=color,alpha=0.2,label='OFF')
+        plt.fill_between(np.linspace(pulsar_phases.regions.OFF.limits[0],pulsar_phases.regions.OFF.limits[1],150), 0,1600500,facecolor='white',color=color,alpha=0.2, hatch='/',label='OFF')
         
-        plt.fill_between(np.linspace(pulsar_phases.regions.OFF.limits[0]+1,pulsar_phases.regions.OFF.limits[1]+1,150), 0,1600500,facecolor=color,color=color,alpha=0.2)
+        plt.fill_between(np.linspace(pulsar_phases.regions.OFF.limits[0]+1,pulsar_phases.regions.OFF.limits[1]+1,150), 0,1600500,facecolor='white',color=color,alpha=0.2, hatch='/')
         
         #Add hline for background level reference (default True)
         if hline==True:
-            plt.hlines(y=np.mean((self.lc[0][(self.lc[1][:-1]>(pulsar_phases.regions.OFF.limits[0])) & (self.lc[1][1:]<(pulsar_phases.regions.OFF.limits[1]))])),xmin=0,xmax=2,linestyle='dashed',color=color) 
+            plt.hlines(y=np.mean((self.lc[0][(self.lc[1][:-1]>(pulsar_phases.regions.OFF.limits[0])) & (self.lc[1][1:]<(pulsar_phases.regions.OFF.limits[1]))])),xmin=0,xmax=2,linestyle='dashed',color=color,zorder=5) 
     
     
     
@@ -165,13 +165,19 @@ class Lightcurve():
     
     def draw_histogram(self,phase_limits,colorhist):
         
-        plt.bar((self.lc[1][1:]+self.lc[1][:-1])/2,self.lc[0],width=1/len(self.lc[0]),color=colorhist,alpha=0.5)
-        plt.bar((self.lc[1][1:]+self.lc[1][:-1])/2+np.ones(len(self.lc[1][:-1])),self.lc[0],width=1/len(self.lc[0]),color=colorhist,alpha=0.5)
+        plt.bar((self.lc[1][1:]+self.lc[1][:-1])/2,self.lc[0],width=1/len(self.lc[0]),color=colorhist,alpha=1,zorder=0)
+        plt.bar((self.lc[1][1:]+self.lc[1][:-1])/2+np.ones(len(self.lc[1][:-1])),self.lc[0],width=1/len(self.lc[0]),color=colorhist,alpha=1,zorder=0)
         
         #Plot errorbars
-        plt.errorbar((self.lc[1][1:]+self.lc[1][:-1])/2,self.lc[0],yerr=np.sqrt(self.lc[0]),color=colorhist,fmt='.')
-        plt.errorbar((self.lc[1][1:]+self.lc[1][:-1])/2+np.ones(len(self.lc[1][:-1])),self.lc[0],yerr=np.sqrt(self.lc[0]),color=colorhist,fmt='.')
+        plt.errorbar((self.lc[1][1:]+self.lc[1][:-1])/2,self.lc[0],yerr=np.sqrt(self.lc[0]),color='k',fmt='.',zorder=1)
+        plt.errorbar((self.lc[1][1:]+self.lc[1][:-1])/2+np.ones(len(self.lc[1][:-1])),self.lc[0],yerr=np.sqrt(self.lc[0]),color='k',fmt='.',zorder=1)
         
+        list_step=list(self.lc[0])
+        list_step.insert(0,self.lc[0][0])
+        
+        plt.step((self.lc[1]),list_step,'k',linestyle='-',linewidth=1,zorder=1)
+        plt.step((self.lc[1])+np.ones(len(self.lc[1])),list_step,'k',linestyle='-',linewidth=1,zorder=1)
+    
         #Add labels
         plt.xlabel('Pulsar phase')
         plt.ylabel('Events')
@@ -182,7 +188,7 @@ class Lightcurve():
         
 
     
-    def show_phaseogram(self,pulsar_phases,phase_limits=[0,1],stats='short',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True,time_label=True):
+    def show_phaseogram(self,pulsar_phases,phase_limits=[0,1],stats='short',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='grey',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True,time_label=True):
         
         #Draw the histogram
         self.draw_histogram(phase_limits,colorhist)
