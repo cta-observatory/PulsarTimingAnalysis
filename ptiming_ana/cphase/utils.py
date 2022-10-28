@@ -294,7 +294,7 @@ def model_fromephem(times,ephem,model_name):
 def add_mjd(file_dataframe):
     times=file_dataframe.dragon_time.values
     t = Time(times,format='unix', scale='utc')
-    mjd_time=t.mjd
+    mjd_time=t.to_value('mjd','long')
 
     #Add time in MJD
     print('Adding MJD time')

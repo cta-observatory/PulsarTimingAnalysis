@@ -155,7 +155,7 @@ def DL3_calphase(file,ephem,output_dir,use_interpolation=False,pickle=False):
     time_orig=df['TIME']
 
     time=time_orig+lst_epoch.to_value(format='unix')
-    timelist=list(Time(time,format='unix').to_value('mjd'))
+    timelist=list(Time(time,format='unix').to_value('mjd','long'))
     
     #Get the name of the files
     timname=str(os.path.basename(file).replace('.fits',''))+'.tim'
