@@ -113,8 +113,8 @@ class PulsarAnalysis():
         self.telescope=tel
         self.energy_units=energy_units
             
-    def setDL3InputFile(self,dirname=None,target_radec=None,max_rad=0.2):
-        self.r=ReadDL3File(directory=dirname,target_radec=target_radec,max_rad=max_rad)
+    def setDL3InputFile(self,dirname=None,target_radec=None,max_rad=0.2,zd_cuts=[0,60]):
+        self.r=ReadDL3File(directory=dirname,target_radec=target_radec,max_rad=max_rad,zd_cuts=zd_cuts)
         self.telescope='lst'
         self.energy_units='TeV'
 

@@ -9,8 +9,7 @@ cphase_setting:
 
 # -------- FILE DIRECTORY -----------
 ephem_dir: '/home/alvaro.mas/software/Pulsar_analysis/data/all.gro'
-pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/DL2_src/'
-
+pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/DL3_pulsar_sys_eff_6nodes/eff_0.7/'
 # -------- ANALYSIS SETTINGS ---------
 
 target:
@@ -20,12 +19,12 @@ target:
 
 flags:
   src_dependent: True
-  DL2_format: True
+  DL2_format: False
   fits_format: False
 
 cuts:
   max_rad: 0.2
-  include_extra_cuts: True
+  include_extra_cuts: False
   energy_dependent: False
   extra_cuts:
     theta: 0.2

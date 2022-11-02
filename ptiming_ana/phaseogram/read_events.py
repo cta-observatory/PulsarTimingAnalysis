@@ -61,14 +61,22 @@ class ReadFermiFile():
             
 
 class ReadDL3File():
-        def __init__(self, directory=None,target_radec=None,max_rad=0.2):
+        def __init__(self, directory=None,target_radec=None,max_rad=0.2,zd_cuts=[0,60]):
             if directory is not None:
                 self.direc=directory
                 self.datastore = DataStore.from_dir(self.direc)
-                self.target_radec=target_radec           
+                
+            self.target_radec=target_radec           
             self.info=None
-            self.ids=self.datastore.obs_table["OBS_ID"].data
+
+            d_zen_max = [self.datastore.obs_table["ZEN_PNT"]<zd_cuts[1]]
+            d_zen_min = [self.datastore.obs_table["ZEN_PNT"]>zd_cuts[0]]
+            
+            
+            self.ids=self.datastore.obs_table[d_zen_max[0]*d_zen_min[0]]["OBS_ID"]
             self.max_rad=max_rad
+            
+           
          
         def read_DL3file(self,obs_id):
             obs = self.datastore.get_observations([obs_id], required_irf=None)
