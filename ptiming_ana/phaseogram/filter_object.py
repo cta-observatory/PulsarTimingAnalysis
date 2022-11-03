@@ -9,9 +9,14 @@ class FilterPulsarAna():
         self.gammaness_cut=gammaness_cut
         self.alpha_cut=alpha_cut
         self.theta2_cut=theta2_cut
-        self.zd_cut=zd_cut
         self.int_cut=int_cut
         self.energy_binning_cut=energy_binning_cut
+        self.zd_cut=zd_cut
+        
+        if self.zd_cut is not None:
+            self.zd_cut_min=zd_cut[0]
+            self.zd_cut_max=zd_cut[1]
+        
         
         if self.energy_binning_cut is None:
             self.check_cuts()
@@ -29,9 +34,16 @@ class FilterPulsarAna():
         if self.theta2_cut is not None:
             if isinstance(self.theta2_cut, float) or isinstance(self.theta2_cut, int):
                 dataframe=dataframe[dataframe['theta2']<self.theta2_cut]
+                
         if self.zd_cut is not None:
-            if isinstance(self.zd_cut, float) or isinstance(self.zd_cut, int):
-                dataframe=dataframe[(90-dataframe['alt_tel']*180/3.1416)<self.zd_cut]
+            if isinstance(self.zd_cut_min, float) or isinstance(self.zd_cut_min, int):
+                print(self.zd_cut_min)
+                dataframe=dataframe[(90-np.rad2deg(dataframe['alt_tel']))>self.zd_cut_min]
+                
+            if isinstance(self.zd_cut_max, float) or isinstance(self.zd_cut_max, int):
+                print(self.zd_cut_max)
+                dataframe=dataframe[(90-np.rad2deg(dataframe['alt_tel']))<self.zd_cut_max]
+                
         if self.int_cut is not None:
             if isinstance(self.int_cut, float):
                 dataframe=dataframe[dataframe['intensity']>self.int_cut]
@@ -67,17 +79,18 @@ class FilterPulsarAna():
                         raise ValueError('Theta2 cut no valid')
                         
         if self.zd_cut is not None:
-            if isinstance(self.zd_cut, (float,int)):
-                if self.zd_cut>90 or self.zd_cut<0:
+            if isinstance(self.zd_cut_min, (float,int)):
+                if self.zd_cut_min>90 or self.zd_cut_min<0:
                     raise ValueError('Zenith angle cut no valid')
-            elif isinstance(self.zd_cut, (list,np.ndarray)):
-                for cut in self.zd_cut:
-                    if cut>90 or cut<0:
-                        raise ValueError('Zenith angle cut no valid')
+            
+            if isinstance(self.zd_cut_max, (float,int)):
+                if self.zd_cut_max>90 or self.zd_cut_max<0:
+                    raise ValueError('Zenith angle cut no valid')
+            
         
      
     def use_fixed_cuts(self):
-        for cut in [self.gammaness_cut,self.alpha_cut,self.theta2_cut,self.zd_cut]:
+        for cut in [self.gammaness_cut,self.alpha_cut,self.theta2_cut,self.zd_cut_min,self.zd_cut_max]:
             if not isinstance(cut, float) and not isinstance(cut, int) and cut is not None:
                 return(False)
         return(True)

@@ -196,11 +196,27 @@ class PulsarAnalysis():
         if conf['flags']['DL2_format']== True:
             self.setLSTInputFile(dirname=conf['pulsar_file_dir'],src_dep=conf['flags']['src_dependent'])
             
+            if conf['cuts']['include_DL2_extra_cuts']:
+                if conf['cuts']['energy_dependent']:
+                    if conf['flags']['src_dependent']:
+                        self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],alpha_cut=conf['cuts']['extra_cuts']['alpha'],zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'],energy_binning_cut=conf['cuts']['extra_cuts']['energy_binning'])
+                    else:
+                        self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],theta_cut=np.power(conf['cuts']['extra_cuts']['theta'],2),zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'],energy_binning_cut=conf['cuts']['extra_cuts']['energy_binning'])
+                else:
+                    if conf['flags']['src_dependent']:
+                        self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],alpha_cut=conf['cuts']['extra_cuts']['alpha'],zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'])
+                    else:
+                        self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],theta_cut=np.power(conf['cuts']['extra_cuts']['theta'],2),zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'])
+                        
+            else:
+                self.setParamCuts(zd_cut=conf['cuts']['zd_range'])            
+            
         elif conf['flags']['fits_format']==True:
             self.setFermiInputFile(dirname=conf['pulsar_file_dir'])
         
         else:
-            self.setDL3InputFile(dirname=conf['pulsar_file_dir'],target_radec=[conf['target']['ra'],conf['target']['dec']],max_rad=conf['cuts']['max_rad'])
+            self.setDL3InputFile(dirname=conf['pulsar_file_dir'],target_radec=[conf['target']['ra'],conf['target']['dec']],max_rad=conf['cuts']['max_rad'],zd_cuts=conf['cuts']['zd_range'])
+        
         
         #Set regions
         self.setBackgroundLimits(conf['phase_regions']['Bkg'])
@@ -231,18 +247,6 @@ class PulsarAnalysis():
             self.setFittingParams(model=conf['fitting']['model'],binned=conf['fitting']['binned'])
         
         
-        if conf['cuts']['include_extra_cuts']:
-            if conf['cuts']['energy_dependent']:
-                if conf['flags']['src_dependent']:
-                    self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],alpha_cut=conf['cuts']['extra_cuts']['alpha'],zd_cut=conf['cuts']['extra_cuts']['zd'],int_cut=conf['cuts']['extra_cuts']['intensity'],energy_binning_cut=conf['cuts']['extra_cuts']['energy_binning'])
-                else:
-                    self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],theta_cut=np.power(conf['cuts']['extra_cuts']['theta'],2),zd_cut=conf['cuts']['extra_cuts']['zd'],int_cut=conf['cuts']['extra_cuts']['intensity'],energy_binning_cut=conf['cuts']['extra_cuts']['energy_binning'])
-            else:
-                if conf['flags']['src_dependent']:
-                    self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],alpha_cut=conf['cuts']['extra_cuts']['alpha'],zd_cut=conf['cuts']['extra_cuts']['zd'],int_cut=conf['cuts']['extra_cuts']['intensity'])
-                else:
-                    self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],theta_cut=np.power(conf['cuts']['extra_cuts']['theta'],2),zd_cut=conf['cuts']['extra_cuts']['zd'],int_cut=conf['cuts']['extra_cuts']['intensity'])
-
                     
                     
                     
