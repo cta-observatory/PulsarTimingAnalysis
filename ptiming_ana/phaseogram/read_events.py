@@ -110,7 +110,7 @@ class ReadDL3File():
                 logger.info('Reading DL3 data files') 
                 info_list=[]
                 for obs_id in self.ids:
-                    logger.info('Reading run number'+str(obs_id))
+                    logger.info('Reading run number '+str(obs_id))
                     try:
                         info_file=self.read_DL3file(obs_id)
                         info_list.append(info_file)

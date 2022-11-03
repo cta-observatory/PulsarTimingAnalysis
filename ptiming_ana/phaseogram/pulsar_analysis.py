@@ -23,7 +23,9 @@ import logging
 
 pd.options.mode.chained_assignment = None
 
-logging.basicConfig(level=logging.NOTSET)
+LOG_FORMAT="%(asctime)2s %(levelname)-6s [%(name)3s] %(message)s"
+logging.basicConfig(level=logging.NOTSET,format=LOG_FORMAT,datefmt="%Y-%m-%d %H:%M:%S")
+
 logger=logging.getLogger(__name__)
 
 class PulsarAnalysis():
