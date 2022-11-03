@@ -13,8 +13,6 @@ from astropy import units as u
 import warnings
 
 
-
-
 def function_sqrt(x,A):
     return(A*np.sqrt(x))
 
@@ -44,14 +42,11 @@ class PulsarTimeAnalysis():
         
         #Define the time interval
         self.tint=tint
-        
-            
+               
         
     ##############################################
                        #EXECUTION
     #############################################
-    
-    
     
     def store_Tvalues(self,pulsar_phases):
         

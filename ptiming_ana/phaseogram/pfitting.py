@@ -21,9 +21,6 @@ class PeakFitting():
             self.check_model()
             self.binned=binned
 
-       
-    
-    
                 
         ##############################################
                            #EXECUTION
@@ -135,7 +132,6 @@ class PeakFitting():
             self.create_result_df()
     
     
-
         #Binned fitting 
         def fit_Binned(self,histogram):
             self.check_model()
@@ -167,13 +163,10 @@ class PeakFitting():
             elif self.model=='gaussian':
                 self.params,pcov_l=curve_fit(gaussian,bin_centres,histogram.lc[0],p0=self.init)
                 self.parnames=['mu', 'sigma','A','B']
-
                 
             #Store the result of params and errors
             self.errors=np.sqrt(np.diag(pcov_l))
-            self.create_result_df()
-
-        
+            self.create_result_df()     
         
         ##############################################
                        #RESULTS
@@ -185,10 +178,8 @@ class PeakFitting():
                 self.params
             except:
                 return(False)
-            
             return(True)
 
-        
         def create_result_df(self):
             d = {'Name': self.parnames, 'Value': self.params,'Error':self.errors}
             self.df_result=pd.DataFrame(data=d)

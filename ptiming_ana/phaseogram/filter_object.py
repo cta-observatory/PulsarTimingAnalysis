@@ -37,11 +37,9 @@ class FilterPulsarAna():
                 
         if self.zd_cut is not None:
             if isinstance(self.zd_cut_min, float) or isinstance(self.zd_cut_min, int):
-                print(self.zd_cut_min)
                 dataframe=dataframe[(90-np.rad2deg(dataframe['alt_tel']))>self.zd_cut_min]
                 
             if isinstance(self.zd_cut_max, float) or isinstance(self.zd_cut_max, int):
-                print(self.zd_cut_max)
                 dataframe=dataframe[(90-np.rad2deg(dataframe['alt_tel']))<self.zd_cut_max]
                 
         if self.int_cut is not None:

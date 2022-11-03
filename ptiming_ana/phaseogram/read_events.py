@@ -13,7 +13,9 @@ import os
 from gammapy.data import DataStore, EventList, Observation, Observations
 from gammapy.utils.regions import SphericalCircleSkyRegion
 from astropy.coordinates import SkyCoord,Angle
+import logging 
 
+logger=logging.getLogger(__name__)
 
 def compute_theta2(reco_src_x,reco_src_y,src_x,src_y):
             coma_correction = 1.0466
@@ -53,11 +55,11 @@ class ReadFermiFile():
             return(sum(diff)*24)
         
         def run(self):
-            print('    Reading Fermi-LAT data file')
+            logger.info('Reading Fermi-LAT data file')
             ftable=self.read_file()
             self.create_df_from_info(ftable)
             self.tobs=self.calculate_tobs()
-            print('    Finishing reading. Total time is '+str(self.tobs)+' h'+'\n')
+            logger.info('Finishing reading. Total time is '+str(self.tobs)+' h'+'\n')
             
 
 class ReadDL3File():
@@ -105,10 +107,10 @@ class ReadDL3File():
             return(info)
 
         def run(self,pulsarana):
-                print('    Reading DL3 data files') 
+                logger.info('Reading DL3 data files') 
                 info_list=[]
                 for obs_id in self.ids:
-                    print('          Reading run number'+str(obs_id))
+                    logger.info('Reading run number'+str(obs_id))
                     try:
                         info_file=self.read_DL3file(obs_id)
                         info_list.append(info_file)
@@ -171,15 +173,15 @@ class ReadLSTFile():
                             df_pos=pd.read_hdf(fname, "source_position")
                             df_pos=df_pos[df_or['event_type']==32] 
                             if 'theta2' in df_pos.columns:
-                                print('Including theta2 column from source position table')
+                                logger.info('Including theta2 column from source position table')
                                 df['theta2']=df_pos['theta2']
                             if 'theta2_on' in df_pos.columns:
-                                print('Including theta2 column from source position table')
+                                logger.info('Including theta2 column from source position table')
                                 df['theta2']=df_pos['theta2_on']
                             else:                
                                 df['theta2']=compute_theta2(np.array(df['reco_src_x']),np.array(df['reco_src_y']),np.array(df_pos['src_x']),np.array(df_pos['src_y']))
                         except:
-                            print('No theta2 computed')
+                            logger.info('No theta2 computed')
                 else:
                     df=df_or 
 
@@ -242,11 +244,11 @@ class ReadLSTFile():
 
 
         def run(self,pulsarana,df_type='short'):
-            print('    Reading LST-1 data file')
+            logger.info('Reading LST-1 data file')
             if isinstance(self.fname,list):
                 info_list=[]
                 for name in self.fname:
-                    print(name)
+                    logger.info('Reading file: '+ name)
                     try:
                         info_file=self.read_LSTfile(name,df_type)
                         self.info=info_file    
@@ -275,19 +277,14 @@ class ReadLSTFile():
                 self.info=self.read_LSTfile(self.fname,df_type)
                 self.tobs=self.calculate_tobs()
                 
-                print('    Finishing reading. Total time is '+str(self.tobs)+' h')
                 pulsarana.cuts.apply_fixed_cut(self)
             
                 if pulsarana.cuts.energy_binning_cut is not None:
                     pulsarana.cuts.apply_energydep_cuts(self)
                 
-                print('    Finishing filtering events:')
-                print('        gammaness cut:'+str(pulsarana.cuts.gammaness_cut))
-                print('        alpha cut:'+str(pulsarana.cuts.alpha_cut))
-                print('        theta2 cut:'+str(pulsarana.cuts.theta2_cut))
-                print('        zd cut:'+str(pulsarana.cuts.zd_cut))
-                print('        energy binning for the cuts:'+str(pulsarana.cuts.energy_binning_cut))
-                print('\n')
+            logger.info('Finishing reading. Total time is ' + str(self.tobs)+ ' h')
+            logger.info('Filtering configuration used in the analysis:' + 'gammaness cut:'+str(pulsarana.cuts.gammaness_cut)+ 'alpha cut:'+str(pulsarana.cuts.alpha_cut)
+                         + 'theta2 cut:'+str(pulsarana.cuts.theta2_cut)+ 'zd cut:'+str(pulsarana.cuts.zd_cut) + 'energy binning for the cuts:'+str(pulsarana.cuts.energy_binning_cut))
 
             
 class ReadtxtFile():
@@ -362,7 +359,7 @@ class ReadtxtFile():
             self.create_df_from_info(data)
             self.tobs=self.calculate_tobs()
             
-            print('    Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
+            logger.info('    Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
                 
 
                 
@@ -394,5 +391,5 @@ class ReadList():
         def run(self):
             self.create_df_from_info()
             self.tobs=self.calculate_tobs()
-            print('    Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
+            logger.info('    Finishing reading. Total time is '+str(self.tobs)+' s'+'\n')
                 

@@ -19,9 +19,12 @@ from .filter_object import FilterPulsarAna
 from .read_events import ReadDL3File,ReadFermiFile,ReadLSTFile, ReadList
 import pickle
 import yaml
+import logging 
 
 pd.options.mode.chained_assignment = None
 
+logging.basicConfig(level=logging.NOTSET)
+logger=logging.getLogger(__name__)
 
 class PulsarAnalysis():
 
@@ -71,12 +74,12 @@ class PulsarAnalysis():
         
         if filename is not None:
             if 'fits' in filename:
-                print('Assuming Fermi-LAT data as an input')
+                logger.info('Assuming Fermi-LAT data as an input')
                 self.setFermiInputFile(filename)
                 self.setTimeInterval(tint=3600*24*10) #Every 10 days
                
             elif 'h5' in filename:
-                print('Assuming LST1 data as an input')
+                logger.info('Assuming LST1 data as an input')
                 self.setLSTInputFile(filename) 
                 self.setTimeInterval(tint=3600) #Every hour
             else:
@@ -338,34 +341,34 @@ class PulsarAnalysis():
         
         #Fit the histogram using PeakFitting class. If binned is False, an Unbinned Likelihood method is used for the fitting
         if self.do_fit==True:
-            print('--> Fitting the data to the given model...')
-            print('    Fit model: '+self.fit_model)
-            print('    Binned fitting: '+str(self.binned))
+            logger.info('Fitting the data to the given model...')
+            logger.info('Fit model: '+self.fit_model)
+            logger.info('Binned fitting: '+str(self.binned))
             try:
                 self.fitting.run(self)
             except:
-                print('    No fit could be done')
+                logger.warning('No fit could be done')
         else:
-            print('No fit has been done since no fit parameters has been set')
+            logger.info('No fit has been done since no fit parameters has been set')
         
         
     def run(self):
         #Initializa
-        print('--> Initializing...')
+        logger.info('Initializing...')
         self.initialize()
         
         #Excute stats
-        print('--> Calculating statistics every '+str(self.tint/60)+' minutes...')
+        logger.info('Calculating statistics every '+str(self.tint/60)+' minutes...')
         self.execute_stats(self.r.tobs)
         
         #Execute stats in energy bins
         try:
-            print('\n'+'--> Performing energy-dependent analysis...')
+            logger.info('Performing energy-dependent analysis...')
             self.EnergyAna.run(self) 
         except:
-            print('No Energy Analysis was performed. Check that you set the right energy params')
+            logger.warning('No Energy Analysis was performed. Check that you set the right energy params')
            
-        print('\n'+ 'FINISHED')
+        logger.info('FINISHED')
 
  
     ##############################################
@@ -376,7 +379,7 @@ class PulsarAnalysis():
         try:
             self.EnergyAna
         except:
-            print('No energy-dependent analysis has been done')
+            logger.info('No energy-dependent analysis has been done')
             return(False)
         return(True)
             

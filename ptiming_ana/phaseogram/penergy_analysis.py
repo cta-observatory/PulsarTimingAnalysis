@@ -9,9 +9,11 @@ import warnings
 import matplotlib.pyplot as plt
 from astropy.io import fits
 import copy
-
+import logging
 
 __all__=['PEnergyAnalysis']
+
+logger=logging.getLogger(__name__)
 
 class PEnergyAnalysis():
     
@@ -84,7 +86,7 @@ class PEnergyAnalysis():
             dataframe=pulsarana.info
             di=dataframe[(dataframe['energy']>self.energy_edges[i]) & (dataframe['energy']<self.energy_edges[i+1])]
             
-            print('Creating object in '+f'energy range ('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}')
+            logger.info('Creating object in '+f'energy range ('+self.energy_units+f'):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}')
             self.Parray.append(copy.copy(pulsarana))
             self.Parray[i].setTimeInterval(self.Parray[i].tint)
             self.Parray[i].phases=np.array(di['pulsar_phase'].to_list())
@@ -97,7 +99,7 @@ class PEnergyAnalysis():
 
                 
             #Update the information every 1 hour and store final values
-            print('Calculating statistics...')
+            logger.info('Calculating statistics...')
             self.Parray[i].execute_stats(self.tobs)
 
     
