@@ -283,8 +283,8 @@ class ReadLSTFile():
                     pulsarana.cuts.apply_energydep_cuts(self)
                 
             logger.info('Finishing reading. Total time is ' + str(self.tobs)+ ' h')
-            logger.info('Filtering configuration used in the analysis:' + 'gammaness cut:'+str(pulsarana.cuts.gammaness_cut)+ 'alpha cut:'+str(pulsarana.cuts.alpha_cut)
-                         + 'theta2 cut:'+str(pulsarana.cuts.theta2_cut)+ 'zd cut:'+str(pulsarana.cuts.zd_cut) + 'energy binning for the cuts:'+str(pulsarana.cuts.energy_binning_cut))
+            logger.info('Filtering configuration used in the analysis:' + ' gammaness cut:'+str(pulsarana.cuts.gammaness_cut)+ ', alpha cut:'+str(pulsarana.cuts.alpha_cut)
+                         + ', theta2 cut:'+str(pulsarana.cuts.theta2_cut) + ', zd cut:'+str(pulsarana.cuts.zd_cut) + ', energy binning for the cuts:'+str(pulsarana.cuts.energy_binning_cut))
 
             
 class ReadtxtFile():
