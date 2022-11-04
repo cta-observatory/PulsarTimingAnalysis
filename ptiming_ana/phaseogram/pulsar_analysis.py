@@ -24,9 +24,10 @@ import logging
 pd.options.mode.chained_assignment = None
 
 LOG_FORMAT="%(asctime)2s %(levelname)-6s [%(name)3s] %(message)s"
-logging.basicConfig(level=logging.NOTSET,format=LOG_FORMAT,datefmt="%Y-%m-%d %H:%M:%S")
+logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt="%Y-%m-%d %H:%M:%S")
 
 logger=logging.getLogger(__name__)
+logging.getLogger('matplotlib.font_manager').disabled=True
 
 class PulsarAnalysis():
 
@@ -386,7 +387,7 @@ class PulsarAnalysis():
         return(True)
             
         
-    def draw_phaseogram(self,phase_limits=[0,2],stats='short',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True):
+    def draw_phaseogram(self,phase_limits=[0,2],stats='short',background=True,signal=['P1','P2','P3'],colorhist='xkcd:sky blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True):
         #Plot histogram from 0 to 1 and from 1 to 2 (2 periods)
         fig=plt.figure(figsize=(15,5))
         self.histogram.show_phaseogram(self,phase_limits,stats,background,signal,colorhist,colorb,colorP,colorfit,fit,hline)
