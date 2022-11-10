@@ -14,8 +14,11 @@ from gammapy.data import DataStore, EventList, Observation, Observations
 from gammapy.utils.regions import SphericalCircleSkyRegion
 from astropy.coordinates import SkyCoord,Angle
 import logging 
+from regions import PointSkyRegion
 
 logger=logging.getLogger(__name__)
+
+logging.getLogger('gammapy').disabled=True
 
 def compute_theta2(reco_src_x,reco_src_y,src_x,src_y):
             coma_correction = 1.0466
@@ -63,35 +66,42 @@ class ReadFermiFile():
             
 
 class ReadDL3File():
-        def __init__(self, directory=None,target_radec=None,max_rad=0.2,zd_cuts=[0,60]):
+        def __init__(self, directory=None,target_radec=None,max_rad=0.2,zd_cuts=[0,60],energy_dependent_theta=True):
             if directory is not None:
                 self.direc=directory
                 self.datastore = DataStore.from_dir(self.direc)
                 
-            self.target_radec=target_radec           
+            self.target_radec=target_radec
+            self.energydep_radmax=energy_dependent_theta
             self.info=None
 
             d_zen_max = [self.datastore.obs_table["ZEN_PNT"]<zd_cuts[1]]
             d_zen_min = [self.datastore.obs_table["ZEN_PNT"]>zd_cuts[0]]
             
-            
             self.ids=self.datastore.obs_table[d_zen_max[0]*d_zen_min[0]]["OBS_ID"]
-            self.max_rad=max_rad
+            self.zd_mask=d_zen_max[0]*d_zen_min[0]
+            
+            if not self.energydep_radmax:
+                self.max_rad=max_rad
             
            
-         
         def read_DL3file(self,obs_id):
-            obs = self.datastore.get_observations([obs_id], required_irf=None)
+            obs = self.datastore.get_observations([obs_id], required_irf="point-like")
             pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
-            on_radius = self.max_rad*u.deg
-            on_region = SphericalCircleSkyRegion(pos_target, on_radius)
-            self.events = obs[0].events.select_region(on_region).table
+            
+            if not self.energydep_radmax:
+                on_radius = self.max_rad*u.deg
+                on_region = SphericalCircleSkyRegion(pos_target, on_radius)
+                self.events = obs[0].events.select_region(on_region).table
+            else:
+                on_region = PointSkyRegion(pos_target)
+                self.events = obs[0].events.select_rad_max(obs[0].rad_max,position=pos_target).table
+                
             info=self.create_dataframe()
             return(info)
 
         def calculate_tobs(self):
-            dataframe=add_delta_t_key(self.info)
-            return(get_effective_time(dataframe)[1].value/3600) 
+            return(self.datastore.obs_table[self.zd_mask]["LIVETIME"].data.sum()/3600) 
         
         def create_dataframe(self):
             df = self.events.to_pandas()

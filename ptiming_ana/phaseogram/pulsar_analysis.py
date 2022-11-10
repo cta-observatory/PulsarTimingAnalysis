@@ -28,6 +28,7 @@ logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt="%Y-%m-%d %H:%M
 
 logger=logging.getLogger(__name__)
 logging.getLogger('matplotlib.font_manager').disabled=True
+logging.getLogger('gammapy').disabled=True
 
 class PulsarAnalysis():
 
@@ -119,8 +120,8 @@ class PulsarAnalysis():
         self.telescope=tel
         self.energy_units=energy_units
             
-    def setDL3InputFile(self,dirname=None,target_radec=None,max_rad=0.2,zd_cuts=[0,60]):
-        self.r=ReadDL3File(directory=dirname,target_radec=target_radec,max_rad=max_rad,zd_cuts=zd_cuts)
+    def setDL3InputFile(self,dirname=None,target_radec=None,max_rad=0.2,zd_cuts=[0,60],energy_dependent_theta=True):
+        self.r=ReadDL3File(directory=dirname,target_radec=target_radec,max_rad=max_rad,zd_cuts=zd_cuts,energy_dependent_theta=True)
         self.telescope='lst'
         self.energy_units='TeV'
 
@@ -138,9 +139,9 @@ class PulsarAnalysis():
         self.cuts=FilterPulsarAna(gammaness_cut,alpha_cut,theta2_cut,zd_cut,int_cut,energy_binning_cut)
 
     
-    def setEnergybinning(self,energy_edges):
+    def setEnergybinning(self,energy_edges,do_diff,do_integral):
         self.energy_edges=energy_edges
-        self.EnergyAna=PEnergyAnalysis(self.energy_edges)
+        self.EnergyAna=PEnergyAnalysis(self.energy_edges,do_diff,do_integral)
         
         
     def setFittingParams(self,model,binned=False,peak='both',do_fit=True):
@@ -203,7 +204,7 @@ class PulsarAnalysis():
             self.setLSTInputFile(dirname=conf['pulsar_file_dir'],src_dep=conf['flags']['src_dependent'])
             
             if conf['cuts']['include_DL2_extra_cuts']:
-                if conf['cuts']['energy_dependent']:
+                if conf['cuts']['extra_cuts']['energy_dependent']:
                     if conf['flags']['src_dependent']:
                         self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],alpha_cut=conf['cuts']['extra_cuts']['alpha'],zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'],energy_binning_cut=conf['cuts']['extra_cuts']['energy_binning'])
                     else:
@@ -221,7 +222,7 @@ class PulsarAnalysis():
             self.setFermiInputFile(dirname=conf['pulsar_file_dir'])
         
         else:
-            self.setDL3InputFile(dirname=conf['pulsar_file_dir'],target_radec=[conf['target']['ra'],conf['target']['dec']],max_rad=conf['cuts']['max_rad'],zd_cuts=conf['cuts']['zd_range'])
+            self.setDL3InputFile(dirname=conf['pulsar_file_dir'],target_radec=[conf['target']['ra'],conf['target']['dec']],max_rad=conf['cuts']['max_rad'],zd_cuts=conf['cuts']['zd_range'],energy_dependent_theta=['energy_dependent_theta'])
         
         
         #Set regions
@@ -246,8 +247,10 @@ class PulsarAnalysis():
             nbins_energy=conf['energy_binning']['nbins']
             emin=conf['energy_binning']['emin']* u.Unit(units_energy)
             emax=conf['energy_binning']['emax']* u.Unit(units_energy)
+            do_integral=conf['energy_binning']['do_integral']
+            do_diff=conf['energy_binning']['do_diff']
             
-            self.setEnergybinning(np.geomspace(emin.to(u.TeV).value,emax.to(u.TeV).value,nbins_energy))
+            self.setEnergybinning(np.geomspace(emin.to(u.TeV).value,emax.to(u.TeV).value,nbins_energy),do_diff,do_integral)
             
         if conf['fitting']['run_fitting']:    
             self.setFittingParams(model=conf['fitting']['model'],binned=conf['fitting']['binned'])
@@ -420,68 +423,68 @@ class PulsarAnalysis():
         return fig1,fig2
     
     
-    def show_EnergyAna(self):
+    def show_EnergyAna(self,  integral = None):
         if self.check_energyana():
-            fig = plt.figure(figsize=(15,4))
+            fig = plt.figure(figsize=(20,4))
             if self.regions.P1 is None or self.regions.P2 is None:
                 nplots=2
             else:
                 nplots=3
                 plt.subplot(1,nplots, 3)
-                self.EnergyAna.P1P2VsEnergy()
+                self.EnergyAna.P1P2VsEnergy(integral)
 
             plt.subplot(1,nplots, 1)
-            self.EnergyAna.PSigVsEnergy()
+            self.EnergyAna.PSigVsEnergy(integral)
 
             plt.subplot(1,nplots, 2)
-            self.EnergyAna.FWHMVsEnergy()
+            self.EnergyAna.FWHMVsEnergy(integral)
 
             plt.tight_layout()
             return(fig)
     
     
-    def show_EnergyPresults(self):
+    def show_EnergyPresults(self, integral = None):
         if self.check_energyana():
-            peak_stat,p_stat=self.EnergyAna.show_EnergyPresults()
+            peak_stat,p_stat=self.EnergyAna.show_EnergyPresults(integral)
             return peak_stat,p_stat
     
     
-    def show_EnergyFitresults(self):
+    def show_EnergyFitresults(self, integral = None):
         if self.check_energyana():
-            fit_results=self.EnergyAna.show_Energy_fitresults()
+            fit_results=self.EnergyAna.show_Energy_fitresults(integral)
             return fit_results
     
     
-    def show_meanVsEnergy(self):
+    def show_meanVsEnergy(self, integral = None):
         if self.check_energyana():
-            fig=self.EnergyAna.MeanVsEnergy()
+            fig=self.EnergyAna.MeanVsEnergy(integral)
             return(fig)
     
     
-    def show_FWHMVsEnergy(self):
+    def show_FWHMVsEnergy(self, integral = None):
         if self.check_energyana():
             fig=plt.figure()
             self.EnergyAna.FWHMVsEnergy()
             return(fig)
     
     
-    def show_SigVsEnergy(self):
+    def show_SigVsEnergy(self, integral = None):
         if self.check_energyana():
             fig=plt.figure()
-            self.EnergyAna.PSigVsEnergy()
+            self.EnergyAna.PSigVsEnergy(integral)
             return(fig)
     
     
-    def show_P1P2VsEnergy(self):
+    def show_P1P2VsEnergy(self,  integral = None):
         if self.check_energyana():
             fig=plt.figure()
-            self.EnergyAna.P1P2VsEnergy()
+            self.EnergyAna.P1P2VsEnergy(integral)
             return(fig)
     
     
-    def show_lcVsEnergy(self):
+    def show_lcVsEnergy(self,  integral = None):
         if self.check_energyana():
-            fig_array=self.EnergyAna.show_Energy_lightcurve()   
+            fig_array=self.EnergyAna.show_Energy_lightcurve(integral)   
             return (fig_array)
     
     
@@ -491,9 +494,9 @@ class PulsarAnalysis():
             return(fig)
     
     
-    def show_all_fits(self):
+    def show_all_fits(self, integral = None):
         if self.check_energyana():
-            fig=self.EnergyAna.show_joined_Energy_fits()
+            fig=self.EnergyAna.show_joined_Energy_fits(integrals)
             return(fig)
     
     

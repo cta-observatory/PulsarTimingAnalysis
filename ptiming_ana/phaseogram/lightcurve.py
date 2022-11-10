@@ -188,13 +188,14 @@ class Lightcurve():
         
 
     
-    def show_phaseogram(self,pulsar_phases,phase_limits=[0,1],stats='short',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='grey',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True,time_label=True):
+    def show_phaseogram(self,pulsar_phases,phase_limits=[0,1],stats='short',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='grey',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True,stats_label=True,time_label=True,add_legend=True):
         
         #Draw the histogram
         self.draw_histogram(phase_limits,colorhist)
      
         #Plot statistics (default True)
-        self.draw_stats(pulsar_phases,phase_limits,stats)
+        if stats_label:
+            self.draw_stats(pulsar_phases,phase_limits,stats)
         
         #Plot regions (default True)
         if background==True:
@@ -211,10 +212,11 @@ class Lightcurve():
                 print('No good fit available')
             
         #Add Tobs label
-        if time_label==True:
+        if time_label:
             plt.annotate(f'Tobs={pulsar_phases.tobs:.1f} h'+'\n'+f'Entries={len(pulsar_phases.phases)}', xy=(0.11, 1.3), xytext=(0.11,1.3), fontsize=15, xycoords='axes fraction', textcoords='offset points', color='k',bbox=dict(facecolor='white', edgecolor='k',alpha=0.8),horizontalalignment='left', verticalalignment='top')
             
         #Add legend
-        plt.legend(loc=2,bbox_to_anchor=(-0.01, 1.37),fontsize=15)
+        if add_legend:
+            plt.legend(loc=2,bbox_to_anchor=(-0.01, 1.37),fontsize=15)
     
 

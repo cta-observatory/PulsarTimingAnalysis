@@ -183,18 +183,24 @@ def DL3_calphase(file,ephem,output_dir,use_interpolation=False,pickle=False):
             cols_list.append(fits.Column(name=orig_cols[j].name, format=orig_cols[j].format,unit=orig_cols[j].unit,array=df[orig_cols[j].name]))
             
         except:
-            cols_list.append(fits.Column(name=orig_cols[j].name, format=orig_cols[j].format,array=df[orig_cols[j].name]))                 
+            cols_list.append(fits.Column(name=orig_cols[j].name, format=orig_cols[j].format,array=df[orig_cols[j].name])) 
+            
     orig_cols_sorted=fits.ColDefs(cols_list)
     
     #New columns to add to the DL3 files
     new_cols = fits.ColDefs([fits.Column(name='PHASE', format='D',array=phase),fits.Column(name='BARYCENT_TIME',format='D',array=barycent_toas)])
     
-    
     #Create the files
     hdu = fits.BinTableHDU.from_columns(orig_cols_sorted + new_cols,header=data[1].header)
-    hdu_list=fits.HDUList([data[0],hdu,data[2],data[3],data[4],data[5]])
+    
+    data_list=[]
+    for d in data:
+        data_list.append(d)
+        
+    hdu_list=fits.HDUList([data_list[0],hdu]+ data_list[2:])
     
     output_file=output_dir+str(os.path.basename(file).replace('.fits',''))+'_pulsar.fits'
+    
     print('Writing outputfile in'+str(output_file))
     
     hdu_list.writeto(output_file)
