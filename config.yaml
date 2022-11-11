@@ -9,7 +9,8 @@ cphase_setting:
 
 # -------- FILE DIRECTORY -----------
 ephem_dir: '/home/alvaro.mas/software/Pulsar_analysis/data/all.gro'
-pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9.9/src_indep/DL3_pulsar_eff_0.8/'
+pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9.9/src_dep/DL3_pulsar_eff_0.7'
+
 
 target:
   name: Crab
@@ -23,7 +24,7 @@ flags:
 
 cuts:
   max_rad: 0.2
-  energy_dependent_theta: True
+  energy_dependent_theta: False
   zd_range: [0,50]
   include_DL2_extra_cuts: False
   extra_cuts:
@@ -61,7 +62,7 @@ time_binning:
 
 
 energy_binning:
-   run_energy_analysis: True
+   run_energy_analysis: False
    do_diff: False #Set to True if want to calculate statistics for data in each energy bin (i.e 50 GeV < E < 80 GeV)
    do_integral: True # Set to True if want to calculate statistics for data above each energy edge (i.e E>50 GeV)
    units: GeV

@@ -121,7 +121,7 @@ class PulsarAnalysis():
         self.energy_units=energy_units
             
     def setDL3InputFile(self,dirname=None,target_radec=None,max_rad=0.2,zd_cuts=[0,60],energy_dependent_theta=True):
-        self.r=ReadDL3File(directory=dirname,target_radec=target_radec,max_rad=max_rad,zd_cuts=zd_cuts,energy_dependent_theta=True)
+        self.r=ReadDL3File(directory=dirname,target_radec=target_radec,max_rad=max_rad,zd_cuts=zd_cuts,energy_dependent_theta=energy_dependent_theta)
         self.telescope='lst'
         self.energy_units='TeV'
 
@@ -222,7 +222,7 @@ class PulsarAnalysis():
             self.setFermiInputFile(dirname=conf['pulsar_file_dir'])
         
         else:
-            self.setDL3InputFile(dirname=conf['pulsar_file_dir'],target_radec=[conf['target']['ra'],conf['target']['dec']],max_rad=conf['cuts']['max_rad'],zd_cuts=conf['cuts']['zd_range'],energy_dependent_theta=['energy_dependent_theta'])
+            self.setDL3InputFile(dirname=conf['pulsar_file_dir'],target_radec=[conf['target']['ra'],conf['target']['dec']],max_rad=conf['cuts']['max_rad'],zd_cuts=conf['cuts']['zd_range'],energy_dependent_theta=conf['cuts']['energy_dependent_theta'])
         
         
         #Set regions
