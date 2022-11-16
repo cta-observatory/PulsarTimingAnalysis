@@ -84,17 +84,29 @@ class ReadDL3File():
             if not self.energydep_radmax:
                 self.max_rad=max_rad
             
-           
+        
+        def read_all_DL3file(self):
+            obs = self.datastore.get_observations(self.ids, required_irf="point-like")
+            pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
+            
+            if not self.energydep_radmax:
+                on_radius = self.max_rad*u.deg
+                self.on_region = SphericalCircleSkyRegion(pos_target, on_radius)
+            else:
+                self.on_region = PointSkyRegion(pos_target)
+            
+            return(obs)
+               
         def read_DL3file(self,obs_id):
             obs = self.datastore.get_observations([obs_id], required_irf="point-like")
             pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
             
             if not self.energydep_radmax:
                 on_radius = self.max_rad*u.deg
-                on_region = SphericalCircleSkyRegion(pos_target, on_radius)
-                self.events = obs[0].events.select_region(on_region).table
+                self.on_region = SphericalCircleSkyRegion(pos_target, on_radius)
+                self.events = obs[0].events.select_region(self.on_region).table
             else:
-                on_region = PointSkyRegion(pos_target)
+                self.on_region = PointSkyRegion(pos_target)
                 self.events = obs[0].events.select_rad_max(obs[0].rad_max,position=pos_target).table
                 
             info=self.create_dataframe()

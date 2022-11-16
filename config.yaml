@@ -2,14 +2,21 @@
 #Configuration file for pulsar analysis using ptiming_ana
 #######
 
-# -------- CPHASE SETTINGS ---------
+###############################################################
+##################### CPHASE PARAMS ###########################
+###############################################################
 cphase_setting:
    tel: lst 
    use_interpolation: True
 
+
+###############################################################
+##################### GENERAL PARAMS ##########################
+###############################################################
+
 # -------- FILE DIRECTORY -----------
 ephem_dir: '/home/alvaro.mas/software/Pulsar_analysis/data/all.gro'
-pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9.9/src_dep/DL3_pulsar_eff_0.7'
+pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9.9/src_indep/DL3_pulsar_eff_0.8/'
 
 
 target:
@@ -17,14 +24,32 @@ target:
   ra: 83.633
   dec: 22.01
 
+
+# -------- REGIONS ---------
+
+phase_regions:
+  Bkg: [0.52,0.87]
+  P1: [0,0.026,0.983,1]
+  P2: [0.377,0.422]
+  P1+P2: [0,0.026,0.377,0.422, 0.983,1]
+  P3: [0.14,0.25]
+  
+  
+
+###############################################################
+##################### PHASEOGRAM TOOLS ########################
+###############################################################
+
+
 flags:
   src_dependent: False
   DL2_format: False
   fits_format: False
 
+
 cuts:
-  max_rad: 0.2
-  energy_dependent_theta: False
+  max_rad: 0.266
+  energy_dependent_theta: True
   zd_range: [0,50]
   include_DL2_extra_cuts: False
   extra_cuts:
@@ -35,15 +60,7 @@ cuts:
     gammaness: 0.5
     energy_binning: [0,0.02,1000]
 
-  
-# -------- REGIONS ---------
 
-phase_regions:
-  Bkg: [0.52,0.87]
-  P1: [0,0.026,0.983,1]
-  P2: [0.377,0.422]
-  P3: [0.14,0.25]
-  
 
 #-------- BINNING--------------
 
@@ -78,3 +95,49 @@ fitting:
    model: dgaussian   # Choose among dgaussian, asym_dgaussian, lorentzian
    binned: False
 
+
+
+
+
+###############################################################
+##################### SPECTRAL TOOLS ##########################
+###############################################################
+
+
+reader:
+  energy_dependent_theta: True
+  max_rad: 0.2
+  zd_range: [0,50]
+
+energy_geometry:
+  real:
+    emin: 0.003
+    emax: 50
+    units: 'TeV'
+    nbinning: 100
+  reco:
+    emin: 0.01
+    emax: 40
+    units: 'TeV'
+    nbinning: 40
+    
+analysis_extra_settings:
+  stacked: True
+  use_safe_mask: False
+  
+spectral_fitting:
+  emin: 20
+  emax: 500
+  units: 'GeV'
+  model: 'PowerLaw'
+
+
+spectral_points:
+  emin: 20
+  emax: 500
+  units: 'GeV'
+  number_points: 7
+  min_ts: 1.5
+  
+
+  

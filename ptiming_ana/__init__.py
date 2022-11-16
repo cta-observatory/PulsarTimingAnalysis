@@ -6,4 +6,5 @@ __all__=[
 	"cphase",
 	"phaseogram",
         "__version__",
+	"spectral",
 ]
