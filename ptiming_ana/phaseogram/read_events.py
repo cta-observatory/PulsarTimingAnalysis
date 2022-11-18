@@ -100,6 +100,7 @@ class ReadDL3File():
         def read_DL3file(self,obs_id):
             obs = self.datastore.get_observations([obs_id], required_irf="point-like")
             pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
+            self.obs_object=obs
             
             if not self.energydep_radmax:
                 on_radius = self.max_rad*u.deg

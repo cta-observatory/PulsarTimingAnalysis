@@ -76,6 +76,7 @@ def execute_makers(observations, ids, dataset_empty, dataset_maker, bkg_maker, n
 
     for obs_id, observation in zip(ids, observations):
         
+        logger.info ('Executing analysis for run number ' + str(obs_id))
         dataset = dataset_maker.run(dataset_empty.copy(name=str(obs_id)), observation)
     
         dataset_on_off = bkg_maker.run(dataset=dataset, observation=observation)
@@ -90,12 +91,16 @@ def execute_makers(observations, ids, dataset_empty, dataset_maker, bkg_maker, n
         
     if stacked:
         datasets = Datasets(datasets).stack_reduce()
+        logger.info('The total significance of the dataset is ' + str(datasets.info_dict()['sqrt_ts']) + ' sigma')
     
     return(datasets)
 
 
-def set_model_to_fit(predefined_model='PowerLaw',model_name=None):
+def set_model_to_fit(spectral_model =None, predefined_model='PowerLaw',model_name=None):
 
+    if spectral_model is not None:
+        model = SkyModel(spectral_model=spectral_model, name=model_name)
+        
     if predefined_model == 'PowerLaw':
         spectral_model = PowerLawSpectralModel(index=2.9, 
                                         amplitude=2e-11 * u.Unit("1 / (cm2 s TeV)"), 
@@ -138,17 +143,15 @@ def do_fitting(dataset, model, geom, emin_fit=None, emax_fit=None,stacked=False)
         joint_result=joint_fit.run(datasets = dataset)
     
         
-    return(dataset, model_best, result)
+    return(dataset, model_best, stacked_fit, result)
 
         
     
 def compute_spectral_points(dataset, model, e_min_points, e_max_points, npoints, min_ts=2, name='Crab'):
-    energy_edges = np.geomspace(e_min_points, e_max_points, npoints+1) * u.TeV
-
+    energy_edges = np.geomspace(e_min_points, e_max_points, npoints+1)
 
     fpe = FluxPointsEstimator(energy_edges=energy_edges, source=name, selection_optional="all")
     flux_points= fpe.run(datasets=dataset)
-
 
     flux_points.is_ul = flux_points.sqrt_ts < min_ts
     flux_points.to_table(sed_type="dnde", formatted=True)

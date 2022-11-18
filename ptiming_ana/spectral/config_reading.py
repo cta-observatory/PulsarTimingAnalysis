@@ -63,7 +63,7 @@ class SpectralConfigSetting():
         self.e_max_fitting = spectral_fitting['emax'] * u.Unit(spectral_fitting['units'])
 
         self.model = spectral_fitting['model']
-
+            
 
         
     def set_spectral_points_from_config(self):
