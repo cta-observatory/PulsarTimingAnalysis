@@ -35,8 +35,20 @@ class SpectralConfigSetting():
         
         configuration_dict = self.conf
 
-        # Read the configuration file
+        # Read the directory
         self.directory = configuration_dict['pulsar_file_dir']
+        
+        # DL4 directory
+        self.dl4_dir = configuration_dict['DL4_directory']
+        if not os.path.exists(self.dl4_dir):
+            logger.info('Creating directory: ' + self.dl4_dir)
+            os.makedirs(self.dl4_dir)
+            
+        # Results Output directory
+        self.output_dir = configuration_dict['results_output_directory']
+        if not os.path.exists(self.output_dir):
+            logger.info('Creating directory: ' + self.output_dir)
+            os.makedirs(self.output_dir)
 
         #Energy dependent theta 
         self.reader_info = configuration_dict['reader']

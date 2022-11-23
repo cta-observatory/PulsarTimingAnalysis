@@ -22,6 +22,8 @@ from matplotlib.gridspec import GridSpec
 
 from ptiming_ana.phaseogram.read_events import ReadDL3File
 import logging 
+from pathlib import Path
+
 
 LOG_FORMAT="%(asctime)2s %(levelname)-6s [%(name)3s] %(message)s"
 logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt="%Y-%m-%d %H:%M:%S")
@@ -70,7 +72,7 @@ def set_makers(on_phase_range, off_phase_range):
 
 
 
-def execute_makers(observations, ids, dataset_empty, dataset_maker, bkg_maker, name='Crab', safe_mask_maker=None, stacked=False):
+def execute_makers(observations, ids, dataset_empty, dataset_maker, bkg_maker, OGIP_dir = None, save_DL4 = False, name='Crab', safe_mask_maker=None, stacked=False):
     
     datasets = Datasets()
 
@@ -88,7 +90,28 @@ def execute_makers(observations, ids, dataset_empty, dataset_maker, bkg_maker, n
         dataset_on_off.meta_table["SOURCE"]=name
     
         datasets.append(dataset_on_off)  
-        
+    
+    if save_DL4:
+        logger.info('Writing DL4 files in ' + str(OGIP_dir))
+        ogip_path = Path(OGIP_dir)
+        for d in range(0,len(datasets)):
+            datasets[d].write(filename=ogip_path / f"obs_{ids[d]}.fits.gz", overwrite=True)
+    
+    
+    if stacked:
+        datasets = datasets.stack_reduce()
+        logger.info('The total significance of the dataset is ' + str(datasets.info_dict()['sqrt_ts']) + ' sigma')
+    
+    return(datasets)
+
+def read_DL4_files(DL4_directory, obs_ids, stacked=False):
+    
+    logger.info('Reading DL4 files from ' + str(DL4_directory))
+    datasets=Datasets()
+    for obs in obs_ids:
+        file=DL4_directory + f"/obs_{obs}.fits.gz"
+        datasets.append(SpectrumDatasetOnOff.read(file))
+    
     if stacked:
         datasets = Datasets(datasets).stack_reduce()
         logger.info('The total significance of the dataset is ' + str(datasets.info_dict()['sqrt_ts']) + ' sigma')
@@ -127,8 +150,8 @@ def do_fitting(dataset, model, geom, emin_fit=None, emax_fit=None,stacked=False)
         dataset.models = model
         dataset.mask_fit = mask_fit
 
-        stacked_fit = Fit()
-        result = stacked_fit.run([dataset])
+        fit = Fit()
+        result = fit.run([dataset])
 
         # make a copy to compare later
         model_best= model.copy()
@@ -139,11 +162,17 @@ def do_fitting(dataset, model, geom, emin_fit=None, emax_fit=None,stacked=False)
             dataset_one.models = model
             dataset_one.mask_fit = mask_fit
             
-        joint_fit=Fit()
-        joint_result=joint_fit.run(datasets = dataset)
-    
+        fit=Fit()
+        result=fit.run(datasets = dataset)
         
-    return(dataset, model_best, stacked_fit, result)
+        
+        #dataset = Datasets(dataset).stack_reduce()
+        #dataset.models = model
+        model_best= model.copy()
+        
+        #logger.info('The total significance of the dataset is ' + str(dataset.info_dict()['sqrt_ts']) + ' sigma')
+        
+    return(dataset, model_best, fit, result)
 
         
     
@@ -154,7 +183,6 @@ def compute_spectral_points(dataset, model, e_min_points, e_max_points, npoints,
     flux_points= fpe.run(datasets=dataset)
 
     flux_points.is_ul = flux_points.sqrt_ts < min_ts
-    flux_points.to_table(sed_type="dnde", formatted=True)
     flux_points_dataset = FluxPointsDataset(data=flux_points, models=model)
     
     return(flux_points, flux_points_dataset)

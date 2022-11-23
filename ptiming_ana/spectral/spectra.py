@@ -7,7 +7,7 @@ from matplotlib.gridspec import GridSpec
 import yaml
 import logging 
 import astropy.units as u
-from .gammapy_utils import read_DL3_files, set_geometry, set_makers, execute_makers, set_model_to_fit, do_fitting, compute_spectral_points
+from .gammapy_utils import read_DL3_files, set_geometry, set_makers, execute_makers, set_model_to_fit, do_fitting, compute_spectral_points, read_DL4_files
 from .config_reading import SpectralConfigSetting
 from .plot_utils import get_kwargs_points, get_kwargs_line, get_kwargs_region
 from IPython.display import display
@@ -25,6 +25,8 @@ logging.getLogger('matplotlib.font_manager').disabled=True
 class SpectralPulsarAnalysis():
     
     def __init__(self, config=None, ref_model=None):
+        
+        self.ref_model = ref_model
         
         if config is not None:
             if '.yaml' in config:
@@ -94,15 +96,23 @@ class SpectralPulsarAnalysis():
     
     
     def execute_analysis(self):
-        datasets = execute_makers(self.observation_list, self.id_list, self.dataset_empty, self.dataset_maker, self.bkg_maker, name = self.config_params.target_info['name'], 
-                                  safe_mask_maker = self.mask_maker, stacked = self.config_params.extra_settings['stacked'])
+        
+        if self.config_params.reader_info['use_DL4']:
+            datasets = read_DL4_files(self.config_params.dl4_dir, self.id_list, stacked = self.config_params.extra_settings['stacked'])
+        
+        else:
+            datasets = execute_makers(self.observation_list, self.id_list, self.dataset_empty, self.dataset_maker, self.bkg_maker, OGIP_dir = self.config_params.dl4_dir, save_DL4= self.config_params.reader_info['save_DL4'], name = self.config_params.target_info['name'], safe_mask_maker = self.mask_maker, stacked = self.config_params.extra_settings['stacked'])
+            
         
         logger.info('Doing the fitting from ' +str(self.config_params.e_min_fitting) + ' to ' + str(self.config_params.e_max_fitting))
+        
         self.datasets, self.model_best, self.fit_object, self.fitting_result = do_fitting(datasets, self.model, self.geom, emin_fit=self.config_params.e_min_fitting, emax_fit=self.config_params.e_max_fitting, stacked=self.config_params.extra_settings['stacked'])  
         
         logger.info('Creating ' +str(self.config_params.npoints) +' spectral points from ' +str(self.config_params.e_min_points) + ' to ' + str(self.config_params.e_max_points) + ' (minimun sqrt_ts = ' +str(self.config_params.min_ts) +')')
+        
         self.flux_points, self.flux_points_dataset = compute_spectral_points(self.datasets, self.model_best, self.config_params.e_min_points, self.config_params.e_max_points, self.config_params.npoints, min_ts=self.config_params.min_ts, name=self.config_params.target_info['name'])
 
+        
         
     def run(self, peak='P1'):
         if self.config_params is None:
@@ -132,9 +142,9 @@ class SpectralPulsarAnalysis():
         
         logger.info('FINISHED. Showing results and final plots')
         self.show_fitting_results()
-        self.show_flux_points()
+        self.get_flux_points()
         self.plot_SED_residuals()
-        self.plot_excess_counts()
+        #self.plot_excess_counts()
         self.plot_fp_likelihood()
         self.create_contour_lines_params()
         self.get_covariance_matrix()
@@ -158,10 +168,12 @@ class SpectralPulsarAnalysis():
         fig_gs2 = fig_sed.add_subplot(*args2)
         
         if include_reference:
-            self.plot_ref_model(ax = fig_gs1, kwargs_ref = kwargs_ref, ref_label = ref_label, color_ref=color_ref)
+            self.plot_ref_model(ax = fig_gs1, ref_spec_model= self.ref_model, kwargs_ref = kwargs_ref, ref_label = ref_label, color_ref=color_ref)
             
         self.plot_SED(ax = fig_gs1 , include_best_model =include_best_model, include_statistical = include_statistical, label_fp=label_fp, color_fp=color_fp, color_model=color_model, kwargs_fp = kwargs_SED, kwargs_best = kwargs_best ,kwargs_best_error=kwargs_best_error)
         self.plot_residuals(ax = fig_gs2)
+        
+        fig_sed.savefig(self.config_params.output_dir + 'SED.png')
 
     
     def plot_residuals(self, ax = None, kwargs = None):
@@ -220,9 +232,11 @@ class SpectralPulsarAnalysis():
         
         ax.set_xlim([self.config_params.e_min_points,self.config_params.e_max_points])
         
-    def show_flux_points(self,sed_type='e2dnde'):
+    def get_flux_points(self,sed_type='e2dnde'):
         print('\n'+'Flux points using ' + str(sed_type) +' format')
-        self.flux_points.to_table(sed_type=sed_type)
+        table = self.flux_points.to_table(sed_type=sed_type)
+        print(table)
+        return(table)
     
     
     def plot_ref_model(self, ax= None, ref_spec_model= None, kwargs_ref=None, ref_label=None, color_ref='red'):
@@ -243,11 +257,8 @@ class SpectralPulsarAnalysis():
                 
     def plot_excess_counts(self,index=0):
         fig, ax = plt.subplots(figsize=(8,5)) 
-                
-        if self.config_params.extra_settings['stacked']:
-            ax_spectrum,ax_residuals = self.datasets.plot_fit()
-        else:
-            ax_spectrum,ax_residuals = self.datasets[index].plot_fit()   
+
+        ax_spectrum,ax_residuals = self.datasets.plot_fit()
         
         
         orig_xticks = [0.02,0.05,0.08,0.1,0.2,0.3,0.4,0.5,0.7,1,5,10]
@@ -255,6 +266,9 @@ class SpectralPulsarAnalysis():
 
         ax.set_xticks(orig_xticks,labels=new_xticks)
         ax.set_xlabel('E (GeV)')
+        
+        
+        fig.savefig(self.config_params.output_dir + 'excess_counts.png')
 
                 
     def plot_fp_likelihood(self, kwargs_fp = None, color_fp='orange'):
@@ -272,6 +286,9 @@ class SpectralPulsarAnalysis():
         ax.set_xticks(orig_xticks,labels=new_xticks)
         ax.set_xlabel('E (GeV)')
         ax.set_xlim([self.config_params.e_min_points,self.config_params.e_max_points])
+        
+        
+        fig.savefig(self.config_params.output_dir + 'likelihood_profile.png')
         
         
     def fit_statistic_profile_params(self):
@@ -297,6 +314,9 @@ class SpectralPulsarAnalysis():
         print('\n'+'Total Correlation matrix:' +'\n')
         fig, ax = plt.subplots(figsize=(6,6)) 
         self.fitting_result.models.covariance.plot_correlation(ax)
+        
+        
+        fig.savefig(self.config_params.output_dir + 'correlation.png')
         
         
     def extract_parameters(self):
@@ -341,3 +361,5 @@ class SpectralPulsarAnalysis():
             levels=[1,2,3]
             contours=ax.contour(x_values,y_values, stat_surface,levels=levels,colors='white')
             ax.clabel(contours,fmt="%.0f$\,\sigma$",inline=3,fontsize=15)
+        
+            fig.savefig(self.config_params.output_dir + f'contour_line_{par_1}_{par_2}.png')

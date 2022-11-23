@@ -256,7 +256,15 @@ class PulsarAnalysis():
             self.setFittingParams(model=conf['fitting']['model'],binned=conf['fitting']['binned'])
         
         
-                    
+        #Set output file for results
+        self.get_results = conf['results']['save_results']
+        if self.get_results:
+            self.output_file = conf['results']['output_directory']
+            if not os.path.exists(self.output_dir):
+                logger.info('Creating directory: ' + self.output_dir)
+                os.makedirs(self.output_dir)
+        else:
+            self.output_file = None
                     
                     
                     
@@ -374,8 +382,10 @@ class PulsarAnalysis():
         except:
             logger.warning('No Energy Analysis was performed. Check that you set the right energy params')
            
-        logger.info('FINISHED')
+        logger.info('FINISHED. Producing general results...')
 
+        if self.get_results:
+            self.save_results()
  
     ##############################################
                        #RESULTS
@@ -500,26 +510,34 @@ class PulsarAnalysis():
             return(fig)
     
     
-    def save_df(self,output_file):
-        self.info.to_hdf(output_file,key='dl2/event/telescope/parameters/LST_LSTCam')
+    def save_df(self,output_file, file_format='h5'):
+        if file_format == 'h5':
+            self.info.to_hdf(output_file,key='dl2/event/telescope/parameters/LST_LSTCam')
+        
+        elif file_format == 'csv':
+            self.info.to_csv(index=False)
     
     
-    def save_results(self,output_file):
-        with PdfPages(output_file) as pdf:
+    def save_results(self,output_file = None):
+        
+        if output_file is not None:
+            self.output_file=output_file
+        
+        with PdfPages(self.output_file) as pdf:
             pdf.savefig(self.draw_phaseogram(phase_limits=[0,2],stats='long',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True),bbox_inches='tight',pad_inches=1)
             pdf.savefig(self.TimeEv.PsigVsTime())
             pdf.savefig(self.TimeEv.PexVsTime())
             pdf.savefig(self.TimeEv.StatsVsTime())
-            try:
+            
+            if self.do_fit:
                 pdf.savefig(self.draw_phaseogram(phase_limits=[0,2],stats='long',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=True,hline=True),bbox_inches='tight',pad_inches=1)
-            except:
-                pass  
+
             try:
                 pdf.savefig(self.EnergyAna.show_Energy_lightcurve())
                 pdf.savefig(self.show_EnergyAna())
             except:
-                pass
-      
+                pass    
+    
     def save_object(self,output_file):
         with open(output_file, 'wb') as file:
             pickle.dump(self, file)

@@ -16,8 +16,9 @@ cphase_setting:
 
 # -------- FILE DIRECTORY -----------
 ephem_dir: '/home/alvaro.mas/software/Pulsar_analysis/data/all.gro'
-pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/DL3_pulsar_sys_eff_6nodes/eff_0.7/'
-
+pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9.9/src_dep/DL3_pulsar_eff_0.7/'
+results_output_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/P1/'
+DL4_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/P2_OGIP/'
 
 target:
   name: Crab
@@ -32,7 +33,7 @@ phase_regions:
   P1: [0,0.026,0.983,1]
   P2: [0.377,0.422]
   P1+P2: [0,0.026,0.377,0.422, 0.983,1]
-  P3: [0.14,0.25]
+  P3: [0.1,0.25]
   
   
 
@@ -48,9 +49,9 @@ flags:
 
 
 cuts:
-  max_rad: 0.266
-  energy_dependent_theta: True
-  zd_range: [0,80]
+  max_rad: 0.2
+  energy_dependent_theta: False
+  zd_range: [0,50]
   include_DL2_extra_cuts: False
   extra_cuts:
     energy_dependent: False
@@ -67,7 +68,7 @@ cuts:
 phase_binning:
   xmin: 0
   xmax: 1
-  nbins: 30
+  nbins: 50
   custom_binning: False
   binning: [0,0.1,0.2]
 
@@ -75,7 +76,7 @@ phase_binning:
 time_binning:
    run_time_analysis: True
    units: h
-   tint: 100
+   tint: 500
 
 
 energy_binning:
@@ -96,7 +97,9 @@ fitting:
    binned: False
 
 
-
+results:
+   save_results: False
+   output_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/phaseogram/'
 
 
 ###############################################################
@@ -107,7 +110,9 @@ fitting:
 reader:
   energy_dependent_theta: False
   max_rad: 0.2
-  zd_range: [0,80]
+  zd_range: [0,50]
+  use_DL4: False
+  save_DL4: False
 
 energy_geometry:
   real:
@@ -132,7 +137,6 @@ spectral_fitting:
   units: 'GeV'
   model: 'PowerLaw'
     
-
 
 spectral_points:
   emin: 20
