@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 import warnings
-from iminuit import Minuit
+from iminuit import Minuit, cost
 from probfit import UnbinnedLH, gaussian, doublegaussian
 import numba as nb
 import pandas as pd
@@ -135,38 +135,45 @@ class PeakFitting():
         #Binned fitting 
         def fit_Binned(self,histogram):
             self.check_model()
-            
-            #Shift the phases if one of the peak is near the interval edge
-            bin_centres=(histogram.lc[1][1:]+histogram.lc[1][:-1])/2
-            if self.shift!=0:
-                for i in range(0,len(bin_centres)):
-                    if bin_centres[i]<self.shift:
-                        bin_centres[i]=bin_centres[i]+1
-            
-            
+  
             if self.model=='dgaussian':
-                self.params,pcov_l=curve_fit(double_gaussian,bin_centres,histogram.lc[0],p0=self.init)
+                c = cost.BinnedNLL(histogram.lc[0], histogram.lc[1], double_gaussian)
+                minuit = Minuit(c, *self.init)
+                #self.params,pcov_l=curve_fit(double_gaussian,bin_centres,histogram.lc[0],p0=self.init)
                 self.parnames=['mu', 'sigma','mu_2','sigma_2','A','B','C']
                 
                    
             elif self.model=='asym_dgaussian':
-                assymetric_gaussian_pdf_vec=np.vectorize(assymetric_double_gaussian)
-                self.params,pcov_l=curve_fit(assymetric_gaussian_pdf_vec,bin_centres,histogram.lc[0],p0=self.init)
+                c = cost.BinnedNLL(histogram.lc[0], histogram.lc[1], assymetric_double_gaussian)
+                minuit = Minuit(c, *self.init)
                 self.parnames=['mu', 'sigma1','sigma2','mu_2','sigma1_2','sigma2_2','A','B','C']
 
 
             elif self.model=='lorentzian':
-                self.params,pcov_l=curve_fit(double_lorentz,bin_centres,histogram.lc[0],p0=self.init)
+                c = cost.BinnedNLL(histogram.lc[0], histogram.lc[1], double_lorentz)
+                minuit = Minuit(c, *self.init)
                 self.parnames=['mu_1', 'gamma_1','mu_2','gamma_2','A','B','C']
 
             
             elif self.model=='gaussian':
-                self.params,pcov_l=curve_fit(gaussian,bin_centres,histogram.lc[0],p0=self.init)
+                c = cost.BinnedNLL(histogram.lc[0], histogram.lc[1], gaussian)
+                minuit = Minuit(c, *self.init)
                 self.parnames=['mu', 'sigma','A','B']
-                
+            
+            minuit.migrad()
+            
+            self.minuit=minuit
+            
             #Store the result of params and errors
-            self.errors=np.sqrt(np.diag(pcov_l))
-            self.create_result_df()     
+            self.params=[]
+            self.errors=[]
+            for name in self.parnames:
+                self.params.append(self.minuit.values[name])
+                self.errors.append(self.minuit.errors[name])
+ 
+            self.create_result_df()    
+        
+        
         
         ##############################################
                        #RESULTS

@@ -89,7 +89,7 @@ class PulsarTimeAnalysis():
             self.t.append(get_effective_time(pulsar_phases.info)[1].value)
         else:
             diff=abs(pulsar_phases.info.dragon_time.values[1:]-pulsar_phases.info.dragon_time.values[:-1])
-            self.t.append(sum(diff))
+            self.t.append(sum(diff[diff<3600]))
             
         pulsar_phases.tobs=self.t[-1]/3600
         
@@ -108,13 +108,13 @@ class PulsarTimeAnalysis():
 
         #Estimate from each telescope the interval of time at which we can ignore the differences of time
         if pulsar_phases.telescope=='fermi':
-            diff_del=3600*5
+            self.diff_del=3600*5
         else:
-            diff_del=3600
+            self.diff_del=3600
         
         #Update the information 
         for i in range(0,len(diff)):
-            if diff[i]<diff_del:
+            if diff[i]<self.diff_del:
                 s=s+diff[i]
                 
                 #Update information when tobs>=tint

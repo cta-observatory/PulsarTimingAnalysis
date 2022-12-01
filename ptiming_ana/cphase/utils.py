@@ -170,12 +170,12 @@ def dl2time_totim(times, name='times.tim',obs='lst'):
         timFile=open(name,'w+')
         timFile.write('FORMAT 1 \n')
         if obs=='lap':
-            timFile.write('lst '+'0.0 '+str(times[0])+' 0.0 '+ 'coe'+ ' \n')
+            timFile.write(str(obs) + ' '+'0.0 '+str(times[0])+' 0.0 '+ 'coe'+ ' \n')
             for i in range(1,len(times)):
-                timFile.write('lst '+'0.0 '+str(times[i])+' 0.0 '+ str(obs)+' \n')
+                timFile.write(str(obs) + ' '+'0.0 '+str(times[i])+' 0.0 '+ str(obs)+' \n')
         else:
             for i in range(0,len(times)):
-                timFile.write('lst '+'0.0 '+str(times[i])+' 0.0 '+ str(obs)+' \n')
+                timFile.write(str(obs) + ' '+'0.0 '+str(times[i])+' 0.0 '+ str(obs)+' \n')
         timFile.close()
 
     
@@ -277,7 +277,6 @@ def model_fromephem(times,ephem,model_name):
 
     tm.validate()
     print('New model generated')
-    print(tm)
 
     #Create the .par file
     tm.as_parfile()

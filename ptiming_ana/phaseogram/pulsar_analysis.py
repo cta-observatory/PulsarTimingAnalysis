@@ -20,6 +20,7 @@ from .read_events import ReadDL3File,ReadFermiFile,ReadLSTFile, ReadList
 import pickle
 import yaml
 import logging 
+import os
 
 pd.options.mode.chained_assignment = None
 
@@ -200,8 +201,12 @@ class PulsarAnalysis():
         
         
         #Read files
+        self.filter_data= conf['cuts']['filter_data']
         if conf['flags']['DL2_format']== True:
-            self.setLSTInputFile(dirname=conf['pulsar_file_dir'],src_dep=conf['flags']['src_dependent'])
+            if os.path.isdir(conf['pulsar_file_dir']):
+                self.setLSTInputFile(dirname=conf['pulsar_file_dir'],src_dep=conf['flags']['src_dependent'])
+            else:
+                self.setLSTInputFile(filename=conf['pulsar_file_dir'],src_dep=conf['flags']['src_dependent'])
             
             if conf['cuts']['include_DL2_extra_cuts']:
                 if conf['cuts']['extra_cuts']['energy_dependent']:
@@ -222,6 +227,7 @@ class PulsarAnalysis():
             self.setFermiInputFile(dirname=conf['pulsar_file_dir'])
         
         else:
+            self.is_DL3_input = True
             self.setDL3InputFile(dirname=conf['pulsar_file_dir'],target_radec=[conf['target']['ra'],conf['target']['dec']],max_rad=conf['cuts']['max_rad'],zd_cuts=conf['cuts']['zd_range'],energy_dependent_theta=conf['cuts']['energy_dependent_theta'])
         
         
@@ -358,10 +364,8 @@ class PulsarAnalysis():
             logger.info('Fitting the data to the given model...')
             logger.info('Fit model: '+self.fit_model)
             logger.info('Binned fitting: '+str(self.binned))
-            try:
-                self.fitting.run(self)
-            except:
-                logger.warning('No fit could be done')
+            self.fitting.run(self)
+
         else:
             logger.info('No fit has been done since no fit parameters has been set')
         

@@ -113,8 +113,11 @@ class ReadDL3File():
             info=self.create_dataframe()
             return(info)
 
-        def calculate_tobs(self):
-            return(self.datastore.obs_table[self.zd_mask]["LIVETIME"].data.sum()/3600) 
+        def calculate_tobs(self, mask = None):
+            if mask is None:
+                mask = self.zd_mask
+            return(self.datastore.obs_table[mask]["LIVETIME"].data.sum()/3600) 
+        
         
         def create_dataframe(self):
             df = self.events.to_pandas()
@@ -126,7 +129,10 @@ class ReadDL3File():
             time=time_orig+lst.to_value(format='unix')
             timelist=list(Time(time,format='unix').to_value('mjd'))
        
-            info=pd.DataFrame({'gammaness':df['GAMMANESS'].to_list(),'mjd_time':df['BARYCENT_TIME'].to_list(),'dragon_time':list(time),'energy':df['ENERGY'].to_list(),'pulsar_phase':df['PHASE'].to_list()})
+            info=pd.DataFrame({'gammaness':df['GAMMANESS'].to_list(),'mjd_time':df['BARYCENT_TIME'].to_list(),'orig_time':time_orig.to_list(),'dragon_time':list(time),'energy':df['ENERGY'].to_list(),'pulsar_phase':df['PHASE'].to_list()})
+        
+            info = add_delta_t_key(info)
+            
             return(info)
 
         def run(self,pulsarana):
@@ -179,74 +185,79 @@ class ReadLSTFile():
             dphase=pd.read_hdf(pname,key=dl2_params_lstcam_key)
             self.info['pulsar_phase']=dphase['pulsar_phase']
 
-        def read_LSTfile(self,fname,df_type='short'):
+        def read_LSTfile(self,fname,df_type='short', filter_data = True ):
             
-            if self.src_dependent==False:
-                df_or=pd.read_hdf(fname,key=dl2_params_lstcam_key)
-                if 'pulsar_phase' not in df_or:
-                    df_pulsar=pd.read_hdf(fname,key="phase_info")
-                    df_or['pulsar_phase'] = df_pulsar['pulsar_phase']
-                    df_or['mjd_time']=df_pulsar['mjd_barycenter_time']
-                
-                if 'event_type' in df_or.columns:
-                    df=df_or[df_or['event_type']==32]
-       
-                    if 'theta2' not in df.columns:
-                        try:
-                            df_pos=pd.read_hdf(fname, "source_position")
-                            df_pos=df_pos[df_or['event_type']==32] 
-                            if 'theta2' in df_pos.columns:
-                                logger.info('Including theta2 column from source position table')
-                                df['theta2']=df_pos['theta2']
-                            if 'theta2_on' in df_pos.columns:
-                                logger.info('Including theta2 column from source position table')
-                                df['theta2']=df_pos['theta2_on']
-                            else:                
-                                df['theta2']=compute_theta2(np.array(df['reco_src_x']),np.array(df['reco_src_y']),np.array(df_pos['src_x']),np.array(df_pos['src_y']))
-                        except:
-                            logger.info('No theta2 computed')
-                else:
-                    df=df_or 
+            if filter_data:
+                if self.src_dependent==False:
+                    df_or=pd.read_hdf(fname,key=dl2_params_lstcam_key)
+                    if 'pulsar_phase' not in df_or:
+                        df_pulsar=pd.read_hdf(fname,key="phase_info")
+                        df_or['pulsar_phase'] = df_pulsar['pulsar_phase']
+                        df_or['mjd_time']=df_pulsar['mjd_barycenter_time']
 
-            
-            elif self.src_dependent==True:
-                srcindep_df=pd.read_hdf(fname,key=dl2_params_lstcam_key,float_precision=20)
-                on_df_srcdep=get_srcdep_params(fname,'on')
-                
-                if 'pulsar_phase' not in srcindep_df:
-                    df_pulsar=pd.read_hdf(fname,key="phase_info")
-                    srcindep_df['pulsar_phase'] = df_pulsar['pulsar_phase']
-                    srcindep_df['mjd_time']=df_pulsar['mjd_barycenter_time']
-                
-                if 'reco_energy' in srcindep_df.keys():
-                    srcindep_df.drop(['reco_energy'])
-                    
-                if 'gammaness' in srcindep_df.keys():
-                    srcindep_df.drop(['gammaness'])
-                    
-                df = pd.concat([srcindep_df, on_df_srcdep], axis=1)
-                df=df[df.event_type==32]
-                
-                
-            if df_type=='short':
-                if 'alpha' in df and 'theta2' in df:
-                    df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","theta2","alt_tel"]]
-                elif 'alpha' in df and 'theta2' not in df:
-                    df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","alt_tel"]]
-                elif 'theta2' in df and 'alpha' not in df:
-                    df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","theta2","alt_tel"]]
-                else:
-                    df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","alt_tel"]]
+                    if 'event_type' in df_or.columns:
+                        df=df_or[df_or['event_type']==32]
 
-                try:
+                        if 'theta2' not in df.columns:
+                            try:
+                                df_pos=pd.read_hdf(fname, "source_position")
+                                df_pos=df_pos[df_or['event_type']==32] 
+                                if 'theta2' in df_pos.columns:
+                                    logger.info('Including theta2 column from source position table')
+                                    df['theta2']=df_pos['theta2']
+                                if 'theta2_on' in df_pos.columns:
+                                    logger.info('Including theta2 column from source position table')
+                                    df['theta2']=df_pos['theta2_on']
+                                else:                
+                                    df['theta2']=compute_theta2(np.array(df['reco_src_x']),np.array(df['reco_src_y']),np.array(df_pos['src_x']),np.array(df_pos['src_y']))
+                            except:
+                                logger.info('No theta2 computed')
+                    else:
+                        df=df_or 
+
+
+                elif self.src_dependent==True:
+                    srcindep_df=pd.read_hdf(fname,key=dl2_params_lstcam_key,float_precision=20)
+                    on_df_srcdep=get_srcdep_params(fname,'on')
+
+                    if 'pulsar_phase' not in srcindep_df:
+                        df_pulsar=pd.read_hdf(fname,key="phase_info")
+                        srcindep_df['pulsar_phase'] = df_pulsar['pulsar_phase']
+                        srcindep_df['mjd_time']=df_pulsar['mjd_barycenter_time']
+
+                    if 'reco_energy' in srcindep_df.keys():
+                        srcindep_df.drop(['reco_energy'])
+
+                    if 'gammaness' in srcindep_df.keys():
+                        srcindep_df.drop(['gammaness'])
+
+                    df = pd.concat([srcindep_df, on_df_srcdep], axis=1)
+                    df=df[df.event_type==32]
+
+
+                if df_type=='short':
+                    if 'alpha' in df and 'theta2' in df:
+                        df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","theta2","alt_tel"]]
+                    elif 'alpha' in df and 'theta2' not in df:
+                        df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","alpha","alt_tel"]]
+                    elif 'theta2' in df and 'alpha' not in df:
+                        df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","theta2","alt_tel"]]
+                    else:
+                        df_filtered=df[["event_id","intensity","mjd_time","pulsar_phase", "dragon_time","gammaness","alt_tel"]]
+
+                    try:
+                        df_filtered['energy']=df['reco_energy']
+                    except:
+                        df_filtered['energy']=df['energy']
+                else:
+                    df_filtered = df
                     df_filtered['energy']=df['reco_energy']
-                except:
-                    df_filtered['energy']=df['energy']
+
+                df_filtered=add_delta_t_key(df_filtered)
+                
             else:
-                df_filtered = df
-                df_filtered['energy']=df['reco_energy']
-             
-            df_filtered=add_delta_t_key(df_filtered)
+                
+                df_filtered = pd.read_hdf(fname,key=dl2_params_lstcam_key)
             return(df_filtered)
 
                 
@@ -267,18 +278,22 @@ class ReadLSTFile():
 
 
         def run(self,pulsarana,df_type='short'):
+            filter_data = pulsarana.filter_data
             logger.info('Reading LST-1 data file')
             if isinstance(self.fname,list):
                 info_list=[]
                 for name in self.fname:
                     logger.info('Reading file: '+ name)
                     try:
-                        info_file=self.read_LSTfile(name,df_type)
+                        info_file=self.read_LSTfile(name,df_type, filter_data)
                         self.info=info_file    
                         self.tobs=self.calculate_tobs()
-                        pulsarana.cuts.apply_fixed_cut(self)
-                        if pulsarana.cuts.energy_binning_cut is not None:
-                            pulsarana.cuts.apply_energydep_cuts(self)
+                        
+                        if filter_data:
+                            pulsarana.cuts.apply_fixed_cut(self)
+                            if pulsarana.cuts.energy_binning_cut is not None:
+                                pulsarana.cuts.apply_energydep_cuts(self)
+                                
                         self.save_memory()
                         info_list.append(self.info)
                     except:
@@ -297,17 +312,16 @@ class ReadLSTFile():
                 self.tobs=self.calculate_tobs()
                 
             else:
-                self.info=self.read_LSTfile(self.fname,df_type)
+                self.info=self.read_LSTfile(self.fname,df_type, filter_data)
                 self.tobs=self.calculate_tobs()
                 
-                pulsarana.cuts.apply_fixed_cut(self)
+                if filter_data:
+                    pulsarana.cuts.apply_fixed_cut(self)
             
-                if pulsarana.cuts.energy_binning_cut is not None:
-                    pulsarana.cuts.apply_energydep_cuts(self)
+                    if pulsarana.cuts.energy_binning_cut is not None:
+                        pulsarana.cuts.apply_energydep_cuts(self)
                 
             logger.info('Finishing reading. Total time is ' + str(self.tobs)+ ' h')
-            logger.info('Filtering configuration used in the analysis:' + ' gammaness cut:'+str(pulsarana.cuts.gammaness_cut)+ ', alpha cut:'+str(pulsarana.cuts.alpha_cut)
-                         + ', theta2 cut:'+str(pulsarana.cuts.theta2_cut) + ', zd cut:'+str(pulsarana.cuts.zd_cut) + ', energy binning for the cuts:'+str(pulsarana.cuts.energy_binning_cut))
 
             
 class ReadtxtFile():

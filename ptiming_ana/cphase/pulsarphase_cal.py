@@ -115,7 +115,7 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
 
     
     
-def DL3_calphase(file,ephem,output_dir,use_interpolation=False,pickle=False):
+def DL3_calphase(file,ephem,output_dir,obs='lst',use_interpolation=False,pickle=False):
     '''
     Function that reads the DL3 files, calculates the phases and create a new DL3 file. The new DL3 file will have two new columns: 'PHASE' and 'BAYCENT_TIME'.
     
@@ -163,12 +163,12 @@ def DL3_calphase(file,ephem,output_dir,use_interpolation=False,pickle=False):
     
     #Calculate phases
     if use_interpolation==False:
-        create_files(timelist,ephem,timname,parname)
-        barycent_toas,phase=get_phase_list_from_tim(timname,parname,pickle)
+        model = create_files(timelist,ephem,timname,parname, obs=obs)
+        barycent_toas,phase=get_phase_list_from_tim(timname,model,pickle)
         phase=phase.frac
     else:
         print('Using interpolation...')
-        phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
+        phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,obs,pickle)
         
     
     #Shift phases
@@ -212,15 +212,9 @@ def DL3_calphase(file,ephem,output_dir,use_interpolation=False,pickle=False):
     if ephem.endswith('.gro'):
         os.remove(str(os.getcwd())+'/'+parname) 
   
-
     
     
-    
-    
-    
-    
-    
-def create_files(timelist,ephem,timname,parname):
+def create_files(timelist,ephem,timname,parname,obs='lst'):
     '''
     Creates the .tim and .par file needed for the use of PINT. 
 
@@ -243,19 +237,22 @@ def create_files(timelist,ephem,timname,parname):
     
     
     print('Creating .tim file')
-    dl2time_totim(timelist,name=timname)
+    dl2time_totim(timelist,name=timname, obs=obs)
     
     print('Setting the .par file')
     if ephem.endswith('.par'):
         model=ephem
+        
     elif ephem.endswith('.gro'):
         print('No .par file given. Creating .par file from .gro file...')
         #Create model from ephemeris
         model=model_fromephem(timelist,ephem,parname)
         
+    return(model)
+
 
         
-def DL2_calphase(dl2file,ephem,use_interpolation=False,pickle=False):
+def DL2_calphase(dl2file,ephem,obs='lst',use_interpolation=False,pickle=False):
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
 
@@ -294,12 +291,12 @@ def DL2_calphase(dl2file,ephem,use_interpolation=False,pickle=False):
     parname=str(os.path.basename(dl2file).replace('.h5',''))+'.par'
     
     if use_interpolation==False:
-        create_files(timelist,ephem,timname,parname)
-        barycent_toas,phase=get_phase_list_from_tim(timname,parname,pickle)
+        model = create_files(timelist,ephem,timname,parname,obs=obs)
+        barycent_toas,phase=get_phase_list_from_tim(timname,model,pickle)
         phase=phase.frac
     else:
         print('Interpolating...')
-        phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,pickle)
+        phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,obs,pickle)
                                                    
     #Removing tim file
     os.remove(str(os.getcwd())+'/'+timname)
@@ -314,7 +311,7 @@ def DL2_calphase(dl2file,ephem,use_interpolation=False,pickle=False):
     print('Finished')
 
         
-def compute_phase_interpolation(timelist,ephem,timname,parname,pickle):
+def compute_phase_interpolation(timelist,ephem,timname,parname,obs='lst', pickle=False):
     
     #Extraxting reference values of times for interpolation
     timelist_n=timelist[0::1000]
@@ -326,16 +323,16 @@ def compute_phase_interpolation(timelist,ephem,timname,parname,pickle):
     timelist_ns = np.array(timelist_n)*86400   
     
     #Create the files
-    create_files(timelist_n,ephem,timname,parname)
+    model = create_files(timelist_n,ephem,timname,parname, obs=obs)
         
     #Calculate the barycent times and phases for reference
-    barycent_toas_sample,phase_sample=get_phase_list_from_tim(timname,parname,pickle)
+    barycent_toas_sample,phase_sample=get_phase_list_from_tim(timname,model,pickle)
     
     #Time of barycent_toas in seconds:
     btime_sample_sec = np.array(barycent_toas_sample)*86400  
   
     #Getting the period:
-    m=models.get_model(parname)
+    m=models.get_model(model)
     P=1/m['F0'].value
     print('The period used for the interpolation is:'+str(P))
     
@@ -390,9 +387,9 @@ def interpolate_btoas(timelist,time_sample,barycent_toas_sample):
     return(barycent_toas)    
 
 
-def get_phase_list(timname,timelist,ephem,parname,pickle=False):
+def get_phase_list(timname,timelist,ephem,parname,obs='lst',pickle=False):
     print('Creating tim file')
-    dl2time_totim(timelist,name=timname)
+    dl2time_totim(timelist,name=timname, obs=obs)
     print('creating TOA list')
 
     

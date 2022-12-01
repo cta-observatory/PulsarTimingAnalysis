@@ -16,9 +16,9 @@ cphase_setting:
 
 # -------- FILE DIRECTORY -----------
 ephem_dir: '/home/alvaro.mas/software/Pulsar_analysis/data/all.gro'
-pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9.9/src_dep/DL3_pulsar_eff_0.7/'
-results_output_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/P1/'
-DL4_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/P2_OGIP/'
+pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/dataframe_all_obs_nov2022.h5'
+results_output_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/bridge/'
+DL4_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/bridge_E/'
 
 target:
   name: Crab
@@ -33,7 +33,7 @@ phase_regions:
   P1: [0,0.026,0.983,1]
   P2: [0.377,0.422]
   P1+P2: [0,0.026,0.377,0.422, 0.983,1]
-  P3: [0.1,0.25]
+  P3: [0.08,0.24]
   
   
 
@@ -44,15 +44,15 @@ phase_regions:
 
 flags:
   src_dependent: False
-  DL2_format: False
+  DL2_format: True
   fits_format: False
 
-
 cuts:
-  max_rad: 0.2
   energy_dependent_theta: False
-  zd_range: [0,50]
+  filter_data: False
   include_DL2_extra_cuts: False
+  zd_range: [0,50]
+  max_rad: 0.2
   extra_cuts:
     energy_dependent: False
     theta: 0.2
@@ -76,13 +76,13 @@ phase_binning:
 time_binning:
    run_time_analysis: True
    units: h
-   tint: 500
+   tint: 200
 
 
 energy_binning:
-   run_energy_analysis: False
-   do_diff: False #Set to True if want to calculate statistics for data in each energy bin (i.e 50 GeV < E < 80 GeV)
-   do_integral: True # Set to True if want to calculate statistics for data above each energy edge (i.e E>50 GeV)
+   run_energy_analysis: True
+   do_diff: True #Set to True if want to calculate statistics for data in each energy bin (i.e 50 GeV < E < 80 GeV)
+   do_integral: False # Set to True if want to calculate statistics for data above each energy edge (i.e E>50 GeV)
    units: GeV
    emin: 20
    emax: 500
@@ -92,7 +92,7 @@ energy_binning:
 
 # --------- PHASEOGRAM MODEL-----------
 fitting:
-   run_fitting: False
+   run_fitting: True
    model: dgaussian   # Choose among dgaussian, asym_dgaussian, lorentzian
    binned: False
 
@@ -112,7 +112,7 @@ reader:
   max_rad: 0.2
   zd_range: [0,50]
   use_DL4: False
-  save_DL4: False
+  save_DL4: True
 
 energy_geometry:
   real:
@@ -133,16 +133,16 @@ analysis_extra_settings:
 
 spectral_fitting:
   emin: 20
-  emax: 500
+  emax: 200
   units: 'GeV'
   model: 'PowerLaw'
     
 
 spectral_points:
   emin: 20
-  emax: 500
+  emax: 200
   units: 'GeV'
-  number_points: 7
+  number_points: 5
   min_ts: 1.5
   
 
