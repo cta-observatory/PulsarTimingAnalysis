@@ -18,7 +18,7 @@ setup(
     install_requires=[
         'astropy>=4.0.5',
         'lstchain~=0.9.0',
-        'gammapy~=1.0',
+        'gammapy~=0.20.1',
         'h5py',
         'matplotlib>=3.5',
         'numba',
