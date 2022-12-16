@@ -16,9 +16,9 @@ setup(
     use_scm_version={"write_to":os.path.join("ptiming_ana","_version.py")},
     packages=find_packages(),
     install_requires=[
-        'astropy>=4.0.5,<5',
+        'astropy>=4.0.5',
         'lstchain~=0.9.0',
-        'gammapy~=0.20.1',
+        'gammapy~=0.19',
         'h5py',
         'matplotlib>=3.5',
         'numba',
