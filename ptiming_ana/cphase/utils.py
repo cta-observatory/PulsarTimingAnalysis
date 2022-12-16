@@ -166,15 +166,11 @@ def dl2time_totim(times, name='times.tim',obs='lst'):
     obs: string
     Code of the observatory
     '''
+
     if obs=='lst':
         timFile=open(name,'w+')
         timFile.write('FORMAT 1 \n')
-        if obs=='lap':
-            timFile.write(str(obs) + ' '+'0.0 '+str(times[0])+' 0.0 '+ 'coe'+ ' \n')
-            for i in range(1,len(times)):
-                timFile.write(str(obs) + ' '+'0.0 '+str(times[i])+' 0.0 '+ str(obs)+' \n')
-        else:
-            for i in range(0,len(times)):
+        for i in range(0,len(times)):
                 timFile.write(str(obs) + ' '+'0.0 '+str(times[i])+' 0.0 '+ str(obs)+' \n')
         timFile.close()
 

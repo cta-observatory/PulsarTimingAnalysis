@@ -96,7 +96,15 @@ class PeakFitting():
             if self.model=='dgaussian':
                 unbinned_likelihood = UnbinnedLH(double_gaussian, np.array(shift_phases))
                 minuit = Minuit(unbinned_likelihood,mu=self.init[0], sigma=self.init[1],mu_2=self.init[2],sigma_2=self.init[3],A=self.init[4],B=self.init[5],C=self.init[6])
+                for par in ['mu','sigma','mu_2','sigma_2','B','C']:
+                    minuit.fixed[par] = True
+
                 self.parnames=['mu', 'sigma','mu_2','sigma_2','A','B','C']
+                minuit.errordef=0.5
+                minuit.migrad()
+                for par in ['mu','sigma','mu_2','sigma_2','B','C']:
+                    minuit.fixed[par] = False
+                minuit.fixed['A'] = True
                 
             elif self.model=='asym_dgaussian':
                 unbinned_likelihood = UnbinnedLH(assymetric_double_gaussian, np.array(shift_phases))

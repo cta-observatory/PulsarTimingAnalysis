@@ -29,6 +29,9 @@ import pint.models as models
 from pint.models import parameter as p
 from pint.models.timing_model import (TimingModel, Component,)
 
+from gammapy.data import DataStore, EventList, Observation, Observations
+from gammapy.data import GTI
+
 __all__=['fermi_calphase','calphase']
 
 
@@ -114,6 +117,66 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
     os.remove(str(os.getcwd())+'/'+timname)
 
     
+
+def DL3_calphase_gammapy(DL3_direc,output_dir,ephem,obs_ids = None, obs='lst',use_interpolation=False,pickle=False, overwrite= True):
+    
+    #Read the files and create datastore
+    total_datastore = DataStore.from_dir(DL3_direc)
+    
+    #Extract observations
+    if obs_ids is None:
+        total_obs_list = total_datastore.obs_table["OBS_ID"].data
+    else:
+        total_obs_list = obs_ids
+    
+    observations = total_datastore.get_observations(total_obs_list, required_irf="point-like")
+
+    #Extract times from EventList
+    for obser in observations:
+        times = obser.events.time
+        timelist = list(times.to_value('mjd','long'))
+        
+        #Get the name of the files
+        timname = 'times.tim'
+        parname = 'model.par'
+
+        #Calculate phases
+        if use_interpolation==False:
+            model = create_files(timelist,ephem,timname,parname, obs = obs)
+            barycent_toas,phase = get_phase_list_from_tim(timname,model,pickle)
+            phase = phase.frac
+        else:
+            print('Using interpolation...')
+            phase,barycent_toas = compute_phase_interpolation(timelist,ephem,timname,parname,obs,pickle)
+
+        #Shift phases
+        for i in range(0,len(phase)):
+            if phase[i]<0:
+                phase[i]=phase[i]+1
+
+        #Create new EventList with the phases
+        table = obser.events.table
+        table['PHASE'] = phase.astype('float64')
+        table.sort('TIME')
+        
+        new_event_list = EventList(table)
+        obser._events = new_event_list
+        
+        #Write them in a dictionary
+        list_ids = list(map(int, f'{obser.obs_id:04d}'))  
+        filename = f'dl3_pulsar_{obser.obs_id:04d}.fits.gz'
+        file_path = output_dir + filename
+        
+        print('Writing outputfile in '+str(file_path))
+        obser.events.write(filename=file_path, gti=obser.gti, overwrite=overwrite)
+        
+        #Removing tim file
+        os.remove(str(os.getcwd())+'/'+timname)
+    
+        #Removing .par file if it was created during execution
+        if ephem.endswith('.gro'):
+            os.remove(str(os.getcwd())+'/'+parname) 
+        
     
 def DL3_calphase(file,ephem,output_dir,obs='lst',use_interpolation=False,pickle=False):
     '''
@@ -141,34 +204,33 @@ def DL3_calphase(file,ephem,output_dir,obs='lst',use_interpolation=False,pickle=
     A new DL3 file with two new columns: 'PHASE' and 'BAYCENT_TIME'. The name of the file will be {filename}_pulsar.fits
    
     '''
-
-
+    
     data = fits.open(file)
     orig_table = data[1].data
     orig_cols = orig_table.columns
-
+            
     #Extract the times from the dataframe and transform scales
     df = pd.DataFrame(data[1].data)
-    df=df.sort_values('TIME')
+    df = df.sort_values('TIME')
     
-    lst_epoch=Time(data[1].header['MJDREFI'],data[1].header['MJDREFF'],format='mjd',scale=data[1].header['TIMESYS'].lower())
-    time_orig=df['TIME']
+    lst_epoch = Time(data[1].header['MJDREFI'],data[1].header['MJDREFF'],format='mjd',scale=data[1].header['TIMESYS'].lower())
+    time_orig = df['TIME']
 
-    time=time_orig+lst_epoch.to_value(format='unix')
-    timelist=list(Time(time,format='unix').to_value('mjd','long'))
+    time = time_orig + lst_epoch.to_value(format='unix')
+    timelist = list(Time(time,format='unix').to_value('mjd','long'))
     
     #Get the name of the files
-    timname=str(os.path.basename(file).replace('.fits',''))+'.tim'
-    parname=str(os.path.basename(file).replace('.fits',''))+'.par'
+    timname = str(os.path.basename(file).replace('.fits','')) + '.tim'
+    parname = str(os.path.basename(file).replace('.fits','')) + '.par'
     
     #Calculate phases
     if use_interpolation==False:
-        model = create_files(timelist,ephem,timname,parname, obs=obs)
-        barycent_toas,phase=get_phase_list_from_tim(timname,model,pickle)
-        phase=phase.frac
+        model = create_files(timelist,ephem,timname,parname, obs = obs)
+        barycent_toas,phase = get_phase_list_from_tim(timname,model,pickle)
+        phase = phase.frac
     else:
         print('Using interpolation...')
-        phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,obs,pickle)
+        phase,barycent_toas = compute_phase_interpolation(timelist,ephem,timname,parname,obs,pickle)
         
     
     #Shift phases
@@ -233,8 +295,6 @@ def create_files(timelist,ephem,timname,parname,obs='lst'):
     Name of the output parfile 
     
     '''
-    
-    
     
     print('Creating .tim file')
     dl2time_totim(timelist,name=timname, obs=obs)

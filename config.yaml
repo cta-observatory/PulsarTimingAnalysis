@@ -16,7 +16,7 @@ cphase_setting:
 
 # -------- FILE DIRECTORY -----------
 ephem_dir: '/home/alvaro.mas/software/Pulsar_analysis/data/all.gro'
-pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/dataframe_all_obs_nov2022.h5'
+pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/DL3_pulsar_sys_eff_6nodes/eff_0.7/'
 results_output_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/bridge/'
 DL4_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/bridge_E/'
 
@@ -44,15 +44,15 @@ phase_regions:
 
 flags:
   src_dependent: False
-  DL2_format: True
+  DL2_format: False
   fits_format: False
 
 cuts:
   energy_dependent_theta: False
-  filter_data: False
+  filter_data: True
   include_DL2_extra_cuts: False
   zd_range: [0,50]
-  max_rad: 0.2
+  max_rad: 0.32
   extra_cuts:
     energy_dependent: False
     theta: 0.2
@@ -82,10 +82,10 @@ time_binning:
 energy_binning:
    run_energy_analysis: True
    do_diff: True #Set to True if want to calculate statistics for data in each energy bin (i.e 50 GeV < E < 80 GeV)
-   do_integral: False # Set to True if want to calculate statistics for data above each energy edge (i.e E>50 GeV)
+   do_integral: True # Set to True if want to calculate statistics for data above each energy edge (i.e E>50 GeV)
    units: GeV
    emin: 20
-   emax: 500
+   emax: 700
    nbins: 8
 
 
