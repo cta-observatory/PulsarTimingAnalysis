@@ -32,6 +32,13 @@ from pint.models.timing_model import (TimingModel, Component,)
 from gammapy.data import DataStore, EventList, Observation, Observations
 from gammapy.data import GTI
 
+from pint import toa
+from pint import models
+from pint.observatory.topo_obs import TopoObs
+from pint.models import get_model
+
+
+
 __all__=['fermi_calphase','calphase']
 
 
@@ -118,7 +125,36 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
 
     
 
-def DL3_calphase_gammapy(DL3_direc,output_dir,ephem,obs_ids = None, obs='lst',use_interpolation=False,pickle=False, overwrite= True):
+def DL3_calphase_gammapy(DL3_direc,output_dir,ephem,obs_ids = None, obs='lst',create_tim_file=False,pickle=False, overwrite= True):
+    
+    '''
+    Function that reads the DL3 files and creates new EventLists with info about the PHASE of the pulsar.
+    
+    Parameters:
+    ------------------
+    DL3_dir: string 
+    path to the DL3 directory to the DL3 observation files
+    
+    output_dir: string
+    path to the directory where to store the new EventList files
+    
+    ephem: string
+    path to the ephemeris file. It can be a .par file or a .gro file (for the case of Crab)
+
+    obs_ids: list
+    list of obs_ids to analyze 
+    
+    obs: string
+    Observatory code to give to PINT
+
+    create_tim_file: boolean
+    Whether to create a temporal tim file to read and reduce TOAs with PINT or to do it step by step with PINT functions.
+
+    pickle: boolean
+    True if want to save a pickle file with the loaded TOAs
+
+
+   '''
     
     #Read the files and create datastore
     total_datastore = DataStore.from_dir(DL3_direc)
@@ -137,33 +173,35 @@ def DL3_calphase_gammapy(DL3_direc,output_dir,ephem,obs_ids = None, obs='lst',us
         timelist = list(times.to_value('mjd','long'))
         
         #Get the name of the files
-        timname = 'times.tim'
+        if create_tim_file:
+            timname = 'times.tim'
+        else:
+            timname = None
+
         parname = 'model.par'
 
         #Calculate phases
-        if use_interpolation==False:
-            model = create_files(timelist,ephem,timname,parname, obs = obs)
-            barycent_toas,phase = get_phase_list_from_tim(timname,model,pickle)
-            phase = phase.frac
+        model = create_files(timelist,ephem,timname,parname, obs = obs)
+        if timname is None:
+            phases = compute_phases_from_times_model(times, model)[1]
         else:
-            print('Using interpolation...')
-            phase,barycent_toas = compute_phase_interpolation(timelist,ephem,timname,parname,obs,pickle)
+            barycent_toas,phases = get_phase_list_from_tim(timname,model,pickle)
+            phases = phases.frac           
+
 
         #Shift phases
-        for i in range(0,len(phase)):
-            if phase[i]<0:
-                phase[i]=phase[i]+1
+        phases = np.where(phases < 0.0 , phases + 1.0 , phases)
 
         #Create new EventList with the phases
         table = obser.events.table
-        table['PHASE'] = phase.astype('float64')
+        table['PHASE'] = phases.astype('float64')
         table.sort('TIME')
         
         new_event_list = EventList(table)
         obser._events = new_event_list
         
-        #Write them in a dictionary
-        list_ids = list(map(int, f'{obser.obs_id:04d}'))  
+        #Write them in a dictionary 
+        print(obser.obs_id)
         filename = f'dl3_pulsar_{obser.obs_id:04d}.fits.gz'
         file_path = output_dir + filename
         
@@ -171,7 +209,8 @@ def DL3_calphase_gammapy(DL3_direc,output_dir,ephem,obs_ids = None, obs='lst',us
         obser.events.write(filename=file_path, gti=obser.gti, overwrite=overwrite)
         
         #Removing tim file
-        os.remove(str(os.getcwd())+'/'+timname)
+        if timname is not None:
+            os.remove(str(os.getcwd())+'/'+timname)
     
         #Removing .par file if it was created during execution
         if ephem.endswith('.gro'):
@@ -219,25 +258,24 @@ def DL3_calphase(file,ephem,output_dir,obs='lst',use_interpolation=False,pickle=
     time = time_orig + lst_epoch.to_value(format='unix')
     timelist = list(Time(time,format='unix').to_value('mjd','long'))
     
+
     #Get the name of the files
-    timname = str(os.path.basename(file).replace('.fits','')) + '.tim'
+    timname = str(os.path.basename(file).replace('.fits','')) + '.tim'      
     parname = str(os.path.basename(file).replace('.fits','')) + '.par'
-    
+  
     #Calculate phases
     if use_interpolation==False:
         model = create_files(timelist,ephem,timname,parname, obs = obs)
-        barycent_toas,phase = get_phase_list_from_tim(timname,model,pickle)
-        phase = phase.frac
+        barycent_toas, phase = get_phase_list_from_tim(timname,model,pickle)
+        phase = phase.frac           
     else:
         print('Using interpolation...')
         phase,barycent_toas = compute_phase_interpolation(timelist,ephem,timname,parname,obs,pickle)
         
     
     #Shift phases
-    for i in range(0,len(phase)):
-        if phase[i]<0:
-            phase[i]=phase[i]+1
-
+    phase = np.where(phase < 0.0 , phase + 1.0 , phase)
+    
     #Generate needed columns
     cols_list=[]
     for j in range(0,len(orig_cols)):
@@ -254,27 +292,60 @@ def DL3_calphase(file,ephem,output_dir,obs='lst',use_interpolation=False,pickle=
     
     #Create the files
     hdu = fits.BinTableHDU.from_columns(orig_cols_sorted + new_cols,header=data[1].header)
+  
+    #Save new file 
+    save_new_DL3_file(file,hdu, output_dir)
     
-    data_list=[]
-    for d in data:
-        data_list.append(d)
-        
-    hdu_list=fits.HDUList([data_list[0],hdu]+ data_list[2:])
-    
-    output_file=output_dir+str(os.path.basename(file).replace('.fits',''))+'_pulsar.fits'
-    
-    print('Writing outputfile in'+str(output_file))
-    
-    hdu_list.writeto(output_file)
-
     #Removing tim file
     os.remove(str(os.getcwd())+'/'+timname)
     
     #Removing .par file if it was created during execution
     if ephem.endswith('.gro'):
         os.remove(str(os.getcwd())+'/'+parname) 
-  
+        
+        
+def save_new_DL3_file(orig_file,new_table, output_dir):
     
+    data = fits.open(orig_file)
+    orig_table = data[1].data
+    orig_cols = orig_table.columns
+    
+    tables=[]
+    for d in data:
+        tables.append(d)
+        
+    hdu_list=fits.HDUList([tables[0],new_table]+ tables[2:])
+    output_file=output_dir+str(os.path.basename(file).replace('.fits',''))+'_pulsar.fits'
+    
+    print('Writing outputfile in'+str(output_file))
+    hdu_list.writeto(output_file)
+    
+    
+    
+def compute_phases_from_times_model(times, ephem,obs = 'lst', include_planets= True, include_bipm = True, include_gps = True):
+    
+    #Read model
+    model = get_model(ephem)
+    
+    #Get TOA list
+    toa_list = list(toa.TOA(t, 0, obs=obs, ephem='DE421', include_bipm=str(include_bipm), 
+                               include_gps=str(include_gps)) for t in times)
+    #Load TOAs 
+    t = toa.TOAs(toalist=toa_list)
+
+    #Apply corrections
+    t.clock_corr_info={'include_bipm': str(include_bipm), 'include_gps': str(include_gps)}
+    t.apply_clock_corrections(include_gps=include_gps,include_bipm=include_bipm)
+    t.compute_TDBs(ephem='DE421')
+    t.compute_posvels(ephem='DE421',planets=include_planets)
+
+    #Compute phases and barycentric toas
+    phases = model.phase(t,abs_phase=True)[1]
+    barycent_toas=model.get_barycentric_toas(t)
+    
+    return(barycent_toas,phases)
+
+
     
 def create_files(timelist,ephem,timname,parname,obs='lst'):
     '''
@@ -297,7 +368,8 @@ def create_files(timelist,ephem,timname,parname,obs='lst'):
     '''
     
     print('Creating .tim file')
-    dl2time_totim(timelist,name=timname, obs=obs)
+    if timname is not None:
+        dl2time_totim(timelist,name=timname, obs=obs)
     
     print('Setting the .par file')
     if ephem.endswith('.par'):
@@ -307,7 +379,7 @@ def create_files(timelist,ephem,timname,parname,obs='lst'):
         print('No .par file given. Creating .par file from .gro file...')
         #Create model from ephemeris
         model=model_fromephem(timelist,ephem,parname)
-        
+
     return(model)
 
 
@@ -370,8 +442,36 @@ def DL2_calphase(dl2file,ephem,obs='lst',use_interpolation=False,pickle=False):
     df_phase.to_hdf(dl2file,key='phase_info')
     print('Finished')
 
+    
+    
+    
         
 def compute_phase_interpolation(timelist,ephem,timname,parname,obs='lst', pickle=False):
+    
+    '''
+    Calculates barycentered times and pulsar phases using an interpolation method for LST-1
+
+    Parameters:
+    -----------------
+    timelist: list
+    List of times of arrivals
+    
+    ephem: string
+    Ephemeris to be used (.par or .gro file)
+    
+    timname: string
+    Name of the .tim file
+    
+    parname: string
+    Name of the .par file if needed to create
+    
+    obs: string
+    Observatory code to give to PINT
+    
+    pickle: boolean
+    True if want to save a pickle file with the loaded TOAs
+    
+    '''
     
     #Extraxting reference values of times for interpolation
     timelist_n=timelist[0::1000]
@@ -387,6 +487,10 @@ def compute_phase_interpolation(timelist,ephem,timname,parname,obs='lst', pickle
         
     #Calculate the barycent times and phases for reference
     barycent_toas_sample,phase_sample=get_phase_list_from_tim(timname,model,pickle)
+    
+    
+    
+    
     
     #Time of barycent_toas in seconds:
     btime_sample_sec = np.array(barycent_toas_sample)*86400  
