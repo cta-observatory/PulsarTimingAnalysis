@@ -315,7 +315,7 @@ def save_new_DL3_file(orig_file,new_table, output_dir):
         tables.append(d)
         
     hdu_list=fits.HDUList([tables[0],new_table]+ tables[2:])
-    output_file=output_dir+str(os.path.basename(file).replace('.fits',''))+'_pulsar.fits'
+    output_file=output_dir+str(os.path.basename(orig_file).replace('.fits',''))+'_pulsar.fits'
     
     print('Writing outputfile in'+str(output_file))
     hdu_list.writeto(output_file)
