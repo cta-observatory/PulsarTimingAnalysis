@@ -18,7 +18,7 @@ setup(
     install_requires=[
         'astropy>=4.0.5',
         'lstchain~=0.9.0',
-        'gammapy~=0.19',
+        'gammapy~=0.20.1',
         'h5py',
         'matplotlib>=3.5',
         'numba',
@@ -29,7 +29,7 @@ setup(
         'tables',
         'protobuf>=3.20.2',
         'toml',
-        'pint-pulsar~=0.8.8',
+        'pint-pulsar~=0.9.3',
         'setuptools_scm',
     ],
     entry_points=entry_points,
