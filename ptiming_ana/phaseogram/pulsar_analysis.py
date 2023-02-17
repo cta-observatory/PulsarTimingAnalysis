@@ -136,8 +136,8 @@ class PulsarAnalysis():
         self.nbins=nbins
         self.binning=PhaseBinning(nbins,xmin,xmax)
     
-    def setParamCuts(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None,int_cut=None,energy_binning_cut=None):
-        self.cuts=FilterPulsarAna(gammaness_cut,alpha_cut,theta2_cut,zd_cut,int_cut,energy_binning_cut)
+    def setParamCuts(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None,int_cut=None,energy_cut=None,energy_binning_cut=None):
+        self.cuts=FilterPulsarAna(gammaness_cut,alpha_cut,theta2_cut,zd_cut,int_cut,energy_cut,energy_binning_cut)
 
     
     def setEnergybinning(self,energy_edges,do_diff,do_integral):
@@ -216,9 +216,9 @@ class PulsarAnalysis():
                         self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],theta_cut=np.power(conf['cuts']['extra_cuts']['theta'],2),zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'],energy_binning_cut=conf['cuts']['extra_cuts']['energy_binning'])
                 else:
                     if conf['flags']['src_dependent']:
-                        self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],alpha_cut=conf['cuts']['extra_cuts']['alpha'],zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'])
+                        self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],alpha_cut=conf['cuts']['extra_cuts']['alpha'],zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'], energy_cut = conf['cuts']['extra_cuts']['energy'] )
                     else:
-                        self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],theta_cut=np.power(conf['cuts']['extra_cuts']['theta'],2),zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'])
+                        self.setParamCuts(gammaness_cut=conf['cuts']['extra_cuts']['gammaness'],theta_cut=np.power(conf['cuts']['extra_cuts']['theta'],2),zd_cut=conf['cuts']['zd_range'],int_cut=conf['cuts']['extra_cuts']['intensity'],energy_cut = conf['cuts']['extra_cuts']['energy'])
                         
             else:
                 self.setParamCuts(zd_cut=conf['cuts']['zd_range'])            
@@ -229,7 +229,7 @@ class PulsarAnalysis():
         else:
             self.is_DL3_input = True
             self.setDL3InputFile(dirname=conf['pulsar_file_dir'],target_radec=[conf['target']['ra'],conf['target']['dec']],max_rad=conf['cuts']['max_rad'],zd_cuts=conf['cuts']['zd_range'],energy_dependent_theta=conf['cuts']['energy_dependent_theta'])
-        
+            self.setParamCuts(energy_cut = conf['cuts']['extra_cuts']['energy'])   
         
         #Set regions
         self.setBackgroundLimits(conf['phase_regions']['Bkg'])

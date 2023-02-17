@@ -55,7 +55,7 @@ class SpectralPulsarAnalysis():
         
         logger.info('Information about the source. Name: ' + str(self.config_params.target_info['name']) +', RA: ' + str(self.source_ra) + 'deg, DEC: ' + str(self.source_dec) +'deg')
         self.observation_list, self.id_list, reader = read_DL3_files(directory=self.config_params.directory,target_radec=[self.source_ra,self.source_dec],max_rad=max_rad,zd_cuts=zd_range,energy_dependent_theta=edependent_theta)
-        
+        self.reader = reader
         self.spectral_model, self.model = self.set_reference_model()
             
         return(reader)
@@ -108,9 +108,12 @@ class SpectralPulsarAnalysis():
         
         self.datasets, self.model_best, self.fit_object, self.fitting_result = do_fitting(datasets, self.model, self.geom, emin_fit=self.config_params.e_min_fitting, emax_fit=self.config_params.e_max_fitting, stacked=self.config_params.extra_settings['stacked'])  
         
-        logger.info('Creating ' +str(self.config_params.npoints) +' spectral points from ' +str(self.config_params.e_min_points) + ' to ' + str(self.config_params.e_max_points) + ' (minimun sqrt_ts = ' +str(self.config_params.min_ts) +')')
+        if self.config_params.bins_per_decade:
+            logger.info('Creating ' +str(self.config_params.bins_per_decade) +' spectral points per decade from ' +str(self.config_params.e_min_points) + ' to ' + str(self.config_params.e_max_points) + ' (minimun sqrt_ts = ' +str(self.config_params.min_ts) +')')
+        else:
+            logger.info('Creating ' +str(self.config_params.npoints) +' spectral points from ' +str(self.config_params.e_min_points) + ' to ' + str(self.config_params.e_max_points) + ' (minimun sqrt_ts = ' +str(self.config_params.min_ts) +')')
         
-        self.flux_points, self.flux_points_dataset = compute_spectral_points(self.datasets, self.model_best, self.config_params.e_min_points, self.config_params.e_max_points, self.config_params.npoints, min_ts=self.config_params.min_ts, name=self.config_params.target_info['name'])
+        self.flux_points, self.flux_points_dataset = compute_spectral_points(self.datasets, self.model_best, self.config_params.e_min_points, self.config_params.e_max_points, self.config_params.npoints, self.config_params.bins_per_decade, min_ts=self.config_params.min_ts, name=self.config_params.target_info['name'])
 
         
         

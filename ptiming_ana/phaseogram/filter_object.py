@@ -5,10 +5,11 @@ import numpy as np
 
 class FilterPulsarAna():
     
-    def __init__(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None,int_cut=None,energy_binning_cut=None):
+    def __init__(self,gammaness_cut=None,alpha_cut=None,theta2_cut=None,zd_cut=None,int_cut=None,energy_cut = None, energy_binning_cut=None):
         self.gammaness_cut=gammaness_cut
         self.alpha_cut=alpha_cut
         self.theta2_cut=theta2_cut
+        self.energy_cut = energy_cut
         self.int_cut=int_cut
         self.energy_binning_cut=energy_binning_cut
         self.zd_cut=zd_cut
@@ -45,6 +46,14 @@ class FilterPulsarAna():
         if self.int_cut is not None:
             if isinstance(self.int_cut, float):
                 dataframe=dataframe[dataframe['intensity']>self.int_cut]
+                
+        if self.energy_cut is not None:
+            if isinstance(self.energy_cut[0], float):
+                dataframe=dataframe[dataframe['energy']>self.energy_cut[0]]
+            if isinstance(self.energy_cut[1], float):
+                dataframe=dataframe[dataframe['energy']<self.energy_cut[1]]
+                
+                
         events.info=dataframe
     
     

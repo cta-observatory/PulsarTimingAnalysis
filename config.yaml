@@ -142,7 +142,8 @@ spectral_points:
   emin: 20
   emax: 200
   units: 'GeV'
-  number_points: 5
+  number_points: 5  #If bins_per_decade is not False, this parameter has no effect.
+  bins_per_decade: 5 #Set to False if only want to set the total number_points
   min_ts: 1.5
   
 

@@ -265,7 +265,7 @@ def DL3_calphase(file,ephem,output_dir,create_tim_file=False,obs='lst',use_inter
           timname = str(os.path.basename(file).replace('.fits','')) + '.tim' 
     else:
           timname = None
-            
+    
     #Get the name of the files
     parname = str(os.path.basename(file).replace('.fits','')) + '.par'
     
@@ -381,6 +381,7 @@ def create_files(timelist,ephem,timname,parname,obs='lst'):
     
     if timname is not None:
         print('Creating .tim file')
+        print(timname)
         dl2time_totim(timelist,name=timname, obs=obs)
     
     print('Setting the .par file')

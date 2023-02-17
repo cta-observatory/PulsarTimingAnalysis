@@ -11,7 +11,7 @@ from lstchain.reco.utils import get_effective_time,add_delta_t_key
 from lstchain.io.io import dl2_params_lstcam_key,dl2_params_src_dep_lstcam_key, get_srcdep_params
 import os
 from gammapy.data import DataStore, EventList, Observation, Observations
-from gammapy.utils.regions import SphericalCircleSkyRegion
+from gammapy.utils.regions import CircleSkyRegion
 from astropy.coordinates import SkyCoord,Angle
 import logging 
 from regions import PointSkyRegion
@@ -66,7 +66,7 @@ class ReadFermiFile():
             
 
 class ReadDL3File():
-        def __init__(self, directory=None,target_radec=None,max_rad=0.2,zd_cuts=[0,60],energy_dependent_theta=True):
+        def __init__(self, directory=None,target_radec=None,max_rad=0.1,zd_cuts=[0,60],energy_dependent_theta=True):
             if directory is not None:
                 self.direc=directory
                 self.datastore = DataStore.from_dir(self.direc)
@@ -87,11 +87,12 @@ class ReadDL3File():
         
         def read_all_DL3file(self):
             obs = self.datastore.get_observations(self.ids, required_irf="point-like")
+            #obs = self.datastore.get_observations(self.ids, required_irf=None)
             pos_target = SkyCoord(ra=self.target_radec[0] * u.deg, dec=self.target_radec[1] * u.deg, frame="icrs")
             
             if not self.energydep_radmax:
                 on_radius = self.max_rad*u.deg
-                self.on_region = SphericalCircleSkyRegion(pos_target, on_radius)
+                self.on_region = CircleSkyRegion(pos_target, on_radius)
             else:
                 self.on_region = PointSkyRegion(pos_target)
             
@@ -104,7 +105,7 @@ class ReadDL3File():
             
             if not self.energydep_radmax:
                 on_radius = self.max_rad*u.deg
-                self.on_region = SphericalCircleSkyRegion(pos_target, on_radius)
+                self.on_region = CircleSkyRegion(pos_target, on_radius)
                 self.events = obs[0].events.select_region(self.on_region).table
             else:
                 self.on_region = PointSkyRegion(pos_target)

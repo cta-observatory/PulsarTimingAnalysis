@@ -150,7 +150,7 @@ def do_fitting(dataset, model, geom, emin_fit=None, emax_fit=None,stacked=False)
         dataset.models = model
         dataset.mask_fit = mask_fit
 
-        fit = Fit()
+        fit = Fit(optimize_opts = {"options": {"ftol": 1e-2, "gtol": 1e-05},})
         result = fit.run([dataset])
 
         # make a copy to compare later
@@ -176,8 +176,17 @@ def do_fitting(dataset, model, geom, emin_fit=None, emax_fit=None,stacked=False)
 
         
     
-def compute_spectral_points(dataset, model, e_min_points, e_max_points, npoints, min_ts=2, name='Crab'):
-    energy_edges = np.geomspace(e_min_points, e_max_points, npoints+1)
+def compute_spectral_points(dataset, model, e_min_points, e_max_points, npoints, npoints_in_decade=False, min_ts=2, name='Crab'):
+    
+    
+    if npoints_in_decade:
+        e_fit_bin = int(round((np.log10(e_max_points.to('TeV').value) - np.log10(e_min_points.to('TeV').value)) * npoints + 1, 0))
+
+        energy_edges = np.logspace(np.log10(e_min_points.to('TeV').value), np.log10(e_max_points.to('TeV').value), e_fit_bin) * u.TeV
+    
+    else:
+        energy_edges = np.geomspace(e_min_points, e_max_points, npoints+1)
+        
 
     fpe = FluxPointsEstimator(energy_edges=energy_edges, source=name, selection_optional="all")
     flux_points= fpe.run(datasets=dataset)

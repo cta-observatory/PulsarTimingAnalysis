@@ -87,6 +87,7 @@ class SpectralConfigSetting():
         self.e_min_points = spectral_points['emin'] * u.Unit(spectral_points['units'])
         self.e_max_points = spectral_points['emax'] * u.Unit(spectral_points['units'])
 
+        self.bins_per_decade = spectral_points['bins_per_decade']
         self.npoints = spectral_points['number_points']
         self.min_ts = spectral_points['min_ts']
             
