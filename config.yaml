@@ -15,10 +15,10 @@ cphase_setting:
 ###############################################################
 
 # -------- FILE DIRECTORY -----------
-ephem_dir: '/home/alvaro.mas/software/Pulsar_analysis/data/all.gro'
-pulsar_file_dir: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/DL3_pulsar_sys_eff_6nodes/eff_0.7/'
-results_output_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/bridge/'
-DL4_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/bridge_E/'
+ephem_dir: #Directory to ephemeris file
+pulsar_file_dir: #Directory to modified DL3 files (with phase!)
+results_output_directory: #Directory to save the output results of SED
+DL4_directory: #Directory to DL4 files
 
 target:
   name: Crab
@@ -99,7 +99,7 @@ fitting:
 
 results:
    save_results: False
-   output_directory: '/fefs/aswg/workspace/alvaro.mas/data/real/Crab/v0.9_newmc/src_dependent/phaseogram/'
+   output_directory: #Name of the output FILE to save the results
 
 
 ###############################################################
