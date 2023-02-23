@@ -8,7 +8,7 @@ dependencies:
   - astropy
   - conda-forge::nbsphinx
   - conda-forge::ctapipe=0.12
-  - conda-forge::gammapy=0.19.0
+  - conda-forge::gammapy=0.20.1
   - cython
   - graphviz
   - h5py
@@ -42,6 +42,6 @@ dependencies:
   - zstandard
   - conda-forge::eventio>=1.5.0
   - pip:
-      - lstchain~=0.9.6
+      - lstchain~=0.9.9
       - probfit~=1.1.0
-      - pint-pulsar~=0.8.8
+      - pint-pulsar~=0.9.3
