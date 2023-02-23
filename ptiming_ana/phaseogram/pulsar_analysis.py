@@ -266,6 +266,7 @@ class PulsarAnalysis():
         self.get_results = conf['results']['save_results']
         if self.get_results:
             self.output_file = conf['results']['output_directory']
+            self.output_dir = os.path.dirname(self.output_file)
             if not os.path.exists(self.output_dir):
                 logger.info('Creating directory: ' + self.output_dir)
                 os.makedirs(self.output_dir)
@@ -526,7 +527,8 @@ class PulsarAnalysis():
         
         if output_file is not None:
             self.output_file=output_file
-        
+            self.output_dir = os.path.dirname(self.output_file)
+            
         with PdfPages(self.output_file) as pdf:
             pdf.savefig(self.draw_phaseogram(phase_limits=[0,2],stats='long',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=False,hline=True),bbox_inches='tight',pad_inches=1)
             pdf.savefig(self.TimeEv.PsigVsTime())
@@ -536,11 +538,22 @@ class PulsarAnalysis():
             if self.do_fit:
                 pdf.savefig(self.draw_phaseogram(phase_limits=[0,2],stats='long',background=True,signal=['P1','P2','P3'],colorhist='blue',colorb='black',colorP=['orange','green','purple'],colorfit='red',fit=True,hline=True),bbox_inches='tight',pad_inches=1)
 
+                fitting = self.fitting.show_result()
+                fitting.to_hdf(self.output_dir+'/overall_fitting.h5', key='results')
+                
             try:
-                pdf.savefig(self.EnergyAna.show_Energy_lightcurve())
-                pdf.savefig(self.show_EnergyAna())
+                pdf.savefig(self.show_EnergyAna(),bbox_inches='tight',pad_inches=1)
+                for i in range(0,len(self.EnergyAna.show_Energy_lightcurve())):
+                    pdf.savefig(self.EnergyAna.show_Energy_lightcurve()[i],bbox_inches='tight',pad_inches=1)
+                if self.do_fit:
+                    for i in range(0,len(self.show_EnergyFitresults())):
+                        df = self.show_EnergyFitresults()[i]
+                        df.to_hdf(self.output_dir +'/fitting_energy_bin'+str(i)+'.h5',key='results')
             except:
                 pass    
+    
+    
+
     
     def save_object(self,output_file):
         with open(output_file, 'wb') as file:

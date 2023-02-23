@@ -407,12 +407,10 @@ class PEnergyAnalysis():
     
     
     def FWHMVsEnergy(self, integral = None):
-        
-        
+       
         if integral is None:
             integral=self.integral
-            
-            
+                       
         FP1=[]
         FP2=[]
         FP1_err=[]
@@ -486,16 +484,21 @@ class PEnergyAnalysis():
                 except:
                     pass
       
+        energies_F1 = np.array(energies_F1)
+        energies_F2 = np.array(energies_F2)
+        FP1 = np.array(FP1)
+        FP2 = np.array(FP2)
+        FP1_err = np.array(FP1_err)
+        FP2_err = np.array(FP2_err)
         
         if len(FP1)>0:
-            plt.errorbar(energies_F1,FP1,yerr=FP1_err,fmt='o-',color='tab:orange',label='P1')
+            plt.errorbar(energies_F1*1000,FP1,yerr=FP1_err,fmt='o-',color='tab:orange',label='P1')
         if len(FP2)>0:
-            plt.errorbar(energies_F2,FP2,yerr=FP2_err,fmt='o-',color='tab:green',label='P2')                                        
+            plt.errorbar(energies_F2*1000,FP2,yerr=FP2_err,fmt='o-',color='tab:green',label='P2')                                        
         if len(FP1)<=0 and len(FP2)<=0:
             plt.annotate('Plot not available', xy=(0.6,0.6), xytext=(0.6,0.6), fontsize=15, xycoords='axes fraction', textcoords='offset points', color='k',bbox=dict(facecolor='white',alpha=0.8),horizontalalignment='right', verticalalignment='top')  
         else:
             plt.ylabel('FWHM')
-            plt.xticks([0.02,0.05,0.08,0.1,0.2,0.3,0.4,0.5,0.7,1],labels=['20','50','80','100','200','300','400','500','700','1000'])
             plt.xlabel('E (GeV)')
             plt.legend()
             plt.tight_layout()

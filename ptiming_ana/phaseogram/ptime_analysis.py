@@ -11,6 +11,8 @@ from decimal import *
 from pylab import *
 from astropy import units as u
 import warnings
+from lstchain.reco.utils import get_effective_time
+
 
 
 def function_sqrt(x,A):
@@ -85,11 +87,11 @@ class PulsarTimeAnalysis():
             pass
         
         if 'delta_t' in pulsar_phases.info:
-            from lstchain.reco.utils import get_effective_time
-            self.t.append(get_effective_time(pulsar_phases.info)[1].value)
+            diff = pulsar_phases.info.delta_t
+            self.t.append(sum(diff[diff<1]))
         else:
             diff=abs(pulsar_phases.info.dragon_time.values[1:]-pulsar_phases.info.dragon_time.values[:-1])
-            self.t.append(sum(diff[diff<3600]))
+            self.t.append(sum(diff[diff<1]))
             
         pulsar_phases.tobs=self.t[-1]/3600
         
