@@ -258,8 +258,14 @@ class PulsarAnalysis():
             
             self.setEnergybinning(np.geomspace(emin.to(u.TeV).value,emax.to(u.TeV).value,nbins_energy),do_diff,do_integral)
             
-        if conf['fitting']['run_fitting']:    
-            self.setFittingParams(model=conf['fitting']['model'],binned=conf['fitting']['binned'])
+        if conf['fitting']['run_fitting']: 
+            
+            if self.P1_limits is None:
+                self.setFittingParams(model=conf['fitting']['model'],binned=conf['fitting']['binned'],peak='P2')
+            elif self.P2_limits is None:
+                self.setFittingParams(model=conf['fitting']['model'],binned=conf['fitting']['binned'],peak='P1')
+            else:
+                self.setFittingParams(model=conf['fitting']['model'],binned=conf['fitting']['binned'])
         
         
         #Set output file for results

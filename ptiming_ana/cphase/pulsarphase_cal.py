@@ -381,7 +381,6 @@ def create_files(timelist,ephem,timname,parname,obs='lst'):
     
     if timname is not None:
         print('Creating .tim file')
-        print(timname)
         dl2time_totim(timelist,name=timname, obs=obs)
     
     print('Setting the .par file')
@@ -485,6 +484,7 @@ def compute_phase_interpolation(timelist,ephem,timname,parname,obs='lst', pickle
     True if want to save a pickle file with the loaded TOAs
     
     '''
+    
     timelist = list(timelist)
     #Extraxting reference values of times for interpolation
     timelist_n=timelist[0::1000]

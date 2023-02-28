@@ -69,7 +69,7 @@ class Lightcurve():
                 
         
         if stats=='long':
-            plt.annotate(text_towrite, xy=(0.29, 1.3), xytext=(0.29,1.3), fontsize=15,xycoords='axes fraction', textcoords='offset points', color='black',bbox=dict(facecolor='white', edgecolor='black'),horizontalalignment='left', verticalalignment='top')
+            plt.annotate(text_towrite +f'\n $\sigma$(P1+P2)/sqrt(T) ={pulsar_phases.regions.P1P2.sign/np.sqrt(pulsar_phases.tobs):.2f}'+r'h$^{-1/2}$', xy=(0.29, 1.4), xytext=(0.29,1.4), fontsize=13,xycoords='axes fraction', textcoords='offset points', color='black',bbox=dict(facecolor='white', edgecolor='black'),horizontalalignment='left', verticalalignment='top')
             
             plt.annotate(f'$\chi^{2}$-test: $\chi^{2}$={pulsar_phases.stats.chisqr_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.chisqr_res[1])} sign={pulsar_phases.stats.chisqr_res[2]:.2f}$\sigma$ \n H-test: H={pulsar_phases.stats.Htest_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.Htest_res[1])} sign={pulsar_phases.stats.Htest_res[2]:.2f}$\sigma$ \n Z$_{{10}}$-test: Z$_{{10}}$={pulsar_phases.stats.Zntest_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.Zntest_res[1])} sign={pulsar_phases.stats.Zntest_res[2]:.2f}$\sigma$ ', xy=(0.54, 1.3), xytext=(0.54,1.3), fontsize=15,xycoords='axes fraction', textcoords='offset points', color='black',bbox=dict(facecolor='white', edgecolor='black'),horizontalalignment='left', verticalalignment='top')
             

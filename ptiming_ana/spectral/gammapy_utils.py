@@ -76,7 +76,9 @@ def execute_makers(observations, ids, dataset_empty, dataset_maker, bkg_maker, O
     
     datasets = Datasets()
 
-    for obs_id, observation in zip(ids, observations):
+    for observation in observations:
+        
+        obs_id=observation.obs_id
         
         logger.info ('Executing analysis for run number ' + str(obs_id))
         dataset = dataset_maker.run(dataset_empty.copy(name=str(obs_id)), observation)
