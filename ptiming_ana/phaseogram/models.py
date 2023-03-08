@@ -12,15 +12,15 @@ kwd = {"parallel": False, "fastmath": True}
 
 @nb.njit(**kwd)
 def gaussian(x, mu, sigma,A,B):
-    return (A+B / np.sqrt(2 * np.pi) / sigma * np.exp(-(x - mu)**2 / 2. / sigma**2)/(A+B))
+    return (A+B / np.sqrt(2 * np.pi) / sigma * np.exp(-(x - mu)**2 / 2. / sigma**2))
 
 @nb.njit(**kwd)
 def double_gaussian(x, mu, sigma,mu_2,sigma_2,A,B,C):
-    return (A+B / np.sqrt(2 * np.pi) / sigma * np.exp(-(x - mu)**2 / 2. / sigma**2)+C / (2 * np.pi)**(1/2) / sigma_2 * np.exp(-(x - mu_2)**2 / 2. / sigma_2** 2))/(A+B+C)
+    return (A+B * np.exp(-(x - mu)**2 / 2. / sigma**2)+C * np.exp(-(x - mu_2)**2 / 2. / sigma_2** 2))
 
 @nb.njit(**kwd)
-def triple_gaussian(x, Bkg, mu, sigma,mu_2,sigma_2,mu_3,sigma_3, A,B,C):
-    return (Bkg + A / np.sqrt(2 * np.pi) / sigma * np.exp(-(x - mu)**2 / 2. / sigma**2)+ B / np.sqrt(2 * np.pi) / sigma_2 * np.exp(-(x - mu_2)**2 / 2. / sigma_2** 2)+  C / np.sqrt(2 * np.pi) / sigma_3 * np.exp(-(x - mu_3)**2 / 2. / sigma_3** 2))/(A+B+C+Bkg)
+def triple_gaussian(x, A, mu, sigma,mu_2,sigma_2,mu_3,sigma_3, B,C, D):
+    return (A + B * np.exp(-(x - mu)**2 / 2. / sigma**2)+ C * np.exp(-(x - mu_2)**2 / 2. / sigma_2** 2)+  D * np.exp(-(x - mu_3)**2 / 2. / sigma_3** 2))
 
     
 @nb.njit(**kwd)

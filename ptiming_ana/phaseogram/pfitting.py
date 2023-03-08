@@ -9,6 +9,7 @@ from probfit import UnbinnedLH, gaussian, doublegaussian
 import numba as nb
 import pandas as pd
 from .models import *
+from more_itertools import sort_together
 
 class PeakFitting():
 
@@ -77,24 +78,22 @@ class PeakFitting():
                                 self.init.extend([(P_info.limits[0]+1+P_info.limits[3])/2,P_info.deltaP/2])
                                 self.shift=2*P_info.deltaP
                             else:
-                                self.init.extend([(P_info.limits[0]+P_info.limits[1])/2,P_info.deltaP/2])
+                                self.init.extend([(P_info.limits[0]+P_info.limits[1])/2+1,P_info.deltaP/2])
 
                             if self.model=='asym_dgaussian':
-                                self.init.append(P_info.deltaP/2)
+                                self.init.append(P_info.deltaP)
                     else:
                         if self.model!='gaussian':
                             raise ValueError('Double Gaussian model needs two peaks')
                 
-                
-                
                 if self.model=='tgaussian':
-                    self.init.extend(height)
-                    bkg = np.mean((pulsar_phases.histogram.lc[0][(pulsar_phases.histogram.lc[1][:-1]>(pulsar_phases.regions.OFF.limits[0])) & (pulsar_phases.histogram.lc[1][1:]<pulsar_phases.regions.OFF.limits[1])]))
-                                                                 
-                    self.init.append(bkg)
-                else:
-                    self.init.append(1)      
-                    self.init.extend(intensity)
+                    self.shift = 0.7
+                
+                bkg = np.mean((pulsar_phases.histogram.lc[0][(pulsar_phases.histogram.lc[1][:-1]>(pulsar_phases.regions.OFF.limits[0])) & (pulsar_phases.histogram.lc[1][1:]<pulsar_phases.regions.OFF.limits[1])]))
+                
+                     
+                self.init.extend(height)
+                self.init.append(bkg) 
                     
 
                 
@@ -112,7 +111,7 @@ class PeakFitting():
             if self.model=='dgaussian':
                 unbinned_likelihood = UnbinnedLH(double_gaussian, np.array(shift_phases))
                 minuit = Minuit(unbinned_likelihood,mu=self.init[0], sigma=self.init[1],mu_2=self.init[2],sigma_2=self.init[3],
-                                A=self.init[4],B=self.init[5],C=self.init[6])
+                                A=self.init[-1],B=self.init[-3],C=self.init[-2])
 
                 self.parnames=['mu', 'sigma','mu_2','sigma_2','A','B','C']
                 for par in ['mu','sigma','mu_2','sigma_2','B','C']:
@@ -125,11 +124,12 @@ class PeakFitting():
                                 sigma_2=self.init[3],mu_3=self.init[4],sigma_3=self.init[5],A=self.init[6],
                                 B=self.init[7],C=self.init[8])
                 
-                self.parnames=['Bkg','mu', 'sigma','mu_2','sigma_2','mu_3','sigma_3','A','B','C']
+
+                self.parnames=['A','mu', 'sigma','mu_2','sigma_2','mu_3','sigma_3','B','C','D']
                 for par in self.parnames:
                     minuit.fixed[par] = False
                     
-                minuit.fixed['Bkg']=True
+                minuit.fixed['Bkg']=False
                 
             elif self.model=='asym_dgaussian':
                 unbinned_likelihood = UnbinnedLH(assymetric_double_gaussian, np.array(shift_phases))
@@ -171,44 +171,76 @@ class PeakFitting():
         #Binned fitting 
         def fit_Binned(self,histogram):
             self.check_model()
-  
+            
+            #Shift the phases if one of the peak is near the interval edge
+            shift_phases= list(histogram.lc[1][:-1])
+            bin_height= list(histogram.lc[0])
+            if self.shift!=0:
+                for i in range(0,len(shift_phases)):
+                    if shift_phases[i]<self.shift:
+                        shift_phases[i]=shift_phases[i]+1
+            
+            
+            bin_height = np.array(sort_together([shift_phases, bin_height])[1])
+            shift_phases.sort()
+            shift_phases.append(shift_phases[0]+1)
+            shift_phases=np.array(shift_phases)
+            bin_centres = (shift_phases[1:]+shift_phases[0:-1])/2
+            
+              
             if self.model=='dgaussian':
-                c = cost.BinnedNLL(histogram.lc[0], histogram.lc[1], double_gaussian)
-                minuit = Minuit(c, *self.init)
-                #self.params,pcov_l=curve_fit(double_gaussian,bin_centres,histogram.lc[0],p0=self.init)
+                custom_dgaussian = lambda x,mu, sigma,mu_2,sigma_2,B,C: double_gaussian(x, mu,sigma,mu_2,
+                                                                                        sigma_2,self.init[-3],B,C)
+         
+                params,pcov_l=curve_fit(custom_dgaussian,bin_centres,bin_height,sigma = np.sqrt(bin_height), p0=self.init[:-1])
                 self.parnames=['mu', 'sigma','mu_2','sigma_2','A','B','C']
-                
+
                    
             elif self.model=='asym_dgaussian':
-                c = cost.BinnedNLL(histogram.lc[0], histogram.lc[1], assymetric_double_gaussian)
+                
+                c = cost.LeastSquares(bin_height,np.sqrt(bin_height),bin_centres,assymetric_double_gaussian)
                 minuit = Minuit(c, *self.init)
                 self.parnames=['mu', 'sigma1','sigma2','mu_2','sigma1_2','sigma2_2','A','B','C']
 
-
+                
+            elif self.model=='tgaussian':
+                  
+                custom_tgaussian = lambda x, mu, sigma,mu_2,sigma_2,mu_3,sigma_3,B,C,D: triple_gaussian(x,self.init[-1], mu,
+                                                                                              sigma,mu_2,sigma_2,mu_3,sigma_3,
+                                                                                              B,C,D)
+                bounds = ([0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,np.inf,np.inf,np.inf])
+                params,pcov_l=curve_fit(custom_tgaussian,bin_centres,bin_height,sigma = np.sqrt(bin_height), 
+                                        p0=self.init[:-1], bounds = bounds)
+                self.parnames=['A','mu', 'sigma','mu_2','sigma_2','mu_3','sigma_3','B','C','D']
+                
+                
             elif self.model=='lorentzian':
-                c = cost.BinnedNLL(histogram.lc[0], histogram.lc[1], double_lorentz)
+                c = cost.LeastSquares(bin_height,np.sqrt(bin_height),bin_centres,lorentzian)
                 minuit = Minuit(c, *self.init)
                 self.parnames=['mu_1', 'gamma_1','mu_2','gamma_2','A','B','C']
 
             
             elif self.model=='gaussian':
-                c = cost.BinnedNLL(histogram.lc[0], histogram.lc[1], gaussian)
+                c = cost.LeastSquares(bin_height,np.sqrt(bin_height),bin_centres,gaussian)
                 minuit = Minuit(c, *self.init)
                 self.parnames=['mu', 'sigma','A','B']
-            
-            minuit.migrad()
-            
-            self.minuit=minuit
+                
             
             #Store the result of params and errors
             self.params=[]
             self.errors=[]
-            for name in self.parnames:
-                self.params.append(self.minuit.values[name])
-                self.errors.append(self.minuit.errors[name])
- 
+            j=0
+            for i in range(0, len(self.parnames) ):
+                if self.parnames[i] =='A':
+                    self.params.append(self.init[-1])
+                    self.errors.append(0)
+                    j=1
+                else:
+                    self.params.append(params[i-j])
+                    self.errors.append(np.sqrt(pcov_l[i-j][i-j]))
+
             self.create_result_df()    
-        
+
         
         
         ##############################################
