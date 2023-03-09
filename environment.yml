@@ -43,5 +43,6 @@ dependencies:
   - conda-forge::eventio>=1.5.0
   - pip:
       - lstchain~=0.9.9
+      - more_itertools
       - probfit~=1.1.0
       - pint-pulsar~=0.9.3

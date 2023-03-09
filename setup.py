@@ -27,6 +27,7 @@ setup(
         'scipy',
         'probfit',
         'tables',
+        'more_itertools',
         'protobuf>=3.20.2',
         'toml',
         'pint-pulsar~=0.9.3',
