@@ -16,7 +16,7 @@ def gaussian(x, mu, sigma,A,B):
 
 @nb.njit(**kwd)
 def double_gaussian(x, mu, sigma,mu_2,sigma_2,A,B,C):
-    return (A+B * np.exp(-(x - mu)**2 / 2. / sigma**2)+C * np.exp(-(x - mu_2)**2 / 2. / sigma_2** 2))
+    return (A + B * np.exp(-(x - mu)**2 / 2. / sigma**2)+ C * np.exp(-(x - mu_2)**2 / 2. / sigma_2** 2))
 
 @nb.njit(**kwd)
 def triple_gaussian(x, A, mu, sigma,mu_2,sigma_2,mu_3,sigma_3, B,C, D):

@@ -115,7 +115,7 @@ class Lightcurve():
         hoff=np.mean((self.lc[0][(self.lc[1][:-1]>(pulsar_phases.regions.OFF.limits[0])) & (self.lc[1][1:]<pulsar_phases.regions.OFF.limits[1])]))
         
         if pulsar_phases.fitting.model=='dgaussian':
-            y=double_gaussian(x, *pulsar_phases.fitting.params[0:7])
+            y=double_gaussian(x, *pulsar_phases.fitting.params)
         
         elif pulsar_phases.fitting.model=='tgaussian':
             y=triple_gaussian(x, *pulsar_phases.fitting.params)
@@ -137,12 +137,12 @@ class Lightcurve():
                 
         #Plot
         if label is not None:
-            plt.plot(x,y,color=color,label=label,linewidth=2)
+            plt.plot(x,y,color=color,label=label,linewidth=3)
         else:
-            plt.plot(x,y,color=color,label='Fit',linewidth=2)
+            plt.plot(x,y,color=color,label='Fit',linewidth=3)
             
-        plt.plot(x+1,y,color=color, linewidth=2)
-        plt.plot(x-1,y,color=color, linewidth=2)
+        plt.plot(x+1,y,color=color, linewidth=3)
+        plt.plot(x-1,y,color=color, linewidth=3)
         
         #Add labels
         plt.xlabel('Pulsar phase',fontsize=10)

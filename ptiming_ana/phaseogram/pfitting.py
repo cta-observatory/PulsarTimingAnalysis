@@ -86,8 +86,7 @@ class PeakFitting():
                         if self.model!='gaussian':
                             raise ValueError('Double Gaussian model needs two peaks')
                 
-                if self.model=='tgaussian':
-                    self.shift = 0.7
+                self.shift = 0.7
                 
                 bkg = np.mean((pulsar_phases.histogram.lc[0][(pulsar_phases.histogram.lc[1][:-1]>(pulsar_phases.regions.OFF.limits[0])) & (pulsar_phases.histogram.lc[1][1:]<pulsar_phases.regions.OFF.limits[1])]))
                 
@@ -190,8 +189,8 @@ class PeakFitting():
               
             if self.model=='dgaussian':
                 custom_dgaussian = lambda x,mu, sigma,mu_2,sigma_2,B,C: double_gaussian(x, mu,sigma,mu_2,
-                                                                                        sigma_2,self.init[-3],B,C)
-         
+                                                                                        sigma_2,self.init[-1],B,C)
+
                 params,pcov_l=curve_fit(custom_dgaussian,bin_centres,bin_height,sigma = np.sqrt(bin_height), p0=self.init[:-1])
                 self.parnames=['mu', 'sigma','mu_2','sigma_2','A','B','C']
 
@@ -208,7 +207,7 @@ class PeakFitting():
                 custom_tgaussian = lambda x, mu, sigma,mu_2,sigma_2,mu_3,sigma_3,B,C,D: triple_gaussian(x,self.init[-1], mu,
                                                                                               sigma,mu_2,sigma_2,mu_3,sigma_3,
                                                                                               B,C,D)
-                bounds = ([0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,np.inf,np.inf,np.inf])
+                bounds = ([0,0,0,0,0,0.1,0,0,0],[2,2,2,2,2,2,np.inf,np.inf,np.inf])
                 params,pcov_l=curve_fit(custom_tgaussian,bin_centres,bin_height,sigma = np.sqrt(bin_height), 
                                         p0=self.init[:-1], bounds = bounds)
                 self.parnames=['A','mu', 'sigma','mu_2','sigma_2','mu_3','sigma_3','B','C','D']
