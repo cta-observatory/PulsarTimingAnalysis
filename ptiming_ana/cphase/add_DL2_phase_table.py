@@ -109,14 +109,14 @@ def main():
 			#Calculate the phases
 			DL2_calphase(filelist[i],ephem,'lst',interpolation,pickle)
 			if include_theta:
-				add_source_info_dl2(output_dir+str(os.path.basename(filelist[i]).replace('.h5',''))+'_pulsar.h5','Crab')
+				add_source_info_dl2(filelist[i],'Crab')
 		
 	else:
 		if in_file is not None:
 			#Calculate the phases
 			DL2_calphase(in_file,ephem,'lst',interpolation,pickle)
 			if include_theta:
-				add_source_info_dl2(output_dir+str(os.path.basename(in_file).replace('.h5',''))+'_pulsar.h5','Crab')
+				add_source_info_dl2(in_file,'Crab')
 		else:
 			raise ValueError('No input file or directory given')
 
