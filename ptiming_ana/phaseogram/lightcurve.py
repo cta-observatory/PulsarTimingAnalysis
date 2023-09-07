@@ -114,17 +114,17 @@ class Lightcurve():
         #Calculate distribution y-points using a model and its fitted params
         hoff=np.mean(self.lc[0])
         if pulsar_phases.fitting.model=='dgaussian':
-            y=hoff*double_gaussian(x, *pulsar_phases.fitting.params[0:7])
+            y=double_gaussian(x, *pulsar_phases.fitting.params[0:7])
             
         elif pulsar_phases.fitting.model=='asym_dgaussian':
             assymetric_gaussian_pdf_vec=np.vectorize(assymetric_double_gaussian)
-            y=hoff*assymetric_gaussian_pdf_vec(x, *pulsar_phases.fitting.params)
+            y=assymetric_gaussian_pdf_vec(x, *pulsar_phases.fitting.params)
             
         elif pulsar_phases.fitting.model=='lorentzian':
-            y=hoff*double_lorentz(x, *pulsar_phases.fitting.params)
+            y=double_lorentz(x, *pulsar_phases.fitting.params)
          
         elif pulsar_phases.fitting.model=='gaussian':
-            y=hoff*gaussian(x, *pulsar_phases.fitting.params)
+            y=gaussian(x, *pulsar_phases.fitting.params)
             
         if density==True:
             width=1/len(self.lc[0])

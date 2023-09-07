@@ -3,12 +3,12 @@ channels:
   - default
   - conda-forge
 dependencies:
-  - python=3.8
+  - python=3.9
   - pip
   - astropy
   - conda-forge::nbsphinx
-  - conda-forge::ctapipe=0.12
-  - conda-forge::gammapy=0.20.1
+  - conda-forge::ctapipe~=0.19.2
+  - conda-forge::gammapy~=1.1
   - cython
   - graphviz
   - h5py
@@ -17,7 +17,7 @@ dependencies:
   - ipywidgets
   - joblib
   - jupyter
-  - matplotlib
+  - matplotlib~=3.7
   - numba
   - numpy=1.21
   - numpydoc
@@ -40,8 +40,8 @@ dependencies:
   - xz
   - zlib
   - zstandard
-  - conda-forge::eventio>=1.5.0
+  - conda-forge::eventio>=1.9.1,<2.0.0a0
   - pip:
-      - lstchain~=0.9.9
-      - probfit~=1.1.0
-      - pint-pulsar~=0.9.3
+      - lstchain~=0.10.4
+      - pint-pulsar~=0.9.5
+      - more-itertools
