@@ -126,7 +126,7 @@ def set_model_to_fit(spectral_model =None, predefined_model='PowerLaw',model_nam
     if spectral_model is not None:
         model = SkyModel(spectral_model=spectral_model, name=model_name)
         
-    if predefined_model == 'PowerLaw':
+    elif predefined_model == 'PowerLaw':
         spectral_model = PowerLawSpectralModel(index=2.9, 
                                         amplitude=2e-11 * u.Unit("1 / (cm2 s TeV)"), 
                                         reference=0.15 * u.TeV)
