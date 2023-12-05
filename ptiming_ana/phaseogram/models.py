@@ -4,7 +4,7 @@ import numba as nb
 
 
 def get_model_list():
-    return(['gaussian','dgaussian','lorentzian','asym_dgaussian','tgaussian'])
+    return(['gaussian','dgaussian','double_lorentz','asym_dgaussian','tgaussian'])
 
 
 

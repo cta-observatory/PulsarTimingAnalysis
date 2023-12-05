@@ -68,6 +68,7 @@ def main():
 	parser.add_argument('--output','-out',action='store',type=str,dest='dir_output',default=None)
 	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
 	parser.add_argument('--run-number','-r',action='store',type=str,dest='run',default=False)
+	parser.add_argument('--number-interpolation','-ninterp',action='store',type=int,dest='ninterp',default=1000)
 	parser.add_argument('--observatory','-obs',action='store',type=str,dest='observatory',default='lst')
 	parser.add_argument('--interpolation','-interp',action='store_true',dest='interpolation')
 	parser.add_argument('--create-tim','-tim',action='store_true',dest='create_tim')
@@ -83,6 +84,7 @@ def main():
 	interpolation=args.interpolation
 	observatory=args.observatory
 	create_tim=args.create_tim
+	ninterp=args.ninterp
     
 	if output_dir is None:
 		warnings.warn("WARNING: No output directory is given so the output will not be saved")
@@ -104,12 +106,11 @@ def main():
 		filelist.sort()
 		for i in range(0,len(filelist)):
 			#Calculate the phases
-			DL3_calphase(filelist[i],ephem,output_dir,create_tim,observatory, interpolation,pickle)
-		
+			DL3_calphase(filelist[i],ephem,output_dir,create_tim,observatory, interpolation,ninterp,pickle)		
 	else:
 		if in_file is not None:
 			#Calculate the phases
-			DL3_calphase(in_file,ephem,output_dir,create_tim,observatory,interpolation,pickle)
+			DL3_calphase(in_file,ephem,output_dir,create_tim,observatory,interpolation,ninterp,pickle)
 		else:
 			raise ValueError('No input file or directory given')
 

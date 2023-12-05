@@ -220,7 +220,7 @@ class PEnergyAnalysis():
         for i in range(0,len(histogram_array)):
             if histogram_array[i].fitting.check_fit_result()==True:
                 
-                histogram_array[i].histogram.draw_fitting(histogram_array[i],color='C'+str(i),density=True,label=f'Energies(GeV):'+f'{self.energy_edges[i]*1000:.0f}-{self.energy_edges[i+1]*1000:.0f}')                
+                histogram_array[i].histogram.draw_fitting(histogram_array[i],color='C'+str(i),density=True,label=f'Energies(GeV):'+f'{self.energy_edges[i]*1000:.2f}-{self.energy_edges[i+1]*1000:.2f}')                
         plt.xlim(2*histogram_array[0].fitting.shift,1+2*histogram_array[i].fitting.shift)
         plt.legend(fontsize=20)
         return(fig)   
@@ -295,7 +295,7 @@ class PEnergyAnalysis():
         fit_results=[0]*(len(self.energy_edges)-1)
         
         for i in range(0,len(self.energy_edges)-1):
-            print(f'Energies(GeV):'+f'{self.energy_edges[i]*1000:.0f}-{self.energy_edges[i+1]*1000:.0f}'+'\n')
+            print(f'Energies(GeV):'+f'{self.energy_edges[i]*1000:.2f}-{self.energy_edges[i+1]*1000:.2f}'+'\n')
             if histogram_array[i].fitting.check_fit_result()==True:
                 fit_results[i]=histogram_array[i].show_fit_results()
             else:
