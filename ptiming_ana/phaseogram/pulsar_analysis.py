@@ -224,7 +224,7 @@ class PulsarAnalysis():
                 self.setParamCuts(zd_cut=conf['cuts']['zd_range'])            
             
         elif conf['flags']['fits_format']==True:
-            self.setFermiInputFile(dirname=conf['pulsar_file_dir'])
+            self.setFermiInputFile(filename=conf['pulsar_file_dir'])
         
         else:
             self.is_DL3_input = True

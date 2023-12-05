@@ -43,7 +43,7 @@ __all__=['fermi_calphase','calphase']
 
 
 def update_fermi(timelist,ephem,t):
-    model=model_fromephem(timelist,ephem)
+    model = create_files(timelist,ephem,None,'model.par')
 
     #Upload TOAs and model
     m=models.get_model(model)
@@ -56,7 +56,7 @@ def update_fermi(timelist,ephem,t):
     return(bt,p)
 
 
-def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
+def fermi_calphase(file,ephem,output_dir,pickle=False,ft2_file=None):
     
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
@@ -80,7 +80,7 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
     '''
     print('Input file:'+str(file))
     #Load observatory and TOAs
-    get_satellite_observatory("Fermi", ft2_file)
+    get_satellite_observatory("fermi", ft2_file,overwrite=True)
     tl=load_Fermi_TOAs(file,fermiobs='fermi')
     
     #Extract the timelist in MJD
@@ -89,7 +89,7 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
         timelist.append(tl[i].mjd.value)
 
     #Create TOAs object
-    t = toa.get_TOAs_list(tl)
+    t = toa.get_TOAs_list(tl,planets=True)
    
         
     #Calculate the phases in intervals of 1000 events so that ephemeris are updated
@@ -117,11 +117,9 @@ def fermi_calphase(file,ephem,output_dir,pickle,ft2_file=None):
     dir_output=output_dir+str(os.path.basename(file).replace('.fits',''))+'_pulsar.fits'
             
     print('Writing outputfile in'+str(dir_output))
-    hdu.writeto(dir_output)
+    hdu.writeto(dir_output,overwrite=True)
             
     print('Finished')
-
-    os.remove(str(os.getcwd())+'/'+timname)
 
     
         
@@ -219,7 +217,7 @@ def DL3_calphase_gammapy(DL3_direc,output_dir,ephem,obs_ids = None, obs='lst',cr
         
     
     
-def DL3_calphase(file,ephem,output_dir,create_tim_file=False,obs='lst',use_interpolation=False,pickle=False):
+def DL3_calphase(file,ephem,output_dir,create_tim_file=False,obs='lst',use_interpolation=False,n_interp=1000,pickle=False):
     '''
     Function that reads the DL3 files, calculates the phases and create a new DL3 file. The new DL3 file will have two new columns: 'PHASE' and 'BAYCENT_TIME'.
     
@@ -281,7 +279,7 @@ def DL3_calphase(file,ephem,output_dir,create_tim_file=False,obs='lst',use_inter
         phase = phases.frac           
     else:
         print('Using interpolation...')
-        phase,barycent_toas = compute_phase_interpolation(times,ephem,timname,parname,obs,pickle)
+        phase,barycent_toas = compute_phase_interpolation(times,ephem,timname,parname,n_interp,obs,pickle)
         
     
     #Shift phases
@@ -396,7 +394,7 @@ def create_files(timelist,ephem,timname,parname,obs='lst'):
 
 
         
-def DL2_calphase(dl2file,ephem,obs='lst',use_interpolation=False,pickle=False):
+def DL2_calphase(dl2file,ephem,obs='lst',use_interpolation=False,n_interp=1000,pickle=False):
     '''
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris. 
 
@@ -440,7 +438,7 @@ def DL2_calphase(dl2file,ephem,obs='lst',use_interpolation=False,pickle=False):
         phase=phase.frac
     else:
         print('Interpolating...')
-        phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,obs,pickle)
+        phase,barycent_toas=compute_phase_interpolation(timelist,ephem,timname,parname,n_interp,obs,pickle)
                                                    
     #Removing tim file
     os.remove(str(os.getcwd())+'/'+timname)
@@ -458,7 +456,7 @@ def DL2_calphase(dl2file,ephem,obs='lst',use_interpolation=False,pickle=False):
     
     
         
-def compute_phase_interpolation(timelist,ephem,timname,parname,obs='lst', pickle=False):
+def compute_phase_interpolation(timelist,ephem,timname,parname,n_interp=1000,obs='lst', pickle=False):
     
     '''
     Calculates barycentered times and pulsar phases using an interpolation method for LST-1
@@ -487,7 +485,7 @@ def compute_phase_interpolation(timelist,ephem,timname,parname,obs='lst', pickle
     
     timelist = list(timelist)
     #Extraxting reference values of times for interpolation
-    timelist_n=timelist[0::1000]
+    timelist_n=timelist[0::n_interp]
     if timelist_n[-1]!=timelist[-1]:
         timelist_n.append(timelist[-1])
         

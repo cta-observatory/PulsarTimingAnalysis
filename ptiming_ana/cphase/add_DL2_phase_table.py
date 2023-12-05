@@ -72,11 +72,12 @@ def main():
 	parser.add_argument('--in-file', '-f', action='store',type=str,dest='in_file',default=None)
 	parser.add_argument('--ephem','-ephem',action='store',type=str,dest='ephem',default=None)
 	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
+	parser.add_argument('--number-interpolation','-ninterp',action='store',type=int,dest='ninterp',default=1000)
 	parser.add_argument('--run-number','-r',action='store',type=str,dest='run',default=False)
 	parser.add_argument('--include-theta','-t',action='store_true',dest='include_theta')
 	parser.add_argument('--interpolation','-interp',action='store_true',dest='interpolation')
     
-    
+
 	args = parser.parse_args()
 
 	ephem=args.ephem
@@ -85,6 +86,7 @@ def main():
 	run=args.run
 	include_theta=args.include_theta
 	interpolation=args.interpolation
+	ninterp=args.ninterp
     
 	dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
 	pd.set_option("display.precision", 10)
@@ -107,14 +109,14 @@ def main():
 		filelist.sort()
 		for i in range(0,len(filelist)):
 			#Calculate the phases
-			DL2_calphase(filelist[i],ephem,'lst',interpolation,pickle)
+			DL2_calphase(filelist[i],ephem,'lst',interpolation,ninterp,pickle)
 			if include_theta:
 				add_source_info_dl2(filelist[i],'Crab')
 		
 	else:
 		if in_file is not None:
 			#Calculate the phases
-			DL2_calphase(in_file,ephem,'lst',interpolation,pickle)
+			DL2_calphase(in_file,ephem,'lst',interpolation,ninterp,pickle)
 			if include_theta:
 				add_source_info_dl2(in_file,'Crab')
 		else:

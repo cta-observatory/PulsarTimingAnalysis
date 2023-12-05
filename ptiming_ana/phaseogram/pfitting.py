@@ -208,8 +208,8 @@ class PeakFitting():
                 self.parnames=['A','mu', 'sigma','mu_2','sigma_2','mu_3','sigma_3','B','C','D']
                
                
-            elif self.model=='lorentzian':
-                c = cost.LeastSquares(bin_height,np.sqrt(bin_height),bin_centres,lorentzian)
+            elif self.model=='double_lorentzian':
+                c = cost.LeastSquares(bin_height,np.sqrt(bin_height),bin_centres,double_lorentzian)
                 minuit = Minuit(c, *self.init)
                 self.parnames=['mu_1', 'gamma_1','mu_2','gamma_2','A','B','C']
 
