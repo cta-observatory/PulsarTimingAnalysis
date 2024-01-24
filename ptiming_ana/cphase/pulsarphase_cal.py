@@ -330,7 +330,7 @@ def save_new_DL3_file(orig_file,new_table, output_dir):
     output_file=output_dir+str(os.path.basename(orig_file).replace('.fits',''))+'_pulsar.fits'
     
     print('Writing outputfile in'+str(output_file))
-    hdu_list.writeto(output_file)
+    hdu_list.writeto(output_file,overwrite=True)
     
     
     
