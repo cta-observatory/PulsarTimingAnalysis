@@ -28,7 +28,7 @@ setup(
         'tables',
         'protobuf>=3.20.2',
         'toml',
-        'pint-pulsar~=0.9.7',
+        'pint-pulsar<=0.9.7',
         'setuptools_scm',
     ],
     entry_points=entry_points,
