@@ -29,10 +29,11 @@ class PeakFitting():
     
         def run(self,pulsar_phases):
             #Estimate initial values 
+            
             self.est_initial_values(pulsar_phases)
             #Do the fitting 
             if self.binned==True:
-                self.fit_Binned(pulsar_phases.histogram)
+                self.fit_Binned(pulsar_phases)
             else:
                 self.fit_ULmodel(pulsar_phases)
          
@@ -72,12 +73,17 @@ class PeakFitting():
                         if name==self.peak_tofit or self.peak_tofit=='both':
                             intensity.append(P_info.Nex/P_info.noff)
                             height.append(P_info.Nex)
+                            self.shift = (pulsar_phases.regions.OFF.limits[1]+pulsar_phases.regions.OFF.limits[0])/2
                             
                             if len(P_info.limits)>2:
-                                self.init.extend([(P_info.limits[0]+1+P_info.limits[3])/2,P_info.deltaP/2])
-                                self.shift=2*P_info.deltaP
+                                extension = (P_info.limits[0]+1+P_info.limits[3])/2
                             else:
-                                self.init.extend([(P_info.limits[0]+P_info.limits[1])/2,P_info.deltaP/2])
+                                extension = (P_info.limits[0]+P_info.limits[1])/2
+
+                            if extension < self.shift:
+                                extension = extension + 1
+
+                            self.init.extend([extension,P_info.deltaP/2])
 
                             if self.model=='asym_dgaussian':
                                 self.init.append(P_info.deltaP/2)
@@ -163,12 +169,15 @@ class PeakFitting():
     
     
         #Binned fitting
-        def fit_Binned(self,histogram):
+        def fit_Binned(self,pulsar_phases):
             self.check_model()
-           
+            histogram = pulsar_phases.histogram
+            
             #Shift the phases if one of the peak is near the interval edge
             shift_phases= list(histogram.lc[1][:-1])
             bin_height= list(histogram.lc[0])
+            
+            
             if self.shift!=0:
                 for i in range(0,len(shift_phases)):
                     if shift_phases[i]<self.shift:
@@ -202,9 +211,9 @@ class PeakFitting():
                 custom_tgaussian = lambda x, mu, sigma,mu_2,sigma_2,mu_3,sigma_3,B,C,D: triple_gaussian(x,self.init[-1], mu,
                                                                                               sigma,mu_2,sigma_2,mu_3,sigma_3,
                                                                                               B,C,D)
-                bounds = ([0,0,0,0,0,0.1,0,0,0],[2,2,2,2,2,2,np.inf,np.inf,np.inf])
+                #bounds = ([0,0,0,0,0,0.1,0,0,0],[2,2,2,2,2,2,np.inf,np.inf,np.inf])
                 params,pcov_l=curve_fit(custom_tgaussian,bin_centres,bin_height,sigma = np.sqrt(bin_height),
-                                        p0=self.init[:-1], bounds = bounds)
+                                        p0=self.init[:-1])
                 self.parnames=['A','mu', 'sigma','mu_2','sigma_2','mu_3','sigma_3','B','C','D']
                
                
