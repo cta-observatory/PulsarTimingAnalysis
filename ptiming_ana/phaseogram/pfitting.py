@@ -63,6 +63,8 @@ class PeakFitting():
                 #Set different initial values for different models
                 if self.model=='tgaussian':
                     regions_names=['P1','P2','P3']
+                elif self.model =='gaussian':
+                    regions_names=['P2']
                 else:
                     regions_names=['P1','P2']
                     
@@ -200,9 +202,10 @@ class PeakFitting():
 
                    
             elif self.model=='asym_dgaussian':
-               
-                c = cost.LeastSquares(bin_height,np.sqrt(bin_height),bin_centres,assymetric_double_gaussian)
-                minuit = Minuit(c, *self.init)
+                assymetric_double_gaussian_vec=np.vectorize(assymetric_double_gaussian,excluded = [1,2,3,4,5,6,7,8,9,10])
+                custom_adgaussian = lambda x, mu,sigma1,sigma2,mu_2,sigma1_2,sigma2_2,B,C: assymetric_double_gaussian_vec(x, mu,sigma1,sigma2,mu_2,sigma1_2,sigma2_2,self.init[-1],B,C)
+
+                params,pcov_l=curve_fit(custom_adgaussian,bin_centres,bin_height,sigma = np.sqrt(bin_height), p0=self.init[:-1])
                 self.parnames=['mu', 'sigma1','sigma2','mu_2','sigma1_2','sigma2_2','A','B','C']
 
                
@@ -217,15 +220,18 @@ class PeakFitting():
                 self.parnames=['A','mu', 'sigma','mu_2','sigma_2','mu_3','sigma_3','B','C','D']
                
                
-            elif self.model=='double_lorentzian':
-                c = cost.LeastSquares(bin_height,np.sqrt(bin_height),bin_centres,double_lorentzian)
-                minuit = Minuit(c, *self.init)
+            elif self.model=='double_lorentz':
+                custom_lorentzian = lambda x, mu_1, gamma_1,mu_2,gamma_2,B,C: double_lorentz(x, mu_1, gamma_1,mu_2,gamma_2,self.init[-1],B,C)
+
+                params,pcov_l=curve_fit(custom_lorentzian,bin_centres,bin_height,sigma = np.sqrt(bin_height), p0=self.init[:-1])
+                
                 self.parnames=['mu_1', 'gamma_1','mu_2','gamma_2','A','B','C']
 
            
             elif self.model=='gaussian':
-                c = cost.LeastSquares(bin_height,np.sqrt(bin_height),bin_centres,gaussian)
-                minuit = Minuit(c, *self.init)
+                custom_gaussian = lambda x,mu, sigma,B: gaussian(x, mu,sigma,self.init[-1],B)
+
+                params,pcov_l=curve_fit(custom_gaussian,bin_centres,bin_height,sigma = np.sqrt(bin_height), p0=self.init[:-1])
                 self.parnames=['mu', 'sigma','A','B']
                
            

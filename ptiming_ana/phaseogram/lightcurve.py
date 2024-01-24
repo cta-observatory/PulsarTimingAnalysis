@@ -109,18 +109,21 @@ class Lightcurve():
         if pulsar_phases.fitting.shift==0:
             x=np.linspace(0,1,100000)
         else:
-            x=np.linspace(2*pulsar_phases.fitting.shift,1+2*pulsar_phases.fitting.shift,100000)
+            x=np.linspace(pulsar_phases.fitting.shift,1+pulsar_phases.fitting.shift,100000)
         
         #Calculate distribution y-points using a model and its fitted params
         hoff=np.mean(self.lc[0])
         if pulsar_phases.fitting.model=='dgaussian':
             y=double_gaussian(x, *pulsar_phases.fitting.params[0:7])
+
+        elif pulsar_phases.fitting.model=='tgaussian':
+            y=triple_gaussian(x, *pulsar_phases.fitting.params)
             
         elif pulsar_phases.fitting.model=='asym_dgaussian':
-            assymetric_gaussian_pdf_vec=np.vectorize(assymetric_double_gaussian)
-            y=assymetric_gaussian_pdf_vec(x, *pulsar_phases.fitting.params)
+            assymetric_double_gaussian_vec=np.vectorize(assymetric_double_gaussian,excluded = [1,2,3,4,5,6,7,8,9,10])
+            y=assymetric_double_gaussian_vec(x, *pulsar_phases.fitting.params)
             
-        elif pulsar_phases.fitting.model=='lorentzian':
+        elif pulsar_phases.fitting.model=='double_lorentz':
             y=double_lorentz(x, *pulsar_phases.fitting.params)
          
         elif pulsar_phases.fitting.model=='gaussian':
@@ -137,8 +140,8 @@ class Lightcurve():
         else:
             plt.plot(x,y,color=color,label='Fit')
             
-        plt.plot(x+1,y,color=color)
-        plt.plot(x-1,y,color=color)
+        plt.plot(x+1,y,color=color,linewidth=2)
+        plt.plot(x-1,y,color=color,linewidth=2)
         
         #Add labels
         plt.xlabel('Pulsar phase',fontsize=10)
