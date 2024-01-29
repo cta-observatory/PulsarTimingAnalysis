@@ -26,6 +26,9 @@ Parameters:
 
 --interpolation: boolean 
    Set to True if want to use the interpolation method (faster but loses some precision)
+   
+--number-interpolation: int
+   Number of events between two interpolation points.
 
 Usage:
 ------------------------
@@ -62,16 +65,16 @@ from ptiming_ana.cphase.pulsarphase_cal import DL3_calphase
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--dir', '-d', action='store',type=str,dest='directory',default=None)
-	parser.add_argument('--in-file', '-f', action='store',type=str,dest='in_file',default=None)
-	parser.add_argument('--ephem','-ephem',action='store',type=str,dest='ephem',default=None)
-	parser.add_argument('--output','-out',action='store',type=str,dest='dir_output',default=None)
-	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
-	parser.add_argument('--run-number','-r',action='store',type=str,dest='run',default=False)
-	parser.add_argument('--number-interpolation','-ninterp',action='store',type=int,dest='ninterp',default=1000)
-	parser.add_argument('--observatory','-obs',action='store',type=str,dest='observatory',default='lst')
-	parser.add_argument('--interpolation','-interp',action='store_true',dest='interpolation')
-	parser.add_argument('--create-tim','-tim',action='store_true',dest='create_tim')
+	parser.add_argument('--dir', '-d', action='store',type=str,dest='directory',default=None,help='Directory where to find the DL3 files')
+	parser.add_argument('--in-file', '-f', action='store',type=str,dest='in_file',default=None, help= 'DL3 standard file if want to analyze only one file')
+	parser.add_argument('--ephem','-ephem',action='store',type=str,dest='ephem',default=None, help= 'Path to the ephemeris file (.par or .gro)')
+	parser.add_argument('--output','-out',action='store',type=str,dest='dir_output',default=None, help= 'Path where to store the DL3 file with the pulsar info')
+	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False, help ='Set True to pickle')
+	parser.add_argument('--run-number','-r',action='store',type=str,dest='run',default=False, help = 'Run number to process (only if --dir is given)')
+	parser.add_argument('--number-interpolation','-ninterp',action='store',type=int,dest='ninterp',default=1000, help = 'Number of events between two interpolation points.')
+	parser.add_argument('--observatory','-obs',action='store',type=str,dest='observatory',default='lst', help='Observatory code')
+	parser.add_argument('--interpolation','-interp',action='store_true',dest='interpolation', help = 'Set to True if want to use the interpolation method (faster but loses some precision)')
+	parser.add_argument('--create-tim','-tim',action='store_true',dest='create_tim', help='Set True to create and save a .tim file')
     
     
 	args = parser.parse_args()

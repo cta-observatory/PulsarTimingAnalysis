@@ -26,7 +26,10 @@ Parameters:
   True if want to add the source position and theta2 values on the DL2 files (in a table called 'source_position')
 
 --interpolation: boolean 
-   Set to True if want to use the interpolation method (faster but loses some precision)
+  Set to True if want to use the interpolation method (faster but loses some precision)
+   
+--number-interpolation: int
+  Number of events between two interpolation points.
 
 
 Usage:
@@ -63,64 +66,60 @@ import argparse
 import numpy as np
 import os
 import warnings
-from pulsarphase_cal import DL2_calphase
-from utils import add_source_info_dl2
+from ptiming_ana.cphase.pulsarphase_cal import DL2_calphase
+from ptiming_ana.cphase.utils import add_source_info_dl2
 
 def main():
-	parser = argparse.ArgumentParser()
-	parser.add_argument('--dir', '-d', action='store',type=str,dest='directory',default=None)
-	parser.add_argument('--in-file', '-f', action='store',type=str,dest='in_file',default=None)
-	parser.add_argument('--ephem','-ephem',action='store',type=str,dest='ephem',default=None)
-	parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False)
-	parser.add_argument('--number-interpolation','-ninterp',action='store',type=int,dest='ninterp',default=1000)
-	parser.add_argument('--run-number','-r',action='store',type=str,dest='run',default=False)
-	parser.add_argument('--include-theta','-t',action='store_true',dest='include_theta')
-	parser.add_argument('--interpolation','-interp',action='store_true',dest='interpolation')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dir', '-d', action='store',type=str,dest='directory',default=None,help = 'Directory where to find the standard DL3 files (one by one)')
+    parser.add_argument('--in-file', '-f', action='store',type=str,dest='in_file',default=None,help = 'DL3 file to process (if want to analyze only one file)')
+    parser.add_argument('--ephem','-ephem',action='store',type=str,dest='ephem',default=None, help = 'Path to the ephemeris file (.par or .gro)')
+    parser.add_argument('--pickle','-pickle',action='store',type=bool,dest='pickle',default=False, help ='True if pickle, False otherwise')
+    parser.add_argument('--run-number','-r',action='store',type=str,dest='run',default=False, help = 'Run number to process (only if --dir is given)' )
+    parser.add_argument('--include-theta','-t',action='store_true',dest='include_theta', help ='True if want to add the source position and theta2 values on the DL2 files (in a table called source_position)')
+    parser.add_argument('--interpolation','-interp',action='store_true',dest='interpolation',help='Set to True if want to use the interpolation method (faster but loses some precision)')
+    parser.add_argument('--number-interpolation','-ninterp',action='store',type=int,dest='ninterp',default=1000, help ='Number of events between two interpolation points' )
     
+    args = parser.parse_args()
 
-	args = parser.parse_args()
-
-	ephem=args.ephem
-	pickle=args.pickle
-	in_file=args.in_file
-	run=args.run
-	include_theta=args.include_theta
-	interpolation=args.interpolation
-	ninterp=args.ninterp
-    
-	dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
-	pd.set_option("display.precision", 10)
-
-
-	if ephem is None:
+    ephem=args.ephem
+    pickle=args.pickle
+    in_file=args.in_file
+    run=args.run
+    include_theta=args.include_theta
+    interpolation=args.interpolation
+    ninterp=args.ninterp
+    dl2_params_lstcam_key='dl2/event/telescope/parameters/LST_LSTCam'
+    pd.set_option("display.precision", 10)
+    if ephem is None:
       		raise ValueError('No ephemeris provided')
                     
-	if args.directory is not None:
-		if in_file is not None:
-			raise ValueError('Both directory and file were given, can only use one of them')
+    if args.directory is not None:
+        if in_file is not None:
+            raise ValueError('Both directory and file were given, can only use one of them')
             
-		filelist=[]
-		for x in os.listdir(args.directory):
-			rel_dir = os.path.relpath(args.directory)
-			rel_file = os.path.join(rel_dir, x)
-			if run in rel_file:
-				filelist.append(rel_file)
+        filelist=[]
+        for x in os.listdir(args.directory):
+            rel_dir = os.path.relpath(args.directory)
+            rel_file = os.path.join(rel_dir, x)
+            if run in rel_file:
+                filelist.append(rel_file)
                 
-		filelist.sort()
-		for i in range(0,len(filelist)):
-			#Calculate the phases
-			DL2_calphase(filelist[i],ephem,'lst',interpolation,ninterp,pickle)
-			if include_theta:
-				add_source_info_dl2(filelist[i],'Crab')
+        filelist.sort()
+        for i in range(0,len(filelist)):
+            #Calculate the phases
+            DL2_calphase(filelist[i],ephem,'lst',interpolation,ninterp,pickle)
+            if include_theta:
+                add_source_info_dl2(filelist[i],'Crab')
 		
-	else:
-		if in_file is not None:
-			#Calculate the phases
-			DL2_calphase(in_file,ephem,'lst',interpolation,ninterp,pickle)
-			if include_theta:
-				add_source_info_dl2(in_file,'Crab')
-		else:
-			raise ValueError('No input file or directory given')
+    else:
+        if in_file is not None:
+            #Calculate the phases
+            DL2_calphase(in_file,ephem,'lst',interpolation,ninterp,pickle)
+            if include_theta:
+                add_source_info_dl2(in_file,'Crab')
+        else:
+            raise ValueError('No input file or directory given')
 
     
 if __name__ == "__main__":

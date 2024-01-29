@@ -6,9 +6,9 @@ import os
 
 entry_points = {}
 entry_points["console_scripts"] = [
-    "add_phase_interp = ptiming_ana.cphase.add_phase_interp:main",
-    "add_pulsarphase = ptiming_ana.cphase.add_pulsarphase:main",
     "merge_pulsar_files= ptiming_ana.cphase.merge_pulsar_files:main",
+    "add_DL3_phase_table= ptiming_ana.cphase.add_DL3_phase_table:main",
+    "add_DL2_phase_table= ptiming_ana.cphase.add_DL2_phase_table:main",
     
 ]
 
