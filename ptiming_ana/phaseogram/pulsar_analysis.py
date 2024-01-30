@@ -271,7 +271,11 @@ class PulsarAnalysis():
         #Set output file for results
         self.get_results = conf['results']['save_results']
         if self.get_results:
-            self.output_file = conf['results']['output_directory']
+            try:
+                self.output_file = conf['results']['output_directory']
+            except:
+                self.output_file = conf['results']['output_file']
+                
             self.output_dir = os.path.dirname(self.output_file)
             if not os.path.exists(self.output_dir):
                 logger.info('Creating directory: ' + self.output_dir)
