@@ -1,3 +1,7 @@
+# Version file produced automatically by setuptools_scm
+_version.py
+_version_cache.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
