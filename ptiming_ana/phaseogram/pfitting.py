@@ -90,7 +90,7 @@ class PeakFitting():
                             if self.model=='asym_dgaussian':
                                 self.init.append(P_info.deltaP/2)
                     else:
-                        if self.model!='gaussian':
+                        if self.model!='gaussian' and self.model!='lorentzian':
                             raise ValueError('Double Gaussian model needs two peaks')
                 
                 bkg = np.mean((pulsar_phases.histogram.lc[0][(pulsar_phases.histogram.lc[1][:-1]>(pulsar_phases.regions.OFF.limits[0])) & (pulsar_phases.histogram.lc[1][1:]<pulsar_phases.regions.OFF.limits[1])]))
@@ -141,11 +141,16 @@ class PeakFitting():
                 self.parnames=['mu', 'sigma1','sigma2','mu_2','sigma1_2','sigma2_2','A','B','C']
 
                 
-            elif self.model=='lorentzian':
+            elif self.model=='double_lorentz':
                 unbinned_likelihood = cost.UnbinnedNLL(double_lorentz, np.array(shift_phases))
                 minuit = Minuit(unbinned_likelihood, mu_1=self.init[0], gamma_1=self.init[1],mu_2=self.init[2],
                                 gamma_2=self.init[3],A=self.init[4],B=self.init[5],C=self.init[6])
                 self.parnames=['mu_1', 'gamma_1','mu_2','gamma_2','A','B','C']
+
+            elif self.model=='lorentzian':
+                unbinned_likelihood = cost.UnbinnedNLL(lorentz, np.array(shift_phases))
+                minuit = Minuit(unbinned_likelihood, mu_1=self.init[0], gamma_1=self.init[1],A=self.init[4],B=self.init[5])
+                self.parnames = ['mu_1', 'gamma_1','A','B']
 
               
             elif self.model=='gaussian':
@@ -227,7 +232,13 @@ class PeakFitting():
                 
                 self.parnames=['mu_1', 'gamma_1','mu_2','gamma_2','A','B','C']
 
-           
+            elif self.model=='lorentzian':
+                custom_lorentzian = lambda x, mu_1, gamma_1,B: lorentzian(x, mu_1, gamma_1,self.init[-1],B)
+
+                params,pcov_l=curve_fit(custom_lorentzian,bin_centres,bin_height,sigma = np.sqrt(bin_height), p0=self.init[:-1])
+                
+                self.parnames=['mu_1', 'gamma_1','A','B']
+                
             elif self.model=='gaussian':
                 custom_gaussian = lambda x,mu, sigma,B: gaussian(x, mu,sigma,self.init[-1],B)
 

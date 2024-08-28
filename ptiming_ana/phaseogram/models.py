@@ -4,7 +4,7 @@ import numba as nb
 
 
 def get_model_list():
-    return(['gaussian','dgaussian','double_lorentz','asym_dgaussian','tgaussian'])
+    return(['gaussian','dgaussian','double_lorentz','asym_dgaussian','tgaussian','lorentzian'])
 
 
 
@@ -39,6 +39,9 @@ def assymetric_double_gaussian(x, mu, sigma1,sigma2,mu_2,sigma1_2,sigma2_2,A,B,C
 def lorentz_pdf(x,mu,gamma):
     return 1/(np.pi*gamma)*(gamma**2)/((x-mu)**2+gamma**2)
 
+def lorentzian(x,mu,gamma,A,B):
+    return A+B/(np.pi*gamma)*(gamma**2)/((x-mu)**2+gamma**2)
+    
 @nb.njit(**kwd)
 def double_lorentz(x, mu_1, gamma_1,mu_2,gamma_2,A,B,C):
     #lorentz_pdf_vec=np.vectorize(lorentz_pdf)

@@ -46,7 +46,7 @@ class Lightcurve():
         #Calculate chi_sqr test
         mean_signal=np.mean(self.lc[0])
         chi_sqr,p_value=chisquare(self.lc[0],mean_signal)
-        sigmas=norm.isf(p_value*10**(-7), loc=0, scale=1)
+        sigmas=norm.isf(p_value, loc=0, scale=1)
         
         return(chi_sqr,p_value,sigmas)
     
@@ -125,7 +125,10 @@ class Lightcurve():
             
         elif pulsar_phases.fitting.model=='double_lorentz':
             y=double_lorentz(x, *pulsar_phases.fitting.params)
-         
+
+        elif pulsar_phases.fitting.model=='lorentzian':
+            y=lorentzian(x, *pulsar_phases.fitting.params)
+            
         elif pulsar_phases.fitting.model=='gaussian':
             y=gaussian(x, *pulsar_phases.fitting.params)
             
