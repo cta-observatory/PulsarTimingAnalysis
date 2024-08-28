@@ -1,6 +1,6 @@
 # PulsarTimingAnalysis
 
-The intention of this repository is to present a package with all the tools needed to perform the periodicity analysis of pulsars at Very High Energy using Python and focusing on the LST-1 telescope analysis chain:
+This repository intends to present a package with all the tools needed to perform the periodicity analysis of pulsars at Very High Energy using Python and focusing on the LST-1 telescope analysis chain:
   1. Modelling and calculation of phases with LST-1 and Fermi-LAT data
   2. Statistics, building phaseograms and search for pulsations with LST-1 and Fermi-LAT data
 
@@ -16,3 +16,5 @@ conda activate pulsar-lst1
 pip install .
 ```
 
+# Cite
+If you use the package in a publication, please cite the version used from Zenodo: https://doi.org/10.5281/zenodo.13385378
