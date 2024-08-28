@@ -9,7 +9,7 @@ The intention of this repository is to present a package with all the tools need
 The easiest way to install the package is by cloning the repository and creating a new environment with the environment.yml
 
 ```
-git clone https://github.com/alvmas/PulsarTimingAnalysis.git
+git clone https://github.com/cta-observatory/PulsarTimingAnalysis.git
 cd PulsarTimingAnalysis
 conda env create -n pulsar-lst1 -f environment.yml
 conda activate pulsar-lst1
