@@ -1,12 +1,13 @@
 # PulsarTimingAnalysis
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13385378.svg)](https://doi.org/10.5281/zenodo.13385378)
 
-This repository intends to present a package with all the tools needed to perform the periodicity analysis of pulsars at Very High Energy using Python and focusing on the LST-1 telescope analysis chain:
+Tools to perform the periodicity analysis of gamma-ray emission from pulsars. It focuses on the data from the LST-1 telescope of the future CTAO gamma-ray observatory. It is built on top of Gammapy and PINT libraries.
   1. Modelling and calculation of phases with LST-1 and Fermi-LAT data
   2. Statistics, building phaseograms and search for pulsations with LST-1 and Fermi-LAT data
 
 
 # Installation
-The easiest way to install the package is by cloning the repository and creating a new environment with the environment.yml
+The easiest way to install the package is by cloning the repository and creating a new environment using `environment.yml`
 
 ```
 git clone https://github.com/cta-observatory/PulsarTimingAnalysis.git
