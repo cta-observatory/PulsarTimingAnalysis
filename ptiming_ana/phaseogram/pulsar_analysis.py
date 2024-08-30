@@ -30,7 +30,9 @@ logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt="%Y-%m-%d %H:%M
 logger=logging.getLogger(__name__)
 logging.getLogger('matplotlib.font_manager').disabled=True
 logging.getLogger('gammapy').disabled=True
+from dataclasses import dataclass
 
+@dataclass
 class PulsarAnalysis():
 
     '''
