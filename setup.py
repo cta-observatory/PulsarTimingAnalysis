@@ -30,6 +30,7 @@ setup(
         'toml',
         'pint-pulsar<=0.9.7',
         'setuptools_scm',
+        'more-itertools==10.4.0',
     ],
     entry_points=entry_points,
 )

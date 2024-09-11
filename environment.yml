@@ -44,4 +44,4 @@ dependencies:
   - pip:
       - lstchain==0.10.6
       - pint-pulsar<=0.9.7
-      - more-itertools
+      - more-itertools==10.4.0
