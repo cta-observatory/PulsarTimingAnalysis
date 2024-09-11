@@ -13,7 +13,7 @@ class TutorialTest(unittest.TestCase):
 
     def test_load_config_file(self):
         h_config_from_file = PulsarAnalysis()
-        h_config_from_file.set_config('tutorial/example_data/config_tutorial.yaml')
+        h_config_from_file.set_config('tests/files/config_test.yaml')
 
         h=PulsarAnalysis()
         h.setBackgroundLimits([0.52,0.87])
@@ -35,7 +35,7 @@ class TutorialTest(unittest.TestCase):
 
     def test_run_analysis_phaseogram(self):
         h=PulsarAnalysis() 
-        h.set_config('tutorial/example_data/config_tutorial.yaml')
+        h.set_config('tests/files/config_test.yaml')
         h.run()
         results=h.show_Presults()
 
@@ -46,7 +46,7 @@ class TutorialTest(unittest.TestCase):
 
     def test_run_analysis_fitting(self):
         h=PulsarAnalysis() 
-        h.set_config('tutorial/example_data/config_tutorial.yaml')
+        h.set_config('tests/files/config_test.yaml')
         h.run()
 
         self.assertEquals(h.fit_model,'dgaussian')
