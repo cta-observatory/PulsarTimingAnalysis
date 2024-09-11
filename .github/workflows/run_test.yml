@@ -11,14 +11,29 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: '3.10'
-    - name: Add conda to system path
+    - name: Prepare mamba installation
+      env:
+          PYTHON_VERSION: '3.10'
       run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
+          # setup correct python version
+          sed -i -e "s/- python=.*/- python=$PYTHON_VERSION/g" environment.yml
+
+    - name: Mamba setup
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        environment-file: environment.yml
+        cache-downloads: true
+
     - name: Install dependencies
       run: |
-        conda env update --file environment.yml --name base
+        python --version
+        echo "Installing additional pip packages"
+
+        echo "pip install ."
+        pip install .
+
+        pip install pytest
+
     - name: Test with pytest
       run: |
-        conda install pytest
         pytest
