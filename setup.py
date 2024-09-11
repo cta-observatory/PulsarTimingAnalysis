@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'astropy~=5.0',
-        'lstchain~=0.10.6',
+        'lstchain==0.10.6',
         'gammapy~=1.1',
         'h5py',
         'matplotlib~=3.7',
