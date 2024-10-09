@@ -7,6 +7,13 @@ version_scheme = "post-release"
 local_scheme = "no-local-version"
 write_to = "ptiming_ana/_version.py"
 
+[project]
+name = "PtimingAna"
+version = "0.1.0"
+description = file: README.md
+authors = [{name = "ptiming_ana developers", email = "alvmas@ucm.es"}]
+dependencies = ["setuptools", "wheel"]
+
 [project.optional-dependencies]
 dev = ['pre-commit~=3.8.0']
 
