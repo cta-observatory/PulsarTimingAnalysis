@@ -8,13 +8,6 @@ exclude = ["docs", "dev"]
 line-length = 88
 indent-width = 4
 
-[tool.ruff.lint]
-ignore = ["E741"]
-extend-ignore = ["E203","E712"]
-
-[tool.ruff.lint.per-file-ignores]
-"examples/*" = ["E402"]
-
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
 quote-style = "double"
