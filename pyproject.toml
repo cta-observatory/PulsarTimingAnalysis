@@ -2,21 +2,6 @@
 requires = ["setuptools >= 40.6.0", "wheel", "setuptools_scm[toml]>=3.4"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools_scm]
-version_scheme = "post-release"
-local_scheme = "no-local-version"
-write_to = "ptiming_ana/_version.py"
-
-[project]
-name = "PtimingAna"
-version = "0.1.0"
-description = "Tools to perform the periodicity analysis of gamma-ray emission from pulsars. It focuses on the data from the LST-1 telescope of the future CTAO gamma-ray observatory. It is built on top of Gammapy and PINT libraries."
-authors = [{name = "ptiming_ana developers", email = "alvmas@ucm.es"}]
-dependencies = ["setuptools", "wheel"]
-
-[project.optional-dependencies]
-dev = ['pre-commit~=3.8.0']
-
 [tool.ruff]
 exclude = ["docs", "dev"]
 # Like black
