@@ -421,7 +421,7 @@ class PulsarAnalysis:
         # Read the data and filter
         try:
             self.r.run(self)
-        except AttributeError:
+        except TypeError:
             self.r.run()
 
         # Extract each attribute

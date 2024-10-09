@@ -1,7 +1,7 @@
 import numpy as np
 
 # from decimal import *
-# from pylab import *
+from pylab import sum
 from scipy.stats import chi2, norm
 import pandas as pd
 

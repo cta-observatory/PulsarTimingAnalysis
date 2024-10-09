@@ -4,7 +4,6 @@ from iminuit import Minuit, cost
 import pandas as pd
 from .models import (
     get_model_list,
-    lorentz,
     gaussian,
     double_gaussian,
     triple_gaussian,
@@ -222,7 +221,7 @@ class PeakFitting:
             self.parnames = ["mu_1", "gamma_1", "mu_2", "gamma_2", "A", "B", "C"]
 
         elif self.model == "lorentzian":
-            unbinned_likelihood = cost.UnbinnedNLL(lorentz, np.array(shift_phases))
+            unbinned_likelihood = cost.UnbinnedNLL(lorentzian, np.array(shift_phases))
             minuit = Minuit(
                 unbinned_likelihood,
                 mu_1=self.init[0],
