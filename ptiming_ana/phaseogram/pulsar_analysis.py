@@ -220,7 +220,7 @@ class PulsarAnalysis:
 
         # Read files
         self.filter_data = conf["cuts"]["filter_data"]
-        if conf["flags"]["DL2_format"] == True:
+        if conf["flags"]["DL2_format"]:
             if os.path.isdir(conf["pulsar_file_dir"]):
                 self.setLSTInputFile(
                     dirname=conf["pulsar_file_dir"],
@@ -275,7 +275,7 @@ class PulsarAnalysis:
             else:
                 self.setParamCuts(zd_cut=conf["cuts"]["zd_range"])
 
-        elif conf["flags"]["fits_format"] == True:
+        elif conf["flags"]["fits_format"]:
             self.setFermiInputFile(filename=conf["pulsar_file_dir"])
 
         else:
@@ -297,7 +297,7 @@ class PulsarAnalysis:
             P3_limits=conf["phase_regions"]["P3"],
         )
 
-        if conf["phase_binning"]["custom_binning"] == False:
+        if conf["phase_binning"]["custom_binning"]:
             self.setBinning(
                 conf["phase_binning"]["nbins"],
                 xmin=conf["phase_binning"]["xmin"],
@@ -445,7 +445,7 @@ class PulsarAnalysis:
         self.tobs = tobs
 
         # Fit the histogram using PeakFitting class. If binned is False, an Unbinned Likelihood method is used for the fitting
-        if self.do_fit == True:
+        if self.do_fit:
             logger.info("Fitting the data to the given model...")
             logger.info("Fit model: " + self.fit_model)
             logger.info("Binned fitting: " + str(self.binned))

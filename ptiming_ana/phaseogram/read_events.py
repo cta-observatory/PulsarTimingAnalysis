@@ -216,7 +216,7 @@ class ReadLSTFile:
 
     def read_LSTfile(self, fname, df_type="short", filter_data=True):
         if filter_data:
-            if self.src_dependent == False:
+            if not self.src_dependent:
                 df_or = pd.read_hdf(fname, key=dl2_params_lstcam_key)
                 if "pulsar_phase" not in df_or:
                     df_pulsar = pd.read_hdf(fname, key="phase_info")
@@ -252,7 +252,7 @@ class ReadLSTFile:
                 else:
                     df = df_or
 
-            elif self.src_dependent == True:
+            elif self.src_dependent:
                 srcindep_df = pd.read_hdf(
                     fname, key=dl2_params_lstcam_key, float_precision=20
                 )

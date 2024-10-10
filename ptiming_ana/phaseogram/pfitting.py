@@ -32,7 +32,7 @@ class PeakFitting:
 
         self.est_initial_values(pulsar_phases)
         # Do the fitting
-        if self.binned == True:
+        if self.binned:
             self.fit_Binned(pulsar_phases)
         else:
             self.fit_ULmodel(pulsar_phases)

@@ -57,14 +57,14 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
         df_list.append(df_i)
 
         # Include source dependent information if it is the case
-        if src_dep == True:
+        if src_dep:
             df_i_src = pd.read_hdf(
                 file, key=dl2_params_src_dep_lstcam_key, float_precision=20
             )
             df_src_list.append(df_i_src)
 
     df = pd.concat(df_list)
-    if src_dep == True:
+    if src_dep:
         df_src = pd.concat(df_src_list)
 
     # Write the new merged dataframe into a file
@@ -76,7 +76,7 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
     metadata = global_metadata()
     write_metadata(metadata, output_file)
 
-    if src_dep == False:
+    if not src_dep:
         write_dl2_dataframe(df, output_file, meta=metadata)
 
     else:

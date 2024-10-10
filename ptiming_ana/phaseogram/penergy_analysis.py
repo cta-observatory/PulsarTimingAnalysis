@@ -106,7 +106,7 @@ class PEnergyAnalysis:
 
                 self.Parray[i].init_regions()
 
-                if self.Parray[i].do_fit == True:
+                if self.Parray[i].do_fit:
                     self.Parray[i].setFittingParams(
                         self.Parray[i].fit_model,
                         self.Parray[i].binned,
@@ -136,7 +136,7 @@ class PEnergyAnalysis:
 
                 self.Parray_integral[i].init_regions()
 
-                if self.Parray_integral[i].do_fit == True:
+                if self.Parray_integral[i].do_fit:
                     self.Parray_integral[i].setFittingParams(
                         self.Parray_integral[i].fit_model,
                         self.Parray_integral[i].binned,
@@ -264,17 +264,17 @@ class PEnergyAnalysis:
             histogram_array = self.Parray
 
         for i in range(0, len(histogram_array)):
-            if histogram_array[i].fitting.check_fit_result() == True:
+            if histogram_array[i].fitting.check_fit_result():
                 fig = plt.figure(figsize=(17, 8))
                 break
             elif (
                 i == len(histogram_array) - 1
-                and histogram_array[i].fitting.check_fit_result() == False
+                and not histogram_array[i].fitting.check_fit_result()
             ):
                 print("No fit available for any energy bin")
                 return
         for i in range(0, len(histogram_array)):
-            if histogram_array[i].fitting.check_fit_result() == True:
+            if histogram_array[i].fitting.check_fit_result():
                 histogram_array[i].histogram.draw_fitting(
                     histogram_array[i],
                     color="C" + str(i),
@@ -390,7 +390,7 @@ class PEnergyAnalysis:
                 + f"{self.energy_edges[i]*1000:.2f}-{self.energy_edges[i+1]*1000:.2f}"
                 + "\n"
             )
-            if histogram_array[i].fitting.check_fit_result() == True:
+            if histogram_array[i].fitting.check_fit_result():
                 fit_results[i] = histogram_array[i].show_fit_results()
             else:
                 print("No fit available for this energy range")

@@ -208,7 +208,7 @@ class Lightcurve:
         )
 
         # Add hline for background level reference (default True)
-        if hline == True:
+        if hline:
             plt.hlines(
                 y=np.mean(
                     (
@@ -256,7 +256,7 @@ class Lightcurve:
         elif pulsar_phases.fitting.model == "gaussian":
             y = gaussian(x, *pulsar_phases.fitting.params)
 
-        if density == True:
+        if density:
             width = 1 / len(self.lc[0])
             weight = np.ones(len(y)) / (np.sum(self.lc[0]) * width)
             y = y * weight
@@ -397,14 +397,14 @@ class Lightcurve:
             self.draw_stats(pulsar_phases, phase_limits, stats)
 
         # Plot regions (default True)
-        if background == True:
+        if background:
             self.draw_background(pulsar_phases, colorb, hline)
 
         for i in range(0, len(signal)):
             self.draw_peakregion(pulsar_phases, signal[i], color=colorP[i])
 
         # Plot fitted distribution (default True)
-        if fit == True:
+        if fit:
             try:
                 self.draw_fitting(pulsar_phases, color=colorfit)
             except AttributeError:

@@ -289,7 +289,7 @@ def DL3_calphase(
     parname = str(os.path.basename(file).replace(".fits", "")) + ".par"
 
     # Calculate phases
-    if use_interpolation == False:
+    if not use_interpolation:
         model = create_files(timelist, ephem, timname, parname, obs=obs)
         if timname is None:
             barycent_toas, phases = compute_phases_from_times_model(times, model)
@@ -494,7 +494,7 @@ def DL2_calphase(
     timname = str(os.path.basename(dl2file).replace(".h5", "")) + ".tim"
     parname = str(os.path.basename(dl2file).replace(".h5", "")) + ".par"
 
-    if use_interpolation == False:
+    if not use_interpolation:
         model = create_files(timelist, ephem, timname, parname, obs=obs)
         barycent_toas, phase = get_phase_list_from_tim(timname, model, pickle)
         phase = phase.frac
