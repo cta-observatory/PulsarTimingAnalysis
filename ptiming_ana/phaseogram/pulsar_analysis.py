@@ -297,7 +297,7 @@ class PulsarAnalysis:
             P3_limits=conf["phase_regions"]["P3"],
         )
 
-        if conf["phase_binning"]["custom_binning"]:
+        if not conf["phase_binning"]["custom_binning"]:
             self.setBinning(
                 conf["phase_binning"]["nbins"],
                 xmin=conf["phase_binning"]["xmin"],
