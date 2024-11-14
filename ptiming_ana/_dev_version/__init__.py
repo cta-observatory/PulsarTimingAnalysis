@@ -1,4 +1,4 @@
-#Try to use setuptools_scm to get the current version; this is only used
+# Try to use setuptools_scm to get the current version; this is only used
 # in development installations from the git repository.
 # see lstchain/version.py for details
 try:
