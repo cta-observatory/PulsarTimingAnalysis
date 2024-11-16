@@ -1,6 +1,71 @@
 [build-system]
-requires = ["setuptools >= 40.6.0", "wheel", "setuptools_scm[toml]>=3.4"]
+requires = ["setuptools>=65", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "ptiming_ana"
+description = "Periodicity analysis of gamma-ray emission from pulsars"
+readme = "README.md"
+license = {text = "BSD-3-Clause"}
+authors = [
+    {name = "Álvaro Mas Aguilar", email = "alvmas@ucm.es"},
+]
+
+requires-python = ">=3.9"
+dependencies = [
+    "astropy~=5.0",
+    "lstchain==0.10.6",
+    "gammapy~=1.1",
+    "h5py",
+    "matplotlib~=3.7",
+    "numba",
+    "numpy",
+    "pandas",
+    "scipy",
+    "tables",
+    "pint-pulsar<=0.9.7",
+    "more-itertools==10.4.0",
+]
+
+# Dynamic versioning through setuptools_scm
+dynamic = ["version"]
+
+[project.urls]
+repository = "https://github.com/cta-observatory/PulsarTimingAnalysis"
+documentation = "https://github.com/cta-observatory/PulsarTimingAnalysis"
+
+# Command-line scripts mapping the name of the tool to the import and function to execute
+[project.scripts]
+merge_pulsar_files = "ptiming_ana.cphase.merge_pulsar_files:main"
+add_DL3_phase_table = "ptiming_ana.cphase.add_DL3_phase_table:main"
+add_DL2_phase_table = "ptiming_ana.cphase.add_DL2_phase_table:main"
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["ptiming_ana._dev_version"]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-cov",
+]
+doc = [
+  "sphinx",
+  "numpydoc",
+]
+dev = [
+  "setuptools_scm",
+]
+
+# Self-references to simplify all, needs to match project.name defined above
+all = [
+  "ptiming_ana[test,doc,dev]",
+]
+
+[tool.setuptools_scm]
+write_to = "src/ptiming_ana/_version.py"
+
 
 [tool.ruff]
 exclude = ["docs", "dev"]
