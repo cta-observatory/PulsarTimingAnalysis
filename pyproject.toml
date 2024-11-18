@@ -25,7 +25,7 @@ requires-python = ">=3.9"
 dependencies = [
     "astropy~=5.0",
     "lstchain==0.10.6",
-    "gammapy~=1.1",
+    "gammapy==1.1",
     "h5py",
     "matplotlib~=3.7",
     "numba",
