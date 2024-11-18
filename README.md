@@ -12,14 +12,14 @@ The easiest way to install the package is by cloning the repository and creating
 ```
 git clone https://github.com/cta-observatory/PulsarTimingAnalysis.git
 cd PulsarTimingAnalysis
-conda env create -n pulsar-lst1 -f environment.yml
+mamba env create -n pulsar-lst1 -f environment.yml
 conda activate pulsar-lst1
 pip install .
 ```
 **Note:** For macOS users with M chips, you may need to install the package `c-blosc2` first (since lstchain requires `python-blosc2`, which is not available for M chips architectures):
 
 ```
-mamba create -c conda-forge -n pulsar-lst1 python=3.11 c-blosc2 protozfits=2
+mamba create -c conda-forge -n pulsar-lst1 python=3.11 c-blosc2 protozfits=2 protobuf=3.20
 ```
 Then install PulsarTimingAnalysis with the rest of the dependencies with `pip install .` after activating the environment.
 
