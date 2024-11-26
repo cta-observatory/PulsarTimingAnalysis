@@ -48,6 +48,14 @@ jobs:
           uses: actions/setup-python@v3
           with:
             python-version: '3.11'
+        - name: Install c-blosc2 for M chip compatibility
+          run: |
+            if [[ "$(uname -m)" == "arm64" ]]; then
+              echo "Detected Apple Silicon. Installing c-blosc2 manually."
+              brew install c-blosc2 || echo "c-blosc2 already installed or not supported."
+            else
+              echo "Not running on Apple Silicon. Skipping c-blosc2 installation."
+            fi
 
         - name: Prepare mamba installation
           env:
