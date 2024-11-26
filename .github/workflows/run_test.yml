@@ -1,0 +1,81 @@
+name: CI tests linux
+
+on: [push]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+    - name: Prepare mamba installation
+      env:
+          PYTHON_VERSION: '3.10'
+      run: |
+          # setup correct python version
+          sed -i -e "s/- python=.*/- python=$PYTHON_VERSION/g" environment.yml
+
+    - name: Mamba setup
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        environment-file: environment.yml
+        cache-downloads: true
+
+    - name: Install dependencies
+      run: |
+        python --version
+        echo "Installing additional pip packages"
+
+        echo "pip install ."
+        pip install .
+
+        pip install pytest
+
+    - name: Test with pytest
+      run: |
+        pytest
+        
+  macos-linux:
+      runs-on: macos-latest
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Set up Python 3.11
+          uses: actions/setup-python@v3
+          with:
+            python-version: '3.11'
+
+        - name: Prepare mamba installation
+          env:
+            PYTHON_VERSION: '3.11'
+          run: |
+            # Update environment.yml with the correct Python version
+            sed -i -e "s/- python=.*/- python=$PYTHON_VERSION/g" environment.yml
+
+        - name: Mamba setup
+          uses: mamba-org/setup-micromamba@v1
+          with:
+            environment-file: environment.yml
+            cache-downloads: true
+            create-args: >
+              -c conda-forge 
+              -n pulsar-lst1 
+              python=3.11 
+              c-blosc2 
+              protozfits=2 
+              protobuf=3.20
+
+        - name: Install dependencies
+          run: |
+            python --version
+            echo "Installing additional pip packages"
+            pip install .
+            pip install pytest
+
+        - name: Test with pytest
+          run: |
+            pytest
