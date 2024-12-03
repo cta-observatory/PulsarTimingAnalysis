@@ -80,8 +80,7 @@ jobs:
           run: |
             python --version
             echo "Installing additional pip packages"
-            pip install .
-            pip install pytest
+            pip install .[test]
 
         - name: Test with pytest
           run: |
