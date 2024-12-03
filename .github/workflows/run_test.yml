@@ -71,7 +71,6 @@ jobs:
             cache-downloads: true
             create-args: >
               -c conda-forge 
-              -n pulsar-lst1 
               python=3.11 
               c-blosc2 
               protozfits=2 
