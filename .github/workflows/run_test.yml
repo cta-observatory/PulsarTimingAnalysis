@@ -21,6 +21,7 @@ jobs:
     - name: Mamba setup
       uses: mamba-org/setup-micromamba@v2
       with:
+        init-shell: bash
         environment-file: environment.yml
         cache-downloads: true
 
@@ -68,6 +69,7 @@ jobs:
           uses: mamba-org/setup-micromamba@v2
           with:
             environment-name: pulsar-lst1
+            init-shell: bash
             cache-downloads: true
             create-args: >-
               python=3.11 
