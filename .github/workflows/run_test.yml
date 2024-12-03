@@ -67,6 +67,7 @@ jobs:
         - name: Mamba setup
           uses: mamba-org/setup-micromamba@v2
           with:
+            environment-name: pulsar-lst1
             cache-downloads: true
             create-args: >
               -c conda-forge 
