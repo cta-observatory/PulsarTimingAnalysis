@@ -1,88 +1,53 @@
-name: CI tests linux
+name: CI tests
 
 on: [push]
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  tests:
+    strategy:
+      matrix:
+          os: [macos-latest, ubuntu-latest]
+          python-version: ["3.10", "3.11"]
+          install-method: ["mamba", "pip"]
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        # Need login shells (-l) for activating mamba env.
+        shell: bash -leo pipefail {0}
+
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
       with:
-        python-version: '3.10'
+            fetch-depth: 0
+    
     - name: Prepare mamba installation
+      if: matrix.install-method == 'mamba'
       env:
-          PYTHON_VERSION: '3.10'
+          PYTHON_VERSION: ${{ matrix.python-version }}
       run: |
           # setup correct python version
           sed -i -e "s/- python=.*/- python=$PYTHON_VERSION/g" environment.yml
 
     - name: Mamba setup
+      if: matrix.install-method == 'mamba'
       uses: mamba-org/setup-micromamba@v2
       with:
         init-shell: bash
         environment-file: environment.yml
         cache-downloads: true
+  
+    - name: Python setup
+      if: matrix.install-method == 'pip'
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
+    - name: Install package and dependencies
       run: |
-        python --version
-        echo "Installing additional pip packages"
+        python --version | grep "Python ${PYTHON_VERSION}"
+        pip install .[test]
 
-        echo "pip install ."
-        pip install .
-
-        pip install pytest
-
-    - name: Test with pytest
+    - name: Tests
       run: |
         pytest
-        
-  build-macos:
-      runs-on: macos-latest
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
-
-        - name: Set up Python 3.11
-          uses: actions/setup-python@v3
-          with:
-            python-version: '3.11'
-        - name: Install c-blosc2 for M chip compatibility
-          run: |
-            if [[ "$(uname -m)" == "arm64" ]]; then
-              echo "Detected Apple Silicon. Installing c-blosc2 manually."
-              brew install c-blosc2 || echo "c-blosc2 already installed or not supported."
-            else
-              echo "Not running on Apple Silicon. Skipping c-blosc2 installation."
-            fi
-
-        - name: Prepare mamba installation
-          env:
-            PYTHON_VERSION: '3.11'
-          run: |
-            # Update environment.yml with the correct Python version
-            sed -i -e "s/- python=.*/- python=$PYTHON_VERSION/g" environment.yml
-
-        - name: Mamba setup
-          uses: mamba-org/setup-micromamba@v2
-          with:
-            environment-name: pulsar-lst1
-            init-shell: bash
-            cache-downloads: true
-            create-args: >-
-              python=3.11 
-              c-blosc2 
-              protozfits=2 
-              protobuf=3.20
-
-        - name: Install dependencies
-          run: |
-            python --version
-            echo "Installing additional pip packages"
-            pip install .[test]
-
-        - name: Test with pytest
-          run: |
-            pytest
