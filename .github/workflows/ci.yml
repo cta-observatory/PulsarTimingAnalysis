@@ -46,19 +46,25 @@ jobs:
           # setup correct python version
           sed -i -e "s/- python=.*/- python=$PYTHON_VERSION/g" environment.yml
     
-    - name: Setup installation for MacOS (M chip, arm64)
+    - name: Mamba setup for MacOS (M chip, arm64)
       if: runner.os == 'macOS'
       uses: mamba-org/setup-micromamba@v2
       with:
         init-shell: bash
         environment-name: pulsar-lst1
+        # We have to install c-blosc2 and protozfits manually because
+        # the recipe in conda-forge for lstchain comes with python-blosc2,
+        # which is not available for arm64.
+        # FIXME: once we upgrade to a newer version of lstchain, this
+        # should not be necessary since python-blosc2 will not be fixed 
+        # in lstchain installation.
         create-args: >-
           python=3.11
           c-blosc2
           protozfits=2
           protobuf=3.20
 
-    - name: Mamba setup
+    - name: Mamba setup for Linux
       if: matrix.install-method == 'mamba' && runner.os != 'macOS'
       uses: mamba-org/setup-micromamba@v2
       with:
