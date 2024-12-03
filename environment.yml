@@ -1,4 +1,4 @@
-name: pulsar-lst4
+name: pulsar-lst1
 channels:
   - conda-forge
 dependencies:
