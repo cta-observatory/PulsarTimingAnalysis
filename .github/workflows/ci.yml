@@ -23,10 +23,10 @@ jobs:
             python-version: "3.11"
             install-method: "pip"
           
-          - name: MacOS (3.11, pip)
+          - name: MacOS (3.11, mamba)
             os: macos-latest
             python-version: "3.11"
-            install-method: "pip"
+            install-method: "mamba"
 
     defaults:
       run:
