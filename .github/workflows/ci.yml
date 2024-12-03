@@ -18,8 +18,13 @@ jobs:
             python-version: "3.10"
             install-method: "mamba"
 
-          - name: Linux (3.11, mamba)
+          - name: Linux (3.11, pip)
             os: ubuntu-latest
+            python-version: "3.11"
+            install-method: "pip"
+          
+          - name: MacOS (3.11, pip)
+            os: macos-latest
             python-version: "3.11"
             install-method: "pip"
 
