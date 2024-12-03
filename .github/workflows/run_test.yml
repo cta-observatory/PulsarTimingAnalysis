@@ -19,7 +19,7 @@ jobs:
           sed -i -e "s/- python=.*/- python=$PYTHON_VERSION/g" environment.yml
 
     - name: Mamba setup
-      uses: mamba-org/setup-micromamba@v1
+      uses: mamba-org/setup-micromamba@v2
       with:
         environment-file: environment.yml
         cache-downloads: true
@@ -69,8 +69,7 @@ jobs:
           with:
             environment-name: pulsar-lst1
             cache-downloads: true
-            create-args: >
-              -c conda-forge 
+            create-args: >-
               python=3.11 
               c-blosc2 
               protozfits=2 
