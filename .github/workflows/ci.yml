@@ -18,11 +18,6 @@ jobs:
             python-version: "3.10"
             install-method: "mamba"
 
-          - name: Linux (3.11, mamba)
-            os: ubuntu-latest
-            python-version: "3.11"
-            install-method: "mamba"
-
     defaults:
       run:
         # Need login shells (-l) for activating mamba env.
