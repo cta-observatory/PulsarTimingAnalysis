@@ -8,10 +8,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Linux (3.9, mamba)
+          - name: Linux (3.9, pip)
             os: ubuntu-latest
             python-version: "3.9"
-            install-method: "mamba"
+            install-method: "pip"
 
           - name: Linux (3.10, mamba)
             os: ubuntu-latest
