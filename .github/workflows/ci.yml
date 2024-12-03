@@ -4,12 +4,24 @@ on: [push]
 
 jobs:
   tests:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-          os: [macos-latest, ubuntu-latest]
-          python-version: ["3.10", "3.11"]
-          install-method: ["mamba", "pip"]
-    runs-on: ${{ matrix.os }}
+        include:
+          - name: Linux (3.9, mamba)
+            os: ubuntu-latest
+            python-version: "3.9"
+            install-method: "mamba"
+
+          - name: Linux (3.10, mamba)
+            os: ubuntu-latest
+            python-version: "3.10"
+            install-method: "mamba"
+
+          - name: Linux (3.11, mamba)
+            os: ubuntu-latest
+            python-version: "3.11"
+            install-method: "mamba"
 
     defaults:
       run:
