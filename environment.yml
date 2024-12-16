@@ -1,47 +1,27 @@
 name: pulsar-lst1
 channels:
-  - default
   - conda-forge
 dependencies:
-  - python=3.9
+  - python=3.11
   - pip
   - astropy
-  - conda-forge::nbsphinx
-  - conda-forge::ctapipe~=0.19.2
-  - conda-forge::gammapy~=1.1
-  - cython
-  - graphviz
+  - ctapipe~=0.19.2
+  - gammapy~=1.1
   - h5py
   - iminuit>=2
   - ipython
-  - ipywidgets
   - joblib
   - jupyter
   - matplotlib~=3.7
   - numba
-  - numpy=1.21
-  - numpydoc
-  - protozfits=2.0
-  - protobuf=3.20
+  - numpy
   - pandas
-  - pre-commit
-  - psutil
   - pyyaml
   - scipy
-  - setuptools
-  - sphinx=4.2
-  - sphinx-automodapi
-  - sphinx_rtd_theme
-  - tqdm
-  - traitlets
   - vitables
   - jplephem
-  - wheel
-  - xz
-  - zlib
   - zstandard
-  - conda-forge::eventio>=1.9.1,<2.0.0a0
+  - lstchain==0.10.6
+  - more-itertools==10.4.0
   - pip:
-      - lstchain==0.10.6
-      - pint-pulsar<=0.9.7
-      - more-itertools==10.4.0
+    - pint-pulsar  # not available for arm64 on conda-forge

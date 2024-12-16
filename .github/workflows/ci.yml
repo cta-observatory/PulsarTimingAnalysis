@@ -1,0 +1,93 @@
+name: CI tests
+
+on: [push]
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - name: Linux (3.9, pip)
+            os: ubuntu-latest
+            python-version: "3.9"
+            install-method: "pip"
+
+          - name: Linux (3.10, mamba)
+            os: ubuntu-latest
+            python-version: "3.10"
+            install-method: "mamba"
+
+          - name: Linux (3.11, pip)
+            os: ubuntu-latest
+            python-version: "3.11"
+            install-method: "pip"
+          
+          - name: MacOS (3.11, mamba)
+            os: macos-latest
+            python-version: "3.11"
+            install-method: "mamba"
+
+    defaults:
+      run:
+        # Need login shells (-l) for activating mamba env.
+        shell: bash -leo pipefail {0}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+            fetch-depth: 0
+    
+    - name: Prepare mamba installation
+      if: matrix.install-method == 'mamba'
+      env:
+          PYTHON_VERSION: ${{ matrix.python-version }}
+      run: |
+          # setup correct python version
+          sed -i -e "s/- python=.*/- python=$PYTHON_VERSION/g" environment.yml
+    
+    - name: Mamba setup for MacOS (M chip, arm64)
+      if: runner.os == 'macOS'
+      uses: mamba-org/setup-micromamba@v2
+      with:
+        init-shell: bash
+        environment-name: pulsar-lst1
+        # We have to install c-blosc2 and protozfits manually because
+        # the recipe in conda-forge for lstchain comes with python-blosc2,
+        # which is not available for arm64.
+        # FIXME: once we upgrade to a newer version of lstchain, this
+        # should not be necessary since python-blosc2 will not be fixed 
+        # in lstchain installation.
+        create-args: >-
+          python=3.11
+          c-blosc2
+          protozfits=2
+          protobuf=3.20
+
+    - name: Mamba setup for Linux
+      if: matrix.install-method == 'mamba' && runner.os != 'macOS'
+      uses: mamba-org/setup-micromamba@v2
+      with:
+        init-shell: bash
+        environment-file: environment.yml
+        cache-downloads: true
+  
+    - name: Python setup
+      if: matrix.install-method == 'pip'
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install package and dependencies
+      run: |
+        python --version | grep "Python ${PYTHON_VERSION}"
+        pip install .[test]
+
+    - name: Tests
+      run: |
+        pytest --cov --cov-report=xml
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
