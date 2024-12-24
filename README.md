@@ -1,4 +1,6 @@
 # PulsarTimingAnalysis
+[![CI tests](https://github.com/cta-observatory/PulsarTimingAnalysis/actions/workflows/ci.yml/badge.svg)](https://github.com/cta-observatory/PulsarTimingAnalysis/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/cta-observatory/PulsarTimingAnalysis/graph/badge.svg?token=5xVpLUeWFZ)](https://codecov.io/gh/cta-observatory/PulsarTimingAnalysis)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13385378.svg)](https://doi.org/10.5281/zenodo.13385378)
 
 Tools to perform the periodicity analysis of gamma-ray emission from pulsars. It focuses on the data from the LST-1 telescope of the future CTAO gamma-ray observatory. It is built on top of Gammapy and PINT libraries.
@@ -28,5 +30,5 @@ If you use the package in a publication, please cite the version used from Zenod
 
 This analysis library was used in the following publications:
 
-* A detailed study of the very-high-energy Crab pulsar emission with the LST-1, CTA-LST Project, A&A (2024) [arXiv:2407.02343](https://doi.org/10.48550/arXiv.2407.02343)
+* *A detailed study of the very-high-energy Crab pulsar emission with the LST-1*, CTA-LST Project, A&A, 690, A167 (2024) https://doi.org/10.1051/0004-6361/202450059
   
