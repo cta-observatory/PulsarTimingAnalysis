@@ -1,4 +1,4 @@
-name: CI tests
+name: CI tests and documentation
 
 on: [push]
 
@@ -91,3 +91,30 @@ jobs:
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+
+  docs:
+    name: Build and deploy documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install doc dependencies
+        run: |
+          pip install -e .[doc]
+          git describe --tags
+          python -c 'import ptiming_ana; print(ptiming_ana.__version__)'
+
+      - name: Build docs
+        run: make html SPHINXOPTS="-W --keep-going -n --color -j auto"
+
+      - name: Deploy to github pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build/html
