@@ -138,4 +138,6 @@ dmypy.json
 
 # Ruff
 output_ruff.txt
-.codegpt
+
+# Mac OSX
+.DS_Store
