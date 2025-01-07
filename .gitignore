@@ -75,6 +75,9 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/auto_examples
+docs/api
+docs/sg_execution_times.rst
 
 # PyBuilder
 target/
@@ -135,3 +138,4 @@ dmypy.json
 
 # Ruff
 output_ruff.txt
+.codegpt
