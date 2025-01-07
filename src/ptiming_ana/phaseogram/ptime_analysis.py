@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 
+__all__ = ["PulsarTimeAnalysis", "function_sqrt", "function_lin"]
+
 
 def function_sqrt(x, A):
     return A * np.sqrt(x)

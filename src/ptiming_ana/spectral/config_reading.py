@@ -10,6 +10,7 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT, datefmt="%Y-%m-%d %H:
 logger = logging.getLogger(__name__)
 logging.getLogger("matplotlib.font_manager").disabled = True
 
+__all__ = ["SpectralConfigSetting"]
 
 class SpectralConfigSetting:
     def __init__(self, config):

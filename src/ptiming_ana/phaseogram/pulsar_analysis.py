@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 logging.getLogger("matplotlib.font_manager").disabled = True
 logging.getLogger("gammapy").disabled = True
 
+__all__ = ["PulsarAnalysis"]
+
 
 @dataclass
 class PulsarAnalysis:

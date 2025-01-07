@@ -5,6 +5,7 @@ from pylab import sum
 from scipy.stats import chi2, norm
 import pandas as pd
 
+__all__ = ["PeriodicityTest"]
 
 class PeriodicityTest:
     """

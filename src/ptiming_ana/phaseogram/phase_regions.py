@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from gammapy.stats import WStatCountsStatistic
 
+__all__ = ["calculate_CountStats", "PhaseRegions", "PulsarPeak"]
+
 
 def calculate_CountStats(on_file, off_file=None, factor=None):
     if off_file is None:
