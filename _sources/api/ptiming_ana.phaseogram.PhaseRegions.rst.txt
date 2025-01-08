@@ -1,0 +1,25 @@
+PhaseRegions
+============
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: PhaseRegions
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PhaseRegions.calculate_P1P2
+      ~PhaseRegions.create_dic
+      ~PhaseRegions.create_peak
+      ~PhaseRegions.remove_peak
+      ~PhaseRegions.show_peak_results
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: calculate_P1P2
+   .. automethod:: create_dic
+   .. automethod:: create_peak
+   .. automethod:: remove_peak
+   .. automethod:: show_peak_results

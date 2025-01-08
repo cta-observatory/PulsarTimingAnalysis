@@ -1,0 +1,21 @@
+ReadList
+========
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: ReadList
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ReadList.calculate_tobs
+      ~ReadList.create_df_from_info
+      ~ReadList.run
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: calculate_tobs
+   .. automethod:: create_df_from_info
+   .. automethod:: run

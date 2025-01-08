@@ -1,0 +1,55 @@
+SpectralPulsarAnalysis
+======================
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autoclass:: SpectralPulsarAnalysis
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SpectralPulsarAnalysis.create_contour_lines_params
+      ~SpectralPulsarAnalysis.execute_analysis
+      ~SpectralPulsarAnalysis.extract_parameters
+      ~SpectralPulsarAnalysis.fit_statistic_profile_params
+      ~SpectralPulsarAnalysis.get_covariance_matrix
+      ~SpectralPulsarAnalysis.get_flux_points
+      ~SpectralPulsarAnalysis.get_predefined_model
+      ~SpectralPulsarAnalysis.init_settings
+      ~SpectralPulsarAnalysis.plot_SED
+      ~SpectralPulsarAnalysis.plot_SED_residuals
+      ~SpectralPulsarAnalysis.plot_excess_counts
+      ~SpectralPulsarAnalysis.plot_fp_likelihood
+      ~SpectralPulsarAnalysis.plot_ref_model
+      ~SpectralPulsarAnalysis.plot_residuals
+      ~SpectralPulsarAnalysis.prepare_analysis
+      ~SpectralPulsarAnalysis.prepare_geometry
+      ~SpectralPulsarAnalysis.prepare_makers
+      ~SpectralPulsarAnalysis.run
+      ~SpectralPulsarAnalysis.set_reference_model
+      ~SpectralPulsarAnalysis.show_fitting_results
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: create_contour_lines_params
+   .. automethod:: execute_analysis
+   .. automethod:: extract_parameters
+   .. automethod:: fit_statistic_profile_params
+   .. automethod:: get_covariance_matrix
+   .. automethod:: get_flux_points
+   .. automethod:: get_predefined_model
+   .. automethod:: init_settings
+   .. automethod:: plot_SED
+   .. automethod:: plot_SED_residuals
+   .. automethod:: plot_excess_counts
+   .. automethod:: plot_fp_likelihood
+   .. automethod:: plot_ref_model
+   .. automethod:: plot_residuals
+   .. automethod:: prepare_analysis
+   .. automethod:: prepare_geometry
+   .. automethod:: prepare_makers
+   .. automethod:: run
+   .. automethod:: set_reference_model
+   .. automethod:: show_fitting_results

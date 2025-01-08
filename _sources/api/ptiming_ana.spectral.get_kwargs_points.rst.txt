@@ -1,0 +1,6 @@
+get_kwargs_points
+=================
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: get_kwargs_points

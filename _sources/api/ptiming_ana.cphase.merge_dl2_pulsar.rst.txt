@@ -1,0 +1,6 @@
+merge_dl2_pulsar
+================
+
+.. currentmodule:: ptiming_ana.cphase
+
+.. autofunction:: merge_dl2_pulsar

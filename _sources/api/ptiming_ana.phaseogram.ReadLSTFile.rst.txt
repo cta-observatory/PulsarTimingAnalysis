@@ -1,0 +1,25 @@
+ReadLSTFile
+===========
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: ReadLSTFile
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ReadLSTFile.add_phases
+      ~ReadLSTFile.calculate_tobs
+      ~ReadLSTFile.read_LSTfile
+      ~ReadLSTFile.run
+      ~ReadLSTFile.save_memory
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: add_phases
+   .. automethod:: calculate_tobs
+   .. automethod:: read_LSTfile
+   .. automethod:: run
+   .. automethod:: save_memory

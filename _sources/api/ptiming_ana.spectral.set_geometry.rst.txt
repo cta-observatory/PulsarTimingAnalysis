@@ -1,0 +1,6 @@
+set_geometry
+============
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: set_geometry

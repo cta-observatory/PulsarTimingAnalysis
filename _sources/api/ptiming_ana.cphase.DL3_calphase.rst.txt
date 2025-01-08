@@ -1,0 +1,6 @@
+DL3_calphase
+============
+
+.. currentmodule:: ptiming_ana.cphase
+
+.. autofunction:: DL3_calphase

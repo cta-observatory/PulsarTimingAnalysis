@@ -1,0 +1,6 @@
+set_model_to_fit
+================
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: set_model_to_fit

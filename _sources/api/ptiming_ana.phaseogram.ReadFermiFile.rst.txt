@@ -1,0 +1,23 @@
+ReadFermiFile
+=============
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: ReadFermiFile
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ReadFermiFile.calculate_tobs
+      ~ReadFermiFile.create_df_from_info
+      ~ReadFermiFile.read_file
+      ~ReadFermiFile.run
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: calculate_tobs
+   .. automethod:: create_df_from_info
+   .. automethod:: read_file
+   .. automethod:: run

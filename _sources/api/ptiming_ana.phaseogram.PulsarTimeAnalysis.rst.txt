@@ -1,0 +1,31 @@
+PulsarTimeAnalysis
+==================
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: PulsarTimeAnalysis
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PulsarTimeAnalysis.PexVsTime
+      ~PulsarTimeAnalysis.PsigVsTime
+      ~PulsarTimeAnalysis.StatsVsTime
+      ~PulsarTimeAnalysis.compare_Peaksig
+      ~PulsarTimeAnalysis.run
+      ~PulsarTimeAnalysis.show_results
+      ~PulsarTimeAnalysis.store_Tvalues
+      ~PulsarTimeAnalysis.update_tinfo
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: PexVsTime
+   .. automethod:: PsigVsTime
+   .. automethod:: StatsVsTime
+   .. automethod:: compare_Peaksig
+   .. automethod:: run
+   .. automethod:: show_results
+   .. automethod:: store_Tvalues
+   .. automethod:: update_tinfo

@@ -1,0 +1,87 @@
+PulsarAnalysis
+==============
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: PulsarAnalysis
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PulsarAnalysis.check_energyana
+      ~PulsarAnalysis.draw_phaseogram
+      ~PulsarAnalysis.execute_stats
+      ~PulsarAnalysis.init_regions
+      ~PulsarAnalysis.initialize
+      ~PulsarAnalysis.run
+      ~PulsarAnalysis.save_df
+      ~PulsarAnalysis.save_object
+      ~PulsarAnalysis.save_results
+      ~PulsarAnalysis.setBackgroundLimits
+      ~PulsarAnalysis.setBinning
+      ~PulsarAnalysis.setDL3InputFile
+      ~PulsarAnalysis.setEnergybinning
+      ~PulsarAnalysis.setFermiInputFile
+      ~PulsarAnalysis.setFittingParams
+      ~PulsarAnalysis.setLSTInputFile
+      ~PulsarAnalysis.setListsInput
+      ~PulsarAnalysis.setParamCuts
+      ~PulsarAnalysis.setPeaklimits
+      ~PulsarAnalysis.setTimeInterval
+      ~PulsarAnalysis.set_config
+      ~PulsarAnalysis.shift_phases
+      ~PulsarAnalysis.show_EnergyAna
+      ~PulsarAnalysis.show_EnergyFitresults
+      ~PulsarAnalysis.show_EnergyPresults
+      ~PulsarAnalysis.show_FWHMVsEnergy
+      ~PulsarAnalysis.show_P1P2VsEnergy
+      ~PulsarAnalysis.show_Presults
+      ~PulsarAnalysis.show_SigVsEnergy
+      ~PulsarAnalysis.show_all_fits
+      ~PulsarAnalysis.show_all_lc
+      ~PulsarAnalysis.show_fit_results
+      ~PulsarAnalysis.show_lcVsEnergy
+      ~PulsarAnalysis.show_meanVsEnergy
+      ~PulsarAnalysis.show_timeEvolution
+      ~PulsarAnalysis.update_info
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: check_energyana
+   .. automethod:: draw_phaseogram
+   .. automethod:: execute_stats
+   .. automethod:: init_regions
+   .. automethod:: initialize
+   .. automethod:: run
+   .. automethod:: save_df
+   .. automethod:: save_object
+   .. automethod:: save_results
+   .. automethod:: setBackgroundLimits
+   .. automethod:: setBinning
+   .. automethod:: setDL3InputFile
+   .. automethod:: setEnergybinning
+   .. automethod:: setFermiInputFile
+   .. automethod:: setFittingParams
+   .. automethod:: setLSTInputFile
+   .. automethod:: setListsInput
+   .. automethod:: setParamCuts
+   .. automethod:: setPeaklimits
+   .. automethod:: setTimeInterval
+   .. automethod:: set_config
+   .. automethod:: shift_phases
+   .. automethod:: show_EnergyAna
+   .. automethod:: show_EnergyFitresults
+   .. automethod:: show_EnergyPresults
+   .. automethod:: show_FWHMVsEnergy
+   .. automethod:: show_P1P2VsEnergy
+   .. automethod:: show_Presults
+   .. automethod:: show_SigVsEnergy
+   .. automethod:: show_all_fits
+   .. automethod:: show_all_lc
+   .. automethod:: show_fit_results
+   .. automethod:: show_lcVsEnergy
+   .. automethod:: show_meanVsEnergy
+   .. automethod:: show_timeEvolution
+   .. automethod:: update_info

@@ -1,0 +1,6 @@
+model_fromephem
+===============
+
+.. currentmodule:: ptiming_ana.cphase
+
+.. autofunction:: model_fromephem

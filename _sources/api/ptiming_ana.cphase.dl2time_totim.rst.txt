@@ -1,0 +1,6 @@
+dl2time_totim
+=============
+
+.. currentmodule:: ptiming_ana.cphase
+
+.. autofunction:: dl2time_totim

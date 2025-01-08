@@ -1,0 +1,23 @@
+PhaseBinning
+============
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: PhaseBinning
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PhaseBinning.Find_CloseEdge
+      ~PhaseBinning.Find_LowHiEdge
+      ~PhaseBinning.getNumEdges
+      ~PhaseBinning.set_edges
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: Find_CloseEdge
+   .. automethod:: Find_LowHiEdge
+   .. automethod:: getNumEdges
+   .. automethod:: set_edges

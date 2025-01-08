@@ -1,0 +1,23 @@
+FilterPulsarAna
+===============
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: FilterPulsarAna
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~FilterPulsarAna.apply_energydep_cuts
+      ~FilterPulsarAna.apply_fixed_cut
+      ~FilterPulsarAna.check_cuts
+      ~FilterPulsarAna.use_fixed_cuts
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: apply_energydep_cuts
+   .. automethod:: apply_fixed_cut
+   .. automethod:: check_cuts
+   .. automethod:: use_fixed_cuts

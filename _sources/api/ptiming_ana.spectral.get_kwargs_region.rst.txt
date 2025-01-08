@@ -1,0 +1,6 @@
+get_kwargs_region
+=================
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: get_kwargs_region

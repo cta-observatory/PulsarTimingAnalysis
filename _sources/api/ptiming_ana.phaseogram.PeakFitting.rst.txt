@@ -1,0 +1,31 @@
+PeakFitting
+===========
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: PeakFitting
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PeakFitting.check_fit_result
+      ~PeakFitting.check_model
+      ~PeakFitting.create_result_df
+      ~PeakFitting.est_initial_values
+      ~PeakFitting.fit_Binned
+      ~PeakFitting.fit_ULmodel
+      ~PeakFitting.run
+      ~PeakFitting.show_result
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: check_fit_result
+   .. automethod:: check_model
+   .. automethod:: create_result_df
+   .. automethod:: est_initial_values
+   .. automethod:: fit_Binned
+   .. automethod:: fit_ULmodel
+   .. automethod:: run
+   .. automethod:: show_result

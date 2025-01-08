@@ -1,0 +1,39 @@
+PEnergyAnalysis
+===============
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: PEnergyAnalysis
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PEnergyAnalysis.FWHMVsEnergy
+      ~PEnergyAnalysis.MeanVsEnergy
+      ~PEnergyAnalysis.P1P2VsEnergy
+      ~PEnergyAnalysis.P1P2_ratioVsEnergy
+      ~PEnergyAnalysis.PSigVsEnergy
+      ~PEnergyAnalysis.PeaksVsEnergy
+      ~PEnergyAnalysis.run
+      ~PEnergyAnalysis.show_EnergyPresults
+      ~PEnergyAnalysis.show_Energy_fitresults
+      ~PEnergyAnalysis.show_Energy_lightcurve
+      ~PEnergyAnalysis.show_joined_Energy_fits
+      ~PEnergyAnalysis.show_joined_Energy_lightcurve
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: FWHMVsEnergy
+   .. automethod:: MeanVsEnergy
+   .. automethod:: P1P2VsEnergy
+   .. automethod:: P1P2_ratioVsEnergy
+   .. automethod:: PSigVsEnergy
+   .. automethod:: PeaksVsEnergy
+   .. automethod:: run
+   .. automethod:: show_EnergyPresults
+   .. automethod:: show_Energy_fitresults
+   .. automethod:: show_Energy_lightcurve
+   .. automethod:: show_joined_Energy_fits
+   .. automethod:: show_joined_Energy_lightcurve

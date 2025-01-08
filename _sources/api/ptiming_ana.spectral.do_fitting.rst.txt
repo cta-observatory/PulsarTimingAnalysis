@@ -1,0 +1,6 @@
+do_fitting
+==========
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: do_fitting

@@ -1,0 +1,29 @@
+SpectralConfigSetting
+=====================
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autoclass:: SpectralConfigSetting
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SpectralConfigSetting.extract_detailed_reading_info
+      ~SpectralConfigSetting.extract_energy_geometry
+      ~SpectralConfigSetting.read_configuration
+      ~SpectralConfigSetting.set_all
+      ~SpectralConfigSetting.set_general_from_config
+      ~SpectralConfigSetting.set_spectral_fitting_from_config
+      ~SpectralConfigSetting.set_spectral_points_from_config
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: extract_detailed_reading_info
+   .. automethod:: extract_energy_geometry
+   .. automethod:: read_configuration
+   .. automethod:: set_all
+   .. automethod:: set_general_from_config
+   .. automethod:: set_spectral_fitting_from_config
+   .. automethod:: set_spectral_points_from_config

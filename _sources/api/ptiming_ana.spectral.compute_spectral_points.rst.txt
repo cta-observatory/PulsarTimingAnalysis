@@ -1,0 +1,6 @@
+compute_spectral_points
+=======================
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: compute_spectral_points

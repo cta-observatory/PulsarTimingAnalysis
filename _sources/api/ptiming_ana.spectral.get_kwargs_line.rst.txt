@@ -1,0 +1,6 @@
+get_kwargs_line
+===============
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: get_kwargs_line

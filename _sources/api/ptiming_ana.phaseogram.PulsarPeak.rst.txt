@@ -1,0 +1,19 @@
+PulsarPeak
+==========
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: PulsarPeak
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PulsarPeak.fillPeak
+      ~PulsarPeak.make_stats
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: fillPeak
+   .. automethod:: make_stats

@@ -1,0 +1,6 @@
+execute_makers
+==============
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: execute_makers

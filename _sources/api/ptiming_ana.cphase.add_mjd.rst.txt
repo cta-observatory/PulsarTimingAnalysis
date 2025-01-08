@@ -1,0 +1,6 @@
+add_mjd
+=======
+
+.. currentmodule:: ptiming_ana.cphase
+
+.. autofunction:: add_mjd

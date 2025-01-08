@@ -1,0 +1,911 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PulsarAnalysis &#8212; Pulsar timing analysis</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=4060cb1b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/ptiming_ana.phaseogram.PulsarAnalysis';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FilterPulsarAna" href="ptiming_ana.phaseogram.FilterPulsarAna.html" />
+    <link rel="prev" title="PEnergyAnalysis" href="ptiming_ana.phaseogram.PEnergyAnalysis.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.6.dev76+g04070b3" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Pulsar timing analysis</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api-reference/index.html">
+    API reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/cta-observatory/PulsarTimingAnalysis" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api-reference/index.html">
+    API reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/cta-observatory/PulsarTimingAnalysis" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api-reference/cphase.html">Phase calculation (<cite>cphase</cite>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.cphase.dl2time_totim.html">dl2time_totim</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.cphase.model_fromephem.html">model_fromephem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.cphase.add_mjd.html">add_mjd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.cphase.DL3_calphase.html">DL3_calphase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.cphase.DL2_calphase.html">DL2_calphase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.cphase.merge_dl2_pulsar.html">merge_dl2_pulsar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.cphase.fermi_calphase.html">fermi_calphase</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api-reference/phaseogram.html">Phaseogram (<cite>phaseogram</cite>)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.PEnergyAnalysis.html">PEnergyAnalysis</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">PulsarAnalysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.FilterPulsarAna.html">FilterPulsarAna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.PeakFitting.html">PeakFitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.Lightcurve.html">Lightcurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.PhaseRegions.html">PhaseRegions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.PhaseBinning.html">PhaseBinning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.PulsarPeak.html">PulsarPeak</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.PeriodicityTest.html">PeriodicityTest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.PulsarTimeAnalysis.html">PulsarTimeAnalysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.ReadFermiFile.html">ReadFermiFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.ReadLSTFile.html">ReadLSTFile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.phaseogram.ReadList.html">ReadList</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api-reference/spectral.html">Spectral analysis (<cite>spectral</cite>)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.read_DL3_files.html">read_DL3_files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.set_geometry.html">set_geometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.set_makers.html">set_makers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.execute_makers.html">execute_makers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.set_model_to_fit.html">set_model_to_fit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.do_fitting.html">do_fitting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.compute_spectral_points.html">compute_spectral_points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.get_kwargs_points.html">get_kwargs_points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.get_kwargs_line.html">get_kwargs_line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.get_kwargs_region.html">get_kwargs_region</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.SpectralConfigSetting.html">SpectralConfigSetting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ptiming_ana.spectral.SpectralPulsarAnalysis.html">SpectralPulsarAnalysis</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api-reference/index.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../api-reference/phaseogram.html" class="nav-link">Phaseogram (<cite>phaseogram</cite>)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">PulsarAnalysis</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="pulsaranalysis">
+<h1>PulsarAnalysis<a class="headerlink" href="#pulsaranalysis" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ptiming_ana.phaseogram.</span></span><span class="sig-name descname"><span class="pre">PulsarAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binned</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dgaussian'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>MAIN CLASS FOR THE PULSAR ANALYSIS.
+A class to store the pulsar phases and mjd_times to be used in the Pulsar analysis. This class allows to develop all the timing pular analysis using different supporting classes and subclasses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataframe</strong><span class="classifier">dataframe containing info</span></dt><dd><p>DL2 LST file after the quality selection. Set daraframe to False if it is not available and want to set the attributes manually.</p>
+</dd>
+<dt><strong>pdata</strong><span class="classifier">List of float</span></dt><dd><p>List of phases (in case no dataframe is available).</p>
+</dd>
+<dt><strong>ptimes: List of float</strong></dt><dd><p>List of mjd times (in case no dataframe is available).</p>
+</dd>
+<dt><strong>tobservation: float</strong></dt><dd><p>Total effective time of observation</p>
+</dd>
+<dt><strong>peak_limits_1: tuple</strong></dt><dd><p>Edges of the first peak. Set to None if no P1 is present.</p>
+</dd>
+<dt><strong>peak_limits_2: tuple</strong></dt><dd><p>Edges of the second peak. Set to None if no P2 is present.</p>
+</dd>
+<dt><strong>off_limits: tuple</strong></dt><dd><p>Edges of the OFF region</p>
+</dd>
+<dt><strong>binned: boolean</strong></dt><dd><p>True for a binned fitting, False for an unbinned fitting.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>phases</strong><span class="classifier">list of float</span></dt><dd><p>List of pulsar phases.</p>
+</dd>
+<dt><strong>times</strong><span class="classifier">list of float</span></dt><dd><p>List of mjd times</p>
+</dd>
+<dt><strong>tobs</strong><span class="classifier">float</span></dt><dd><p>Effective time of observation in hours</p>
+</dd>
+<dt><strong>regions: PhaseRegions object</strong></dt><dd><p>Information of the OFF/signal regions</p>
+</dd>
+<dt><strong>histogram: Lightcurve object</strong></dt><dd><p>Information of the phaseogram</p>
+</dd>
+<dt><strong>stats: PeriodicityTest object</strong></dt><dd><p>Information of Statistical Tests for searching Periodicity</p>
+</dd>
+<dt><strong>fitting: PeakFitting object</strong></dt><dd><p>Information abot the fitting used for the peaks</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods Summary</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.check_energyana" title="ptiming_ana.phaseogram.PulsarAnalysis.check_energyana"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_energyana</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram" title="ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_phaseogram</span></code></a>([phase_limits, stats, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.execute_stats" title="ptiming_ana.phaseogram.PulsarAnalysis.execute_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute_stats</span></code></a>(tobs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.init_regions" title="ptiming_ana.phaseogram.PulsarAnalysis.init_regions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_regions</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.initialize" title="ptiming_ana.phaseogram.PulsarAnalysis.initialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.run" title="ptiming_ana.phaseogram.PulsarAnalysis.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.save_df" title="ptiming_ana.phaseogram.PulsarAnalysis.save_df"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_df</span></code></a>(output_file[, file_format])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.save_object" title="ptiming_ana.phaseogram.PulsarAnalysis.save_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_object</span></code></a>(output_file)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.save_results" title="ptiming_ana.phaseogram.PulsarAnalysis.save_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_results</span></code></a>([output_file])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setBackgroundLimits" title="ptiming_ana.phaseogram.PulsarAnalysis.setBackgroundLimits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBackgroundLimits</span></code></a>(OFF_limits)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setBinning" title="ptiming_ana.phaseogram.PulsarAnalysis.setBinning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBinning</span></code></a>(nbins[, xmin, xmax])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setDL3InputFile" title="ptiming_ana.phaseogram.PulsarAnalysis.setDL3InputFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setDL3InputFile</span></code></a>([dirname, target_radec, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setEnergybinning" title="ptiming_ana.phaseogram.PulsarAnalysis.setEnergybinning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setEnergybinning</span></code></a>(energy_edges, do_diff, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setFermiInputFile" title="ptiming_ana.phaseogram.PulsarAnalysis.setFermiInputFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFermiInputFile</span></code></a>(filename)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setFittingParams" title="ptiming_ana.phaseogram.PulsarAnalysis.setFittingParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setFittingParams</span></code></a>(model[, binned, peak, do_fit])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setLSTInputFile" title="ptiming_ana.phaseogram.PulsarAnalysis.setLSTInputFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setLSTInputFile</span></code></a>([filename, dirname, src_dep])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setListsInput" title="ptiming_ana.phaseogram.PulsarAnalysis.setListsInput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setListsInput</span></code></a>(plist[, tlist, elist, tel, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setParamCuts" title="ptiming_ana.phaseogram.PulsarAnalysis.setParamCuts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setParamCuts</span></code></a>([gammaness_cut, alpha_cut, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setPeaklimits" title="ptiming_ana.phaseogram.PulsarAnalysis.setPeaklimits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setPeaklimits</span></code></a>([P1_limits, P2_limits, P3_limits])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.setTimeInterval" title="ptiming_ana.phaseogram.PulsarAnalysis.setTimeInterval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTimeInterval</span></code></a>(tint)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.set_config" title="ptiming_ana.phaseogram.PulsarAnalysis.set_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_config</span></code></a>(configuration_file)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.shift_phases" title="ptiming_ana.phaseogram.PulsarAnalysis.shift_phases"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shift_phases</span></code></a>(xmin)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyAna" title="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyAna"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_EnergyAna</span></code></a>([integral])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyFitresults" title="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyFitresults"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_EnergyFitresults</span></code></a>([integral])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyPresults" title="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyPresults"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_EnergyPresults</span></code></a>([integral])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_FWHMVsEnergy" title="ptiming_ana.phaseogram.PulsarAnalysis.show_FWHMVsEnergy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_FWHMVsEnergy</span></code></a>([integral])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_P1P2VsEnergy" title="ptiming_ana.phaseogram.PulsarAnalysis.show_P1P2VsEnergy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_P1P2VsEnergy</span></code></a>([integral])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_Presults" title="ptiming_ana.phaseogram.PulsarAnalysis.show_Presults"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_Presults</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_SigVsEnergy" title="ptiming_ana.phaseogram.PulsarAnalysis.show_SigVsEnergy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_SigVsEnergy</span></code></a>([integral])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_all_fits" title="ptiming_ana.phaseogram.PulsarAnalysis.show_all_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_all_fits</span></code></a>([integral])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_all_lc" title="ptiming_ana.phaseogram.PulsarAnalysis.show_all_lc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_all_lc</span></code></a>([ylimits])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_fit_results" title="ptiming_ana.phaseogram.PulsarAnalysis.show_fit_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_fit_results</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_lcVsEnergy" title="ptiming_ana.phaseogram.PulsarAnalysis.show_lcVsEnergy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_lcVsEnergy</span></code></a>([integral])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_meanVsEnergy" title="ptiming_ana.phaseogram.PulsarAnalysis.show_meanVsEnergy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_meanVsEnergy</span></code></a>([integral])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_timeEvolution" title="ptiming_ana.phaseogram.PulsarAnalysis.show_timeEvolution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_timeEvolution</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ptiming_ana.phaseogram.PulsarAnalysis.update_info" title="ptiming_ana.phaseogram.PulsarAnalysis.update_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_info</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.check_energyana">
+<span class="sig-name descname"><span class="pre">check_energyana</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.check_energyana" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram">
+<span class="sig-name descname"><span class="pre">draw_phaseogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase_limits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">2]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'short'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['P1',</span> <span class="pre">'P2',</span> <span class="pre">'P3']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorhist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xkcd:sky</span> <span class="pre">blue'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['orange',</span> <span class="pre">'green',</span> <span class="pre">'purple']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorfit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.execute_stats">
+<span class="sig-name descname"><span class="pre">execute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tobs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.execute_stats" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.init_regions">
+<span class="sig-name descname"><span class="pre">init_regions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.init_regions" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.initialize">
+<span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.initialize" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.run" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.save_df">
+<span class="sig-name descname"><span class="pre">save_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'h5'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.save_df" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.save_object">
+<span class="sig-name descname"><span class="pre">save_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.save_object" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.save_results">
+<span class="sig-name descname"><span class="pre">save_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.save_results" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setBackgroundLimits">
+<span class="sig-name descname"><span class="pre">setBackgroundLimits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OFF_limits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setBackgroundLimits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setBinning">
+<span class="sig-name descname"><span class="pre">setBinning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setBinning" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setDL3InputFile">
+<span class="sig-name descname"><span class="pre">setDL3InputFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dirname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_radec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zd_cuts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">60]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_dependent_theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setDL3InputFile" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setEnergybinning">
+<span class="sig-name descname"><span class="pre">setEnergybinning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy_edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_diff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_integral</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setEnergybinning" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setFermiInputFile">
+<span class="sig-name descname"><span class="pre">setFermiInputFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setFermiInputFile" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setFittingParams">
+<span class="sig-name descname"><span class="pre">setFittingParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binned</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'both'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_fit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setFittingParams" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setLSTInputFile">
+<span class="sig-name descname"><span class="pre">setLSTInputFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_dep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setLSTInputFile" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setListsInput">
+<span class="sig-name descname"><span class="pre">setListsInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MAGIC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'GeV'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setListsInput" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setParamCuts">
+<span class="sig-name descname"><span class="pre">setParamCuts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gammaness_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta2_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zd_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_binning_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setParamCuts" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setPeaklimits">
+<span class="sig-name descname"><span class="pre">setPeaklimits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P1_limits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P2_limits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P3_limits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setPeaklimits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.setTimeInterval">
+<span class="sig-name descname"><span class="pre">setTimeInterval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.setTimeInterval" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.set_config">
+<span class="sig-name descname"><span class="pre">set_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configuration_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.set_config" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.shift_phases">
+<span class="sig-name descname"><span class="pre">shift_phases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xmin</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.shift_phases" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyAna">
+<span class="sig-name descname"><span class="pre">show_EnergyAna</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyAna" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyFitresults">
+<span class="sig-name descname"><span class="pre">show_EnergyFitresults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyFitresults" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyPresults">
+<span class="sig-name descname"><span class="pre">show_EnergyPresults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyPresults" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_FWHMVsEnergy">
+<span class="sig-name descname"><span class="pre">show_FWHMVsEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_FWHMVsEnergy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_P1P2VsEnergy">
+<span class="sig-name descname"><span class="pre">show_P1P2VsEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_P1P2VsEnergy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_Presults">
+<span class="sig-name descname"><span class="pre">show_Presults</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_Presults" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_SigVsEnergy">
+<span class="sig-name descname"><span class="pre">show_SigVsEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_SigVsEnergy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_all_fits">
+<span class="sig-name descname"><span class="pre">show_all_fits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_all_fits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_all_lc">
+<span class="sig-name descname"><span class="pre">show_all_lc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ylimits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_all_lc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_fit_results">
+<span class="sig-name descname"><span class="pre">show_fit_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_fit_results" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_lcVsEnergy">
+<span class="sig-name descname"><span class="pre">show_lcVsEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_lcVsEnergy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_meanVsEnergy">
+<span class="sig-name descname"><span class="pre">show_meanVsEnergy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integral</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_meanVsEnergy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.show_timeEvolution">
+<span class="sig-name descname"><span class="pre">show_timeEvolution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_timeEvolution" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ptiming_ana.phaseogram.PulsarAnalysis.update_info">
+<span class="sig-name descname"><span class="pre">update_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ptiming_ana.phaseogram.PulsarAnalysis.update_info" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ptiming_ana.phaseogram.PEnergyAnalysis.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">PEnergyAnalysis</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="ptiming_ana.phaseogram.FilterPulsarAna.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">FilterPulsarAna</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.check_energyana"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.check_energyana()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.draw_phaseogram()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.execute_stats"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.execute_stats()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.init_regions"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.init_regions()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.initialize"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.initialize()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.run"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.run()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.save_df"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.save_df()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.save_object"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.save_object()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.save_results"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.save_results()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setBackgroundLimits"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setBackgroundLimits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setBinning"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setBinning()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setDL3InputFile"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setDL3InputFile()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setEnergybinning"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setEnergybinning()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setFermiInputFile"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setFermiInputFile()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setFittingParams"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setFittingParams()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setLSTInputFile"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setLSTInputFile()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setListsInput"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setListsInput()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setParamCuts"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setParamCuts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setPeaklimits"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setPeaklimits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.setTimeInterval"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.setTimeInterval()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.set_config"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.set_config()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.shift_phases"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.shift_phases()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyAna"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_EnergyAna()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyFitresults"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_EnergyFitresults()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyPresults"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_EnergyPresults()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_FWHMVsEnergy"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_FWHMVsEnergy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_P1P2VsEnergy"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_P1P2VsEnergy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_Presults"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_Presults()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_SigVsEnergy"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_SigVsEnergy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_all_fits"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_all_fits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_all_lc"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_all_lc()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_fit_results"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_fit_results()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_lcVsEnergy"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_lcVsEnergy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_meanVsEnergy"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_meanVsEnergy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.show_timeEvolution"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.show_timeEvolution()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptiming_ana.phaseogram.PulsarAnalysis.update_info"><code class="docutils literal notranslate"><span class="pre">PulsarAnalysis.update_info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/ptiming_ana.phaseogram.PulsarAnalysis.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Álvaro Mas Aguilar, Cristian Pozo González, Daniel Morcuende.  Last updated 08 Jan 2025 08:51.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

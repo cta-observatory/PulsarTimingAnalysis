@@ -1,0 +1,6 @@
+read_DL3_files
+==============
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: read_DL3_files

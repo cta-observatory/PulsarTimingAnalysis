@@ -1,0 +1,31 @@
+Lightcurve
+==========
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: Lightcurve
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Lightcurve.chi_sqr_pulsar_test
+      ~Lightcurve.draw_background
+      ~Lightcurve.draw_density_hist
+      ~Lightcurve.draw_fitting
+      ~Lightcurve.draw_histogram
+      ~Lightcurve.draw_peakregion
+      ~Lightcurve.draw_stats
+      ~Lightcurve.show_phaseogram
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: chi_sqr_pulsar_test
+   .. automethod:: draw_background
+   .. automethod:: draw_density_hist
+   .. automethod:: draw_fitting
+   .. automethod:: draw_histogram
+   .. automethod:: draw_peakregion
+   .. automethod:: draw_stats
+   .. automethod:: show_phaseogram

@@ -1,0 +1,27 @@
+PeriodicityTest
+===============
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: PeriodicityTest
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PeriodicityTest.H_test
+      ~PeriodicityTest.apply_all_tests
+      ~PeriodicityTest.apply_moment_tests
+      ~PeriodicityTest.moments
+      ~PeriodicityTest.show_Pstats
+      ~PeriodicityTest.zn_test
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: H_test
+   .. automethod:: apply_all_tests
+   .. automethod:: apply_moment_tests
+   .. automethod:: moments
+   .. automethod:: show_Pstats
+   .. automethod:: zn_test

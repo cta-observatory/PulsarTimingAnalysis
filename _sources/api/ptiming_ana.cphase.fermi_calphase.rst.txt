@@ -1,0 +1,6 @@
+fermi_calphase
+==============
+
+.. currentmodule:: ptiming_ana.cphase
+
+.. autofunction:: fermi_calphase
