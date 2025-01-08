@@ -10,6 +10,8 @@ from .models import (
     lorentzian,
 )
 
+__all__ = ["Lightcurve"]
+
 
 class Lightcurve:
     """

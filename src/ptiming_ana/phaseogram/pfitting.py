@@ -13,6 +13,8 @@ from .models import (
 )
 from more_itertools import sort_together
 
+__all__ = ["PeakFitting"]
+
 
 class PeakFitting:
     def __init__(self, binned, model, peak="both"):

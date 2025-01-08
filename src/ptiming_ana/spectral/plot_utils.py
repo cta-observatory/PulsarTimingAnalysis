@@ -1,5 +1,10 @@
 import astropy.units as u
 
+__all__ = [
+    "get_kwargs_points",
+    "get_kwargs_line",
+    "get_kwargs_region",
+]
 
 def get_kwargs_points(sed_type="e2dnde", color="blue", label="Spectral points"):
     kwargs = {"sed_type": sed_type, "label": label, "color": color}

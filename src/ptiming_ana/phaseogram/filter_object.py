@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+__all__ = ["FilterPulsarAna"]
+
 
 class FilterPulsarAna:
     def __init__(
