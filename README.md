@@ -2,6 +2,7 @@
 [![CI tests](https://github.com/cta-observatory/PulsarTimingAnalysis/actions/workflows/ci.yml/badge.svg)](https://github.com/cta-observatory/PulsarTimingAnalysis/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/cta-observatory/PulsarTimingAnalysis/graph/badge.svg?token=5xVpLUeWFZ)](https://codecov.io/gh/cta-observatory/PulsarTimingAnalysis)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13385378.svg)](https://doi.org/10.5281/zenodo.13385378)
+[![Docs](https://img.shields.io/badge/View-documentation-blue)](https://cta-observatory.github.io/PulsarTimingAnalysis/)
 
 Tools to perform the periodicity analysis of gamma-ray emission from pulsars. It focuses on the data from the LST-1 telescope of the future CTAO gamma-ray observatory. It is built on top of Gammapy and PINT libraries.
   1. Modelling and calculation of phases with LST-1 and Fermi-LAT data
