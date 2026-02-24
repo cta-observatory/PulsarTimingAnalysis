@@ -350,7 +350,14 @@ class SpectralPulsarAnalysis:
             self.model_best.spectral_model.plot(ax=ax, **kwargs_best)
 
             if include_statistical:
-                self.model_best.spectral_model.plot_error(ax=ax, **kwargs_best_error)
+                # TODO: incompatibility between gammapy 1.3 and matplotlib 3.10 for plotting error bands (yunits attribute)
+                try:
+                    self.model_best.spectral_model.plot_error(ax=ax, **kwargs_best_error)
+                except AttributeError as e:
+                    if "yunits" in str(e):
+                        print("Skipping error band (matplotlib 3.10 incompatibility with gammapy 1.3)")
+                    else:
+                        raise
 
         ax.legend()
         ax.grid(which="both")
@@ -452,10 +459,8 @@ class SpectralPulsarAnalysis:
         print(self.fitting_result.models.covariance)
 
         print("\n" + "Total Correlation matrix:" + "\n")
-        fig, ax = plt.subplots(figsize=(6, 6))
-        self.fitting_result.models.covariance.plot_correlation(ax)
-
-        fig.savefig(self.config_params.output_dir + "correlation.png")
+        self.fitting_result.models.covariance.plot_correlation(figsize=(6,6))
+        plt.savefig(self.config_params.output_dir + "correlation.png")
 
     def extract_parameters(self):
         name_list = []
