@@ -34,6 +34,7 @@ __all__ = [
     "dl2time_totim",
     "model_fromephem",
     "add_mjd",
+    "add_mjd_ctlearn",
     "merge_dl2_pulsar",
 ]
 
@@ -351,6 +352,19 @@ def model_fromephem(times, ephem, model_name):
 def add_mjd(file_dataframe):
     times = file_dataframe.dragon_time.values
     t = Time(times, format="unix", scale="utc")
+    mjd_time = t.to_value("mjd", "long")
+
+    # Add time in MJD
+    print("Adding MJD time")
+    file_dataframe["mjd_time"] = mjd_time.tolist()
+
+    return mjd_time.tolist()
+
+def add_mjd_ctlearn(file_dataframe):
+    times = file_dataframe['time_mono']
+    # t = Time(times, format="unix_tai", scale="tai")
+    t = times.utc
+    t.format = "unix"
     mjd_time = t.to_value("mjd", "long")
 
     # Add time in MJD
