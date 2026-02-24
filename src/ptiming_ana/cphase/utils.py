@@ -24,10 +24,9 @@ from lstchain.io.io import (
     write_dl2_dataframe,
     dl2_params_lstcam_key,
 )
-from astropy.coordinates import SkyCoord, AltAz
+from astropy.coordinates import SkyCoord, AltAz, EarthLocation
 from astropy.coordinates.erfa_astrom import ErfaAstromInterpolator, erfa_astrom
 from ctapipe.coordinates import CameraFrame
-from lstchain.reco.utils import location
 
 
 __all__ = [
@@ -87,6 +86,8 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
 
 
 def add_source_info_dl2(file, source_name):
+    # Define lst location
+    location = EarthLocation.from_geodetic(-17.89139 * u.deg, 28.76139 * u.deg, 2184 * u.m)
     print("Adding source information in" + str(file))
 
     coma_factor = 1.0466
