@@ -1,18 +1,16 @@
-name: pulsar-lst1
+name: pulsar-lst1-updated
 channels:
   - conda-forge
 dependencies:
   - python=3.11
   - pip
   - astropy
-  - ctapipe~=0.19.2
-  - gammapy~=1.1
   - h5py
   - iminuit>=2
   - ipython
   - joblib
   - jupyter
-  - matplotlib~=3.7
+  - matplotlib
   - numba
   - numpy
   - pandas
@@ -21,7 +19,7 @@ dependencies:
   - vitables
   - jplephem
   - zstandard
-  - lstchain==0.10.6
-  - more-itertools==10.4.0
+  - more-itertools
+  - lstchain   # sin fijar versión
   - pip:
-    - pint-pulsar  # not available for arm64 on conda-forge
+      - pint-pulsar
