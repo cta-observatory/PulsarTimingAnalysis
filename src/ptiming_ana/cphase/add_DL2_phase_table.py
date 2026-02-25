@@ -106,6 +106,13 @@ def main():
         help="True if pickle, False otherwise",
     )
     parser.add_argument(
+        "--ctlearn",
+        "-ctlearn",
+        action="store_true",
+        dest="ctlearn",
+        help="True if ctlearn DL2 file, False otherwise",
+    )
+    parser.add_argument(
         "--run-number",
         "-r",
         action="store",
@@ -142,6 +149,7 @@ def main():
 
     ephem = args.ephem
     pickle = args.pickle
+    ctlearn = args.ctlearn
     in_file = args.in_file
     run = args.run
     include_theta = args.include_theta
@@ -168,16 +176,16 @@ def main():
         filelist.sort()
         for i in range(0, len(filelist)):
             # Calculate the phases
-            DL2_calphase(filelist[i], ephem, "lst", interpolation, ninterp, pickle)
+            DL2_calphase(filelist[i], ephem, "lst", interpolation, ninterp, pickle, ctlearn)
             if include_theta:
-                add_source_info_dl2(filelist[i], "Crab")
+                add_source_info_dl2(filelist[i], "Crab", ctlearn)
 
     else:
         if in_file is not None:
             # Calculate the phases
-            DL2_calphase(in_file, ephem, "lst", interpolation, ninterp, pickle)
+            DL2_calphase(in_file, ephem, "lst", interpolation, ninterp, pickle, ctlearn)
             if include_theta:
-                add_source_info_dl2(in_file, "Crab")
+                add_source_info_dl2(in_file, "Crab", ctlearn)
         else:
             raise ValueError("No input file or directory given")
 
