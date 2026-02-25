@@ -24,6 +24,7 @@ from lstchain.io.io import (
     write_dl2_dataframe,
     dl2_params_lstcam_key,
 )
+from ctapipe.io import TableLoader, read_table
 from astropy.coordinates import SkyCoord, AltAz, EarthLocation
 from astropy.coordinates.erfa_astrom import ErfaAstromInterpolator, erfa_astrom
 from ctapipe.coordinates import CameraFrame
@@ -85,25 +86,73 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
             df_src, output_file, dl2_params_src_dep_lstcam_key, meta=metadata
         )
 
+def get_reco_xy_ctlearn(df_i, location, times, focal=28*u.m, coma_factor=1.0466):
+    """Convierte alt/az reco de CTLearn a coordenadas de cámara (x, y)."""
+    focal = coma_factor * focal
 
-def add_source_info_dl2(file, source_name):
+    # Reconstrucción alt/az del evento
+    reco_alt = df_i["CTLearn_alt"]
+    reco_az  = df_i["CTLearn_az"]
+
+    tel_pos = SkyCoord(alt=reco_alt, az=reco_az, frame=AltAz(obstime=times, location=location))
+
+    # Transformación a coordenadas de cámara
+    with erfa_astrom.set(ErfaAstromInterpolator(5 * u.min)):
+        camera_frame = CameraFrame(
+            focal_length=focal,
+            telescope_pointing=tel_pos,
+            location=location,
+            obstime=times,
+        )
+        reco_cam = tel_pos.transform_to(camera_frame)
+
+    reco_x = reco_cam.data.x.to(u.m).value
+    reco_y = reco_cam.data.y.to(u.m).value
+
+    return reco_x, reco_y
+
+def add_source_info_dl2(dl2file, source_name, ctlearn):
     # Define lst location
     location = EarthLocation.from_geodetic(-17.89139 * u.deg, 28.76139 * u.deg, 2184 * u.m)
-    print("Adding source information in" + str(file))
+    print("Adding source information in" + str(dl2file))
 
     coma_factor = 1.0466
     focal = coma_factor * 28 * u.m
-
-    df1 = pd.read_hdf(file, key=dl2_params_lstcam_key)
-
     source_pos = SkyCoord.from_name(source_name)
 
-    times = Time(df1["dragon_time"], format="unix", scale="utc")
-    tel_pos = SkyCoord(
-        alt=np.array(df1["alt_tel"]) * u.rad,
-        az=np.array(df1["az_tel"]) * u.rad,
-        frame=AltAz(obstime=times, location=location),
-    )
+    if ctlearn is True:
+        with TableLoader(input_url=dl2file) as loader:
+            df_i = loader.read_telescope_events(
+                start=None,
+                stop=None,
+                dl2=True,
+                simulated=False,
+                observation_info=True,
+                pointing=True,
+            )
+            times = df_i['time_mono']
+            # times = Time(times, format="unix_tai", scale="tai")
+            times = times.utc
+            times.format = "unix"
+            # TODO: camino al que apunta pointing de table loader diferente al guardado en ctlearn
+            pos = read_table(dl2file, 'dl1/monitoring/telescope/pointing/tel_001')
+            df_i['alt_tel'] = pos['altitude']
+            df_i['az_tel'] = pos['azimuth']
+            tel_pos = SkyCoord(
+                alt=pos['altitude'],
+                az=pos['azimuth'],
+                frame=AltAz(obstime=times, location=location),
+            )
+            del pos
+    else:
+        df_i = pd.read_hdf(dl2file, key=dl2_params_lstcam_key)
+        times = Time(df_i["dragon_time"], format="unix", scale="utc")
+
+        tel_pos = SkyCoord(
+            alt=np.array(df_i["alt_tel"]) * u.rad,
+            az=np.array(df_i["az_tel"]) * u.rad,
+            frame=AltAz(obstime=times, location=location),
+        )
 
     with erfa_astrom.set(ErfaAstromInterpolator(5 * u.min)):
         camera_frame = CameraFrame(
@@ -116,9 +165,11 @@ def add_source_info_dl2(file, source_name):
 
     src_x = source_campos.data.x.value
     src_y = source_campos.data.y.value
-
-    reco_src_x = df1["reco_src_x"]
-    reco_src_y = df1["reco_src_y"]
+    if ctlearn:
+        reco_src_x, reco_src_y = get_reco_xy_ctlearn(df_i, location, times)
+    else:
+        reco_src_x = df_i["reco_src_x"]
+        reco_src_y = df_i["reco_src_y"]
 
     print("Computing theta2...")
     theta_meters = np.sqrt(
@@ -142,7 +193,7 @@ def add_source_info_dl2(file, source_name):
             "theta2_off": list(theta2_off),
         }
     )
-    table_source.to_hdf(file, key="source_position")
+    table_source.to_hdf(dl2file, key="source_position")
 
 
 def read_ephemfile(ephem):

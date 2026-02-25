@@ -16,10 +16,12 @@ import pint.toa as toa
 from pint.fermi_toas import load_Fermi_TOAs
 from ptiming_ana.cphase.utils import (
     add_mjd,
+    add_mjd_ctlearn,
     dl2time_totim,
     model_fromephem,
 )
 from lstchain.io.io import dl2_params_lstcam_key
+from ctapipe.io import TableLoader
 
 import pint.models as models
 
@@ -451,7 +453,7 @@ def create_files(timelist, ephem, timname, parname, obs="lst"):
 
 
 def DL2_calphase(
-    dl2file, ephem, obs="lst", use_interpolation=False, n_interp=1000, pickle=False
+    dl2file, ephem, obs="lst", use_interpolation=False, n_interp=1000, pickle=False, ctlearn=False
 ):
     """
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris.
@@ -484,11 +486,22 @@ def DL2_calphase(
 
     # Read the file
     logger.info("Input file:" + str(dl2file))
-    df_i = pd.read_hdf(dl2file, key=dl2_params_lstcam_key, float_precision=20)
-    add_mjd(df_i)
-
-    # Create the .tim file
-    timelist = df_i.mjd_time.tolist()
+    if ctlearn is True:
+        with TableLoader(input_url=dl2file) as loader:
+            df_i = loader.read_telescope_events(
+                start=None,
+                stop=None,
+                dl2=True,
+                simulated=False,
+                observation_info=True,
+            )
+            add_mjd_ctlearn(df_i)
+            timelist = df_i['mjd_time'].tolist()
+    else:
+        df_i = pd.read_hdf(dl2file, key=dl2_params_lstcam_key, float_precision=20)
+        add_mjd(df_i)
+        # Create the .tim file
+        timelist = df_i.mjd_time.tolist()
 
     # Name of the files
     timname = str(os.path.basename(dl2file).replace(".h5", "")) + ".tim"
