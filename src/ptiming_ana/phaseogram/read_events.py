@@ -9,6 +9,8 @@ from lstchain.io.io import (
     get_srcdep_params,
 )
 import os
+from ctapipe.io import TableLoader
+from ctapipe.io import read_table
 from gammapy.data import DataStore
 from gammapy.utils.regions import CircleSkyRegion
 from astropy.coordinates import SkyCoord
@@ -152,6 +154,7 @@ class ReadDL3File:
     def calculate_tobs(self, mask=None):
         if mask is None:
             mask = self.zd_mask
+        print(self.datastore.obs_table[mask]["LIVETIME"].data.sum() / 3600)
         return self.datastore.obs_table[mask]["LIVETIME"].data.sum() / 3600
 
     def create_dataframe(self):
@@ -195,7 +198,7 @@ class ReadDL3File:
 
 
 class ReadLSTFile:
-    def __init__(self, file=None, directory=None, src_dependent=False):
+    def __init__(self, file=None, directory=None, src_dependent=False, ctlearn=False):
         if file is None and directory is None:
             raise ValueError("No file provided")
         elif file is not None and directory is not None:
@@ -218,6 +221,7 @@ class ReadLSTFile:
 
         self.info = None
         self.src_dependent = src_dependent
+        self.ctlearn = ctlearn
 
     def add_phases(self, pname):
         dphase = pd.read_hdf(pname, key=dl2_params_lstcam_key)
@@ -226,25 +230,53 @@ class ReadLSTFile:
     def read_LSTfile(self, fname, df_type="short", filter_data=True):
         if filter_data:
             if not self.src_dependent:
-                df_or = pd.read_hdf(fname, key=dl2_params_lstcam_key)
-                if "pulsar_phase" not in df_or:
+                if self.ctlearn:
+                    with TableLoader(input_url=fname) as loader:
+                        df_or = loader.read_telescope_events(
+                            start=None,
+                            stop=None,
+                            dl2=True,
+                            simulated=False,
+                            observation_info=True,
+                            pointing=True,
+                        )
+                        ctlearn_mask = df_or["CTLearn_is_valid_1"] == True
+                        df_or = df_or[ctlearn_mask]
+                        pos = read_table(fname, 'dl1/monitoring/telescope/pointing/tel_001')
+                        # pos = pd.read_hdf(fname, key='dl1/monitoring/telescope/pointing/tel_001', columns=['altitude'])
+                        pos = pos[ctlearn_mask]
+                        df_or['alt_tel'] = pos['altitude']
+                        del pos
+                        df_or.rename_column("time_mono", "dragon_time")
+                        df_or.rename_column("hillas_intensity", "intensity")
+                        df_or.rename_column("CTLearn_prediction", "gammaness")
+                        df_or.rename_column("CTLearn_energy", "reco_energy")
+                        t = df_or["dragon_time"]
+                        t = t.utc               
+                        df_or["dragon_time"] = t.unix
+                else:
+                    df_or = pd.read_hdf(fname, key=dl2_params_lstcam_key)
+                if "pulsar_phase" not in df_or.colnames:
                     df_pulsar = pd.read_hdf(fname, key="phase_info")
+                    df_pulsar = df_pulsar[ctlearn_mask]
                     df_or["pulsar_phase"] = df_pulsar["pulsar_phase"]
                     df_or["mjd_time"] = df_pulsar["mjd_barycenter_time"]
-
-                if "event_type" in df_or.columns:
+                    logger.info("Including phase column from phase position table")
+                    del df_pulsar
+                if "event_type" in df_or.colnames:
                     df = df_or[df_or["event_type"] == 32]
 
-                    if "theta2" not in df.columns:
+                    if "theta2" not in df.colnames:
                         try:
                             df_pos = pd.read_hdf(fname, "source_position")
+                            df_pos = df_pos[ctlearn_mask]
                             df_pos = df_pos[df_or["event_type"] == 32]
                             if "theta2" in df_pos.columns:
                                 logger.info(
                                     "Including theta2 column from source position table"
                                 )
                                 df["theta2"] = df_pos["theta2"]
-                            if "theta2_on" in df_pos.columns:
+                            elif "theta2_on" in df_pos.columns:
                                 logger.info(
                                     "Including theta2 column from source position table"
                                 )
@@ -256,6 +288,7 @@ class ReadLSTFile:
                                     np.array(df_pos["src_x"]),
                                     np.array(df_pos["src_y"]),
                                 )
+                            del df_pos
                         except AttributeError:
                             logger.info("No theta2 computed")
                 else:
@@ -282,7 +315,22 @@ class ReadLSTFile:
                 df = df[df.event_type == 32]
 
             if df_type == "short":
-                if "alpha" in df and "theta2" in df:
+                if self.ctlearn:
+                    logger.info("Filtering columns")
+                    df_filtered = df[
+                        [
+                            "event_id",
+                            "intensity",
+                            "mjd_time",
+                            "event_type",
+                            "pulsar_phase",
+                            "dragon_time",
+                            "gammaness",
+                            "theta2",
+                            "alt_tel",
+                        ]
+                    ]
+                elif "alpha" in df and "theta2" in df:
                     df_filtered = df[
                         [
                             "event_id",
@@ -342,9 +390,11 @@ class ReadLSTFile:
             else:
                 df_filtered = df
                 df_filtered["energy"] = df["reco_energy"]
-
+            logger.info("Converting to pandas dataframe")
+            df_filtered = df_filtered.to_pandas()
+            logger.info("Adding delta key")
             df_filtered = add_delta_t_key(df_filtered)
-
+            logger.info("Finishing reading and filtering LST-1 data file")
         else:
             df_filtered = pd.read_hdf(fname, key=dl2_params_lstcam_key)
         return df_filtered

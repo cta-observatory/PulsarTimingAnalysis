@@ -140,8 +140,8 @@ class PulsarAnalysis:
         self.telescope = "lst"
         self.energy_units = "TeV"
 
-    def setLSTInputFile(self, filename=None, dirname=None, src_dep=False):
-        self.r = ReadLSTFile(file=filename, directory=dirname, src_dependent=src_dep)
+    def setLSTInputFile(self, filename=None, dirname=None, src_dep=False, ctlearn=False):
+        self.r = ReadLSTFile(file=filename, directory=dirname, src_dependent=src_dep, ctlearn=ctlearn)
         self.telescope = "lst"
         self.energy_units = "TeV"
 
@@ -227,11 +227,13 @@ class PulsarAnalysis:
                 self.setLSTInputFile(
                     dirname=conf["pulsar_file_dir"],
                     src_dep=conf["flags"]["src_dependent"],
+                    ctlearn=conf["flags"]["ctlearn"],
                 )
             else:
                 self.setLSTInputFile(
                     filename=conf["pulsar_file_dir"],
                     src_dep=conf["flags"]["src_dependent"],
+                    ctlearn=conf["flags"]["ctlearn"],
                 )
 
             if conf["cuts"]["include_DL2_extra_cuts"]:
@@ -249,7 +251,7 @@ class PulsarAnalysis:
                     else:
                         self.setParamCuts(
                             gammaness_cut=conf["cuts"]["extra_cuts"]["gammaness"],
-                            theta_cut=np.power(conf["cuts"]["extra_cuts"]["theta"], 2),
+                            theta2_cut=conf["cuts"]["extra_cuts"]["theta2"],
                             zd_cut=conf["cuts"]["zd_range"],
                             int_cut=conf["cuts"]["extra_cuts"]["intensity"],
                             energy_binning_cut=conf["cuts"]["extra_cuts"][
@@ -268,7 +270,7 @@ class PulsarAnalysis:
                     else:
                         self.setParamCuts(
                             gammaness_cut=conf["cuts"]["extra_cuts"]["gammaness"],
-                            theta_cut=np.power(conf["cuts"]["extra_cuts"]["theta"], 2),
+                            theta2_cut=conf["cuts"]["extra_cuts"]["theta2"],
                             zd_cut=conf["cuts"]["zd_range"],
                             int_cut=conf["cuts"]["extra_cuts"]["intensity"],
                             energy_cut=conf["cuts"]["extra_cuts"]["energy"],
