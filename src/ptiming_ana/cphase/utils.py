@@ -15,6 +15,7 @@ from pint.models.timing_model import (
     TimingModel,
     Component,
 )
+import h5py
 import astropy.units as u
 import os
 from lstchain.io import global_metadata, write_metadata
@@ -25,6 +26,9 @@ from lstchain.io.io import (
     dl2_params_lstcam_key,
 )
 from ctapipe.io import TableLoader, read_table
+from ctapipe.time import ctao_high_res_to_time
+from ctapipe_io_lst.constants import LST1_LOCATION
+from ctapipe_io_lst import LSTEventSource
 from astropy.coordinates import SkyCoord, AltAz, EarthLocation
 from astropy.coordinates.erfa_astrom import ErfaAstromInterpolator, erfa_astrom
 from ctapipe.coordinates import CameraFrame
@@ -35,7 +39,7 @@ __all__ = [
     "dl2time_totim",
     "model_fromephem",
     "add_mjd",
-    "add_mjd_ctlearn",
+    "add_source_info_dl2",
     "merge_dl2_pulsar",
 ]
 
@@ -86,113 +90,112 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
             df_src, output_file, dl2_params_src_dep_lstcam_key, meta=metadata
         )
 
-def get_reco_xy_ctlearn(df_i, location, times, focal=28*u.m, coma_factor=1.0466):
-    """Convierte alt/az reco de CTLearn a coordenadas de cámara (x, y)."""
-    focal = coma_factor * focal
-
-    # Reconstrucción alt/az del evento
-    reco_alt = df_i["CTLearn_alt"]
-    reco_az  = df_i["CTLearn_az"]
-
-    tel_pos = SkyCoord(alt=reco_alt, az=reco_az, frame=AltAz(obstime=times, location=location))
-
-    # Transformación a coordenadas de cámara
-    with erfa_astrom.set(ErfaAstromInterpolator(5 * u.min)):
-        camera_frame = CameraFrame(
-            focal_length=focal,
-            telescope_pointing=tel_pos,
-            location=location,
-            obstime=times,
-        )
-        reco_cam = tel_pos.transform_to(camera_frame)
-
-    reco_x = reco_cam.data.x.to(u.m).value
-    reco_y = reco_cam.data.y.to(u.m).value
-
-    return reco_x, reco_y
-
 def add_source_info_dl2(dl2file, source_name, ctlearn):
     # Define lst location
-    location = EarthLocation.from_geodetic(-17.89139 * u.deg, 28.76139 * u.deg, 2184 * u.m)
     print("Adding source information in" + str(dl2file))
 
-    coma_factor = 1.0466
-    focal = coma_factor * 28 * u.m
+    sa = LSTEventSource.create_subarray(tel_id=1)
+    focal = sa.tel[1].optics.effective_focal_length
     source_pos = SkyCoord.from_name(source_name)
 
     if ctlearn is True:
-        with TableLoader(input_url=dl2file) as loader:
-            df_i = loader.read_telescope_events(
-                start=None,
-                stop=None,
-                dl2=True,
-                simulated=False,
-                observation_info=True,
-                pointing=True,
-            )
-            times = df_i['time_mono']
-            # times = Time(times, format="unix_tai", scale="tai")
-            times = times.utc
-            times.format = "unix"
-            # TODO: camino al que apunta pointing de table loader diferente al guardado en ctlearn
-            pos = read_table(dl2file, 'dl1/monitoring/telescope/pointing/tel_001')
-            df_i['alt_tel'] = pos['altitude']
-            df_i['az_tel'] = pos['azimuth']
-            tel_pos = SkyCoord(
-                alt=pos['altitude'],
-                az=pos['azimuth'],
-                frame=AltAz(obstime=times, location=location),
-            )
-            del pos
+        with h5py.File(dl2file, "r") as f:
+            trigger = f["dl1/event/subarray/trigger"][:]
+            t_sec = trigger["time"][:, 0]
+            t_ns  = trigger["time"][:, 1]
+            t = ctao_high_res_to_time(t_sec, t_ns)
+            dragon_time = t.to_value("unix", "long")
+            # dragon_time = t_sec + t_ns * 0.25e-9
+            # dragon_time = Time(dragon_time, scale="tai", format="unix_tai")
+            # dragon_time = dragon_time.utc.unix 
+            pointing = f["dl1/monitoring/telescope/pointing/tel_001"][:]
+            alt_tel = pointing["altitude"]
+            az_tel = pointing["azimuth"]
+            ct_node = f["dl2/event/subarray/geometry/CTLearn"][:]
+            ct_alt = ct_node["CTLearn_alt"]
+            ct_az = ct_node["CTLearn_az"]
+            df_i = pd.DataFrame({
+                "dragon_time": dragon_time,
+                "alt_tel": alt_tel,
+                "az_tel": az_tel,
+                "CTLearn_alt": ct_alt,
+                "CTLearn_az": ct_az,
+            })
+            times = Time(df_i["dragon_time"], format="unix", scale="utc")
     else:
         df_i = pd.read_hdf(dl2file, key=dl2_params_lstcam_key)
         times = Time(df_i["dragon_time"], format="unix", scale="utc")
 
-        tel_pos = SkyCoord(
-            alt=np.array(df_i["alt_tel"]) * u.rad,
-            az=np.array(df_i["az_tel"]) * u.rad,
-            frame=AltAz(obstime=times, location=location),
-        )
+    tel_pos = SkyCoord(
+        alt=np.array(df_i["alt_tel"]) * u.rad,
+        az=np.array(df_i["az_tel"]) * u.rad,
+        frame=AltAz(obstime=times, location=LST1_LOCATION),
+    )
 
-    with erfa_astrom.set(ErfaAstromInterpolator(5 * u.min)):
+    with erfa_astrom.set(ErfaAstromInterpolator(300 * u.s)):
         camera_frame = CameraFrame(
             focal_length=focal,
             telescope_pointing=tel_pos,
-            location=location,
+            location=LST1_LOCATION,
             obstime=times,
         )
         source_campos = source_pos.transform_to(camera_frame)
 
     src_x = source_campos.data.x.value
     src_y = source_campos.data.y.value
-    if ctlearn:
-        reco_src_x, reco_src_y = get_reco_xy_ctlearn(df_i, location, times)
-    else:
+    if ctlearn is False:
         reco_src_x = df_i["reco_src_x"]
         reco_src_y = df_i["reco_src_y"]
 
-    print("Computing theta2...")
-    theta_meters = np.sqrt(
-        np.power(reco_src_x - src_x, 2) + np.power(reco_src_y - src_y, 2)
-    )
-    theta_on = np.rad2deg(np.arctan2(theta_meters, focal.value))
-    theta2 = np.power(theta_on, 2)
+        print("Computing theta2...")
+        theta_meters = np.sqrt(
+            np.power(reco_src_x - src_x, 2) + np.power(reco_src_y - src_y, 2)
+        )
 
-    theta_meters = np.sqrt(
-        np.power(reco_src_x + src_x, 2) + np.power(reco_src_y + src_y, 2)
-    )
-    theta_off = np.rad2deg(np.arctan2(theta_meters, focal.value))
-    theta2_off = np.power(theta_off, 2)
+        theta_meters_off = np.sqrt(
+            np.power(reco_src_x + src_x, 2) + np.power(reco_src_y + src_y, 2)
+        )
+        theta_on = np.rad2deg(np.arctan2(theta_meters, focal.value))
+        theta2 = np.power(theta_on, 2)
 
-    print("Writing in new table...")
-    table_source = pd.DataFrame(
-        {
-            "src_x": list(src_x),
-            "src_y": list(src_y),
-            "theta2": list(theta2),
-            "theta2_off": list(theta2_off),
-        }
-    )
+        theta_off = np.rad2deg(np.arctan2(theta_meters_off, focal.value))
+        theta2_off = np.power(theta_off, 2)
+
+        print("Writing in new table...")
+        table_source = pd.DataFrame(
+            {
+                "src_x": list(src_x),
+                "src_y": list(src_y),
+                "theta2": list(theta2),
+                "theta2_off": list(theta2_off),
+            }
+        )
+    else:
+        print("Computing theta2 ctlearn...")
+        print("Reconstructed position in alt-az:")
+        reco_coord = SkyCoord(
+            alt=df_i["CTLearn_alt"].values * u.deg,
+            az=df_i["CTLearn_az"].values * u.deg,
+            frame=AltAz(obstime=times, location=LST1_LOCATION),
+        )
+        print("Source position in alt-az:")
+        # Posición de la fuente en cada tiempo
+        with erfa_astrom.set(ErfaAstromInterpolator(300 * u.s)):
+            aa_frame = AltAz(obstime=times, location=LST1_LOCATION)
+            source_altaz = source_pos.transform_to(aa_frame)
+            print("Calculating separation...")
+            # separación angular real
+            theta = reco_coord.separation(source_altaz)
+
+        theta2 = theta.to(u.deg).value**2
+        print("Writing in new table...")
+        table_source = pd.DataFrame(
+            {
+                "src_x": list(src_x),
+                "src_y": list(src_y),
+                "theta2": list(theta2),
+            }
+        )
     table_source.to_hdf(dl2file, key="source_position")
 
 
@@ -403,19 +406,6 @@ def model_fromephem(times, ephem, model_name):
 def add_mjd(file_dataframe):
     times = file_dataframe.dragon_time.values
     t = Time(times, format="unix", scale="utc")
-    mjd_time = t.to_value("mjd", "long")
-
-    # Add time in MJD
-    print("Adding MJD time")
-    file_dataframe["mjd_time"] = mjd_time.tolist()
-
-    return mjd_time.tolist()
-
-def add_mjd_ctlearn(file_dataframe):
-    times = file_dataframe['time_mono']
-    # t = Time(times, format="unix_tai", scale="tai")
-    t = times.utc
-    t.format = "unix"
     mjd_time = t.to_value("mjd", "long")
 
     # Add time in MJD

@@ -1,0 +1,587 @@
+2026-03-17 12:17:54 INFO   [__main__] Found 117 DL2 files in /top1/jbuces/pulsars/ctlearn_crab/DL2/
+2026-03-17 12:17:54 INFO   [__main__] Processing Run 2914: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02914.h5
+2026-03-17 12:18:06 INFO   [__main__]   Run 2914: intensity cut > 80.0
+2026-03-17 12:18:06 INFO   [__main__]   Run 2914: 3309278 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:18:10 INFO   [__main__]   Run 2914: livetime = 0.318 h
+2026-03-17 12:18:10 INFO   [__main__]   Run 2914: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02914.pkl
+2026-03-17 12:18:10 INFO   [__main__] Processing Run 2929: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02929.h5
+2026-03-17 12:18:30 INFO   [__main__]   Run 2929: intensity cut > 80.0
+2026-03-17 12:18:30 INFO   [__main__]   Run 2929: 3210376 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:18:36 INFO   [__main__]   Run 2929: livetime = 0.302 h
+2026-03-17 12:18:36 INFO   [__main__]   Run 2929: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02929.pkl
+2026-03-17 12:18:36 INFO   [__main__] Processing Run 2930: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02930.h5
+2026-03-17 12:18:56 INFO   [__main__]   Run 2930: intensity cut > 80.0
+2026-03-17 12:18:56 INFO   [__main__]   Run 2930: 3509161 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:19:02 INFO   [__main__]   Run 2930: livetime = 0.330 h
+2026-03-17 12:19:02 INFO   [__main__]   Run 2930: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02930.pkl
+2026-03-17 12:19:02 INFO   [__main__] Processing Run 2931: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02931.h5
+2026-03-17 12:19:21 INFO   [__main__]   Run 2931: intensity cut > 80.0
+2026-03-17 12:19:21 INFO   [__main__]   Run 2931: 3538546 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:19:26 INFO   [__main__]   Run 2931: livetime = 0.325 h
+2026-03-17 12:19:27 INFO   [__main__]   Run 2931: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02931.pkl
+2026-03-17 12:19:27 INFO   [__main__] Processing Run 2932: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02932.h5
+2026-03-17 12:19:45 INFO   [__main__]   Run 2932: intensity cut > 80.0
+2026-03-17 12:19:46 INFO   [__main__]   Run 2932: 3444056 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:19:51 INFO   [__main__]   Run 2932: livetime = 0.327 h
+2026-03-17 12:19:51 INFO   [__main__]   Run 2932: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02932.pkl
+2026-03-17 12:19:51 INFO   [__main__] Processing Run 2933: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02933.h5
+2026-03-17 12:20:10 INFO   [__main__]   Run 2933: intensity cut > 80.0
+2026-03-17 12:20:10 INFO   [__main__]   Run 2933: 3549640 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:20:15 INFO   [__main__]   Run 2933: livetime = 0.327 h
+2026-03-17 12:20:16 INFO   [__main__]   Run 2933: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02933.pkl
+2026-03-17 12:20:16 INFO   [__main__] Processing Run 2934: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02934.h5
+2026-03-17 12:20:34 INFO   [__main__]   Run 2934: intensity cut > 80.0
+2026-03-17 12:20:34 INFO   [__main__]   Run 2934: 3544838 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:20:39 INFO   [__main__]   Run 2934: livetime = 0.327 h
+2026-03-17 12:20:39 INFO   [__main__]   Run 2934: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02934.pkl
+2026-03-17 12:20:39 INFO   [__main__] Processing Run 2949: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02949.h5
+2026-03-17 12:20:41 INFO   [__main__]   Run 2949: intensity cut > 80.0
+2026-03-17 12:20:41 INFO   [__main__]   Run 2949: 601314 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:20:42 INFO   [__main__]   Run 2949: livetime = 0.056 h
+2026-03-17 12:20:42 INFO   [__main__]   Run 2949: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02949.pkl
+2026-03-17 12:20:42 INFO   [__main__] Processing Run 2950: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02950.h5
+2026-03-17 12:20:50 INFO   [__main__]   Run 2950: intensity cut > 80.0
+2026-03-17 12:20:50 INFO   [__main__]   Run 2950: 1921904 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:20:53 INFO   [__main__]   Run 2950: livetime = 0.175 h
+2026-03-17 12:20:53 INFO   [__main__]   Run 2950: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02950.pkl
+2026-03-17 12:20:53 INFO   [__main__] Processing Run 2967: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02967.h5
+2026-03-17 12:21:05 INFO   [__main__]   Run 2967: intensity cut > 80.0
+2026-03-17 12:21:05 INFO   [__main__]   Run 2967: 3544258 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:21:08 INFO   [__main__]   Run 2967: livetime = 0.332 h
+2026-03-17 12:21:09 INFO   [__main__]   Run 2967: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02967.pkl
+2026-03-17 12:21:09 INFO   [__main__] Processing Run 2968: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02968.h5
+2026-03-17 12:21:20 INFO   [__main__]   Run 2968: intensity cut > 80.0
+2026-03-17 12:21:20 INFO   [__main__]   Run 2968: 3577344 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:21:24 INFO   [__main__]   Run 2968: livetime = 0.328 h
+2026-03-17 12:21:24 INFO   [__main__]   Run 2968: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02968.pkl
+2026-03-17 12:21:24 INFO   [__main__] Processing Run 2969: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02969.h5
+2026-03-17 12:21:36 INFO   [__main__]   Run 2969: intensity cut > 80.0
+2026-03-17 12:21:36 INFO   [__main__]   Run 2969: 3622488 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:21:40 INFO   [__main__]   Run 2969: livetime = 0.328 h
+2026-03-17 12:21:40 INFO   [__main__]   Run 2969: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02969.pkl
+2026-03-17 12:21:40 INFO   [__main__] Processing Run 2970: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02970.h5
+2026-03-17 12:21:53 INFO   [__main__]   Run 2970: intensity cut > 80.0
+2026-03-17 12:21:53 INFO   [__main__]   Run 2970: 3655993 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:21:56 INFO   [__main__]   Run 2970: livetime = 0.328 h
+2026-03-17 12:21:57 INFO   [__main__]   Run 2970: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02970.pkl
+2026-03-17 12:21:57 INFO   [__main__] Processing Run 2971: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02971.h5
+2026-03-17 12:22:10 INFO   [__main__]   Run 2971: intensity cut > 80.0
+2026-03-17 12:22:10 INFO   [__main__]   Run 2971: 3712794 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:22:13 INFO   [__main__]   Run 2971: livetime = 0.331 h
+2026-03-17 12:22:14 INFO   [__main__]   Run 2971: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02971.pkl
+2026-03-17 12:22:14 INFO   [__main__] Processing Run 2972: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02972.h5
+2026-03-17 12:22:26 INFO   [__main__]   Run 2972: intensity cut > 80.0
+2026-03-17 12:22:27 INFO   [__main__]   Run 2972: 3726794 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:22:30 INFO   [__main__]   Run 2972: livetime = 0.329 h
+2026-03-17 12:22:30 INFO   [__main__]   Run 2972: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02972.pkl
+2026-03-17 12:22:30 INFO   [__main__] Processing Run 2973: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02973.h5
+2026-03-17 12:22:44 INFO   [__main__]   Run 2973: intensity cut > 80.0
+2026-03-17 12:22:44 INFO   [__main__]   Run 2973: 3721678 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:22:48 INFO   [__main__]   Run 2973: livetime = 0.329 h
+2026-03-17 12:22:48 INFO   [__main__]   Run 2973: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02973.pkl
+2026-03-17 12:22:48 INFO   [__main__] Processing Run 2974: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02974.h5
+2026-03-17 12:23:01 INFO   [__main__]   Run 2974: intensity cut > 80.0
+2026-03-17 12:23:01 INFO   [__main__]   Run 2974: 3747650 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:23:05 INFO   [__main__]   Run 2974: livetime = 0.331 h
+2026-03-17 12:23:05 INFO   [__main__]   Run 2974: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02974.pkl
+2026-03-17 12:23:05 INFO   [__main__] Processing Run 2975: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02975.h5
+2026-03-17 12:23:18 INFO   [__main__]   Run 2975: intensity cut > 80.0
+2026-03-17 12:23:18 INFO   [__main__]   Run 2975: 3704373 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:23:22 INFO   [__main__]   Run 2975: livetime = 0.330 h
+2026-03-17 12:23:22 INFO   [__main__]   Run 2975: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02975.pkl
+2026-03-17 12:23:22 INFO   [__main__] Processing Run 2976: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02976.h5
+2026-03-17 12:23:35 INFO   [__main__]   Run 2976: intensity cut > 80.0
+2026-03-17 12:23:35 INFO   [__main__]   Run 2976: 3582215 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:23:39 INFO   [__main__]   Run 2976: livetime = 0.321 h
+2026-03-17 12:23:39 INFO   [__main__]   Run 2976: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02976.pkl
+2026-03-17 12:23:39 INFO   [__main__] Processing Run 2977: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02977.h5
+2026-03-17 12:23:52 INFO   [__main__]   Run 2977: intensity cut > 80.0
+2026-03-17 12:23:52 INFO   [__main__]   Run 2977: 3610659 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:23:55 INFO   [__main__]   Run 2977: livetime = 0.326 h
+2026-03-17 12:23:56 INFO   [__main__]   Run 2977: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02977.pkl
+2026-03-17 12:23:56 INFO   [__main__] Processing Run 2988: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02988.h5
+2026-03-17 12:24:16 INFO   [__main__]   Run 2988: intensity cut > 80.0
+2026-03-17 12:24:16 INFO   [__main__]   Run 2988: 3625083 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:24:20 INFO   [__main__]   Run 2988: livetime = 0.328 h
+2026-03-17 12:24:20 INFO   [__main__]   Run 2988: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02988.pkl
+2026-03-17 12:24:20 INFO   [__main__] Processing Run 2989: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02989.h5
+2026-03-17 12:24:33 INFO   [__main__]   Run 2989: intensity cut > 80.0
+2026-03-17 12:24:33 INFO   [__main__]   Run 2989: 3610540 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:24:37 INFO   [__main__]   Run 2989: livetime = 0.326 h
+2026-03-17 12:24:38 INFO   [__main__]   Run 2989: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02989.pkl
+2026-03-17 12:24:38 INFO   [__main__] Processing Run 2990: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02990.h5
+2026-03-17 12:24:52 INFO   [__main__]   Run 2990: intensity cut > 80.0
+2026-03-17 12:24:52 INFO   [__main__]   Run 2990: 3568245 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:24:56 INFO   [__main__]   Run 2990: livetime = 0.322 h
+2026-03-17 12:24:56 INFO   [__main__]   Run 2990: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02990.pkl
+2026-03-17 12:24:56 INFO   [__main__] Processing Run 2991: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02991.h5
+2026-03-17 12:25:10 INFO   [__main__]   Run 2991: intensity cut > 80.0
+2026-03-17 12:25:11 INFO   [__main__]   Run 2991: 3595084 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:25:14 INFO   [__main__]   Run 2991: livetime = 0.329 h
+2026-03-17 12:25:15 INFO   [__main__]   Run 2991: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02991.pkl
+2026-03-17 12:25:15 INFO   [__main__] Processing Run 2992: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run02992.h5
+2026-03-17 12:25:29 INFO   [__main__]   Run 2992: intensity cut > 80.0
+2026-03-17 12:25:29 INFO   [__main__]   Run 2992: 3581584 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:25:33 INFO   [__main__]   Run 2992: livetime = 0.331 h
+2026-03-17 12:25:33 INFO   [__main__]   Run 2992: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run02992.pkl
+2026-03-17 12:25:33 INFO   [__main__] Processing Run 3004: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03004.h5
+2026-03-17 12:25:50 INFO   [__main__]   Run 3004: intensity cut > 80.0
+2026-03-17 12:25:51 INFO   [__main__]   Run 3004: 3659902 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:25:55 INFO   [__main__]   Run 3004: livetime = 0.327 h
+2026-03-17 12:25:55 INFO   [__main__]   Run 3004: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03004.pkl
+2026-03-17 12:25:55 INFO   [__main__] Processing Run 3005: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03005.h5
+2026-03-17 12:26:12 INFO   [__main__]   Run 3005: intensity cut > 80.0
+2026-03-17 12:26:12 INFO   [__main__]   Run 3005: 3376149 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:26:16 INFO   [__main__]   Run 3005: livetime = 0.323 h
+2026-03-17 12:26:17 INFO   [__main__]   Run 3005: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03005.pkl
+2026-03-17 12:26:17 INFO   [__main__] Processing Run 3006: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03006.h5
+2026-03-17 12:26:36 INFO   [__main__]   Run 3006: intensity cut > 80.0
+2026-03-17 12:26:36 INFO   [__main__]   Run 3006: 3466492 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:26:41 INFO   [__main__]   Run 3006: livetime = 0.323 h
+2026-03-17 12:26:41 INFO   [__main__]   Run 3006: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03006.pkl
+2026-03-17 12:26:41 INFO   [__main__] Processing Run 3007: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03007.h5
+2026-03-17 12:27:01 INFO   [__main__]   Run 3007: intensity cut > 80.0
+2026-03-17 12:27:01 INFO   [__main__]   Run 3007: 3577342 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:27:06 INFO   [__main__]   Run 3007: livetime = 0.332 h
+2026-03-17 12:27:06 INFO   [__main__]   Run 3007: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03007.pkl
+2026-03-17 12:27:06 INFO   [__main__] Processing Run 3008: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03008.h5
+2026-03-17 12:27:25 INFO   [__main__]   Run 3008: intensity cut > 80.0
+2026-03-17 12:27:25 INFO   [__main__]   Run 3008: 3530193 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:27:30 INFO   [__main__]   Run 3008: livetime = 0.330 h
+2026-03-17 12:27:30 INFO   [__main__]   Run 3008: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03008.pkl
+2026-03-17 12:27:30 INFO   [__main__] Processing Run 3093: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03093.h5
+2026-03-17 12:27:45 INFO   [__main__]   Run 3093: intensity cut > 80.0
+2026-03-17 12:27:46 INFO   [__main__]   Run 3093: 3528027 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:27:50 INFO   [__main__]   Run 3093: livetime = 0.321 h
+2026-03-17 12:27:50 INFO   [__main__]   Run 3093: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03093.pkl
+2026-03-17 12:27:50 INFO   [__main__] Processing Run 3094: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03094.h5
+2026-03-17 12:28:04 INFO   [__main__]   Run 3094: intensity cut > 80.0
+2026-03-17 12:28:05 INFO   [__main__]   Run 3094: 3808146 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:28:09 INFO   [__main__]   Run 3094: livetime = 0.340 h
+2026-03-17 12:28:09 INFO   [__main__]   Run 3094: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03094.pkl
+2026-03-17 12:28:09 INFO   [__main__] Processing Run 3095: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03095.h5
+2026-03-17 12:28:32 INFO   [__main__]   Run 3095: intensity cut > 80.0
+2026-03-17 12:28:32 INFO   [__main__]   Run 3095: 6083607 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:28:38 INFO   [__main__]   Run 3095: livetime = 0.535 h
+2026-03-17 12:28:39 INFO   [__main__]   Run 3095: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03095.pkl
+2026-03-17 12:28:39 INFO   [__main__] Processing Run 3096: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03096.h5
+2026-03-17 12:28:53 INFO   [__main__]   Run 3096: intensity cut > 80.0
+2026-03-17 12:28:53 INFO   [__main__]   Run 3096: 3939584 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:28:57 INFO   [__main__]   Run 3096: livetime = 0.338 h
+2026-03-17 12:28:57 INFO   [__main__]   Run 3096: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03096.pkl
+2026-03-17 12:28:57 INFO   [__main__] Processing Run 3231: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03231.h5
+2026-03-17 12:29:07 INFO   [__main__]   Run 3231: intensity cut > 80.0
+2026-03-17 12:29:08 INFO   [__main__]   Run 3231: 3659726 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:29:10 INFO   [__main__]   Run 3231: livetime = 0.330 h
+2026-03-17 12:29:11 INFO   [__main__]   Run 3231: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03231.pkl
+2026-03-17 12:29:11 INFO   [__main__] Processing Run 3232: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03232.h5
+2026-03-17 12:29:20 INFO   [__main__]   Run 3232: intensity cut > 80.0
+2026-03-17 12:29:20 INFO   [__main__]   Run 3232: 3630464 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:29:23 INFO   [__main__]   Run 3232: livetime = 0.335 h
+2026-03-17 12:29:23 INFO   [__main__]   Run 3232: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03232.pkl
+2026-03-17 12:29:23 INFO   [__main__] Processing Run 3243: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03243.h5
+2026-03-17 12:29:33 INFO   [__main__]   Run 3243: intensity cut > 80.0
+2026-03-17 12:29:33 INFO   [__main__]   Run 3243: 3691778 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:29:36 INFO   [__main__]   Run 3243: livetime = 0.327 h
+2026-03-17 12:29:36 INFO   [__main__]   Run 3243: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03243.pkl
+2026-03-17 12:29:36 INFO   [__main__] Processing Run 3270: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03270.h5
+2026-03-17 12:29:48 INFO   [__main__]   Run 3270: intensity cut > 80.0
+2026-03-17 12:29:48 INFO   [__main__]   Run 3270: 3688762 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:29:51 INFO   [__main__]   Run 3270: livetime = 0.327 h
+2026-03-17 12:29:51 INFO   [__main__]   Run 3270: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03270.pkl
+2026-03-17 12:29:51 INFO   [__main__] Processing Run 3271: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03271.h5
+2026-03-17 12:30:02 INFO   [__main__]   Run 3271: intensity cut > 80.0
+2026-03-17 12:30:02 INFO   [__main__]   Run 3271: 3727100 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:30:05 INFO   [__main__]   Run 3271: livetime = 0.326 h
+2026-03-17 12:30:05 INFO   [__main__]   Run 3271: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03271.pkl
+2026-03-17 12:30:05 INFO   [__main__] Processing Run 3272: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03272.h5
+2026-03-17 12:30:17 INFO   [__main__]   Run 3272: intensity cut > 80.0
+2026-03-17 12:30:17 INFO   [__main__]   Run 3272: 3792812 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:30:20 INFO   [__main__]   Run 3272: livetime = 0.327 h
+2026-03-17 12:30:20 INFO   [__main__]   Run 3272: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03272.pkl
+2026-03-17 12:30:20 INFO   [__main__] Processing Run 3273: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03273.h5
+2026-03-17 12:30:32 INFO   [__main__]   Run 3273: intensity cut > 80.0
+2026-03-17 12:30:32 INFO   [__main__]   Run 3273: 3925438 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:30:35 INFO   [__main__]   Run 3273: livetime = 0.334 h
+2026-03-17 12:30:36 INFO   [__main__]   Run 3273: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03273.pkl
+2026-03-17 12:30:36 INFO   [__main__] Processing Run 3274: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03274.h5
+2026-03-17 12:30:47 INFO   [__main__]   Run 3274: intensity cut > 80.0
+2026-03-17 12:30:48 INFO   [__main__]   Run 3274: 3839854 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:30:50 INFO   [__main__]   Run 3274: livetime = 0.323 h
+2026-03-17 12:30:51 INFO   [__main__]   Run 3274: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03274.pkl
+2026-03-17 12:30:51 INFO   [__main__] Processing Run 3275: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03275.h5
+2026-03-17 12:31:02 INFO   [__main__]   Run 3275: intensity cut > 80.0
+2026-03-17 12:31:02 INFO   [__main__]   Run 3275: 3990703 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:31:05 INFO   [__main__]   Run 3275: livetime = 0.340 h
+2026-03-17 12:31:05 INFO   [__main__]   Run 3275: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03275.pkl
+2026-03-17 12:31:05 INFO   [__main__] Processing Run 3276: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03276.h5
+2026-03-17 12:31:15 INFO   [__main__]   Run 3276: intensity cut > 80.0
+2026-03-17 12:31:15 INFO   [__main__]   Run 3276: 3906245 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:31:18 INFO   [__main__]   Run 3276: livetime = 0.330 h
+2026-03-17 12:31:18 INFO   [__main__]   Run 3276: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03276.pkl
+2026-03-17 12:31:18 INFO   [__main__] Processing Run 3277: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03277.h5
+2026-03-17 12:31:29 INFO   [__main__]   Run 3277: intensity cut > 80.0
+2026-03-17 12:31:29 INFO   [__main__]   Run 3277: 3836979 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:31:31 INFO   [__main__]   Run 3277: livetime = 0.327 h
+2026-03-17 12:31:32 INFO   [__main__]   Run 3277: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03277.pkl
+2026-03-17 12:31:32 INFO   [__main__] Processing Run 3278: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03278.h5
+2026-03-17 12:31:42 INFO   [__main__]   Run 3278: intensity cut > 80.0
+2026-03-17 12:31:42 INFO   [__main__]   Run 3278: 3784908 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:31:45 INFO   [__main__]   Run 3278: livetime = 0.329 h
+2026-03-17 12:31:45 INFO   [__main__]   Run 3278: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03278.pkl
+2026-03-17 12:31:45 INFO   [__main__] Processing Run 3279: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03279.h5
+2026-03-17 12:31:52 INFO   [__main__]   Run 3279: intensity cut > 80.0
+2026-03-17 12:31:52 INFO   [__main__]   Run 3279: 2727864 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:31:54 INFO   [__main__]   Run 3279: livetime = 0.244 h
+2026-03-17 12:31:54 INFO   [__main__]   Run 3279: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03279.pkl
+2026-03-17 12:31:54 INFO   [__main__] Processing Run 3318: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03318.h5
+2026-03-17 12:32:04 INFO   [__main__]   Run 3318: intensity cut > 80.0
+2026-03-17 12:32:04 INFO   [__main__]   Run 3318: 3611680 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:32:07 INFO   [__main__]   Run 3318: livetime = 0.314 h
+2026-03-17 12:32:07 INFO   [__main__]   Run 3318: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03318.pkl
+2026-03-17 12:32:07 INFO   [__main__] Processing Run 3319: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03319.h5
+2026-03-17 12:32:18 INFO   [__main__]   Run 3319: intensity cut > 80.0
+2026-03-17 12:32:18 INFO   [__main__]   Run 3319: 3845657 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:32:21 INFO   [__main__]   Run 3319: livetime = 0.332 h
+2026-03-17 12:32:21 INFO   [__main__]   Run 3319: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03319.pkl
+2026-03-17 12:32:21 INFO   [__main__] Processing Run 3320: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03320.h5
+2026-03-17 12:32:31 INFO   [__main__]   Run 3320: intensity cut > 80.0
+2026-03-17 12:32:31 INFO   [__main__]   Run 3320: 3729773 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:32:34 INFO   [__main__]   Run 3320: livetime = 0.321 h
+2026-03-17 12:32:34 INFO   [__main__]   Run 3320: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03320.pkl
+2026-03-17 12:32:34 INFO   [__main__] Processing Run 3321: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03321.h5
+2026-03-17 12:32:45 INFO   [__main__]   Run 3321: intensity cut > 80.0
+2026-03-17 12:32:45 INFO   [__main__]   Run 3321: 3820057 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:32:48 INFO   [__main__]   Run 3321: livetime = 0.329 h
+2026-03-17 12:32:48 INFO   [__main__]   Run 3321: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03321.pkl
+2026-03-17 12:32:48 INFO   [__main__] Processing Run 3328: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03328.h5
+2026-03-17 12:32:58 INFO   [__main__]   Run 3328: intensity cut > 80.0
+2026-03-17 12:32:59 INFO   [__main__]   Run 3328: 3806897 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:33:01 INFO   [__main__]   Run 3328: livetime = 0.328 h
+2026-03-17 12:33:02 INFO   [__main__]   Run 3328: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03328.pkl
+2026-03-17 12:33:02 INFO   [__main__] Processing Run 3329: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03329.h5
+2026-03-17 12:33:11 INFO   [__main__]   Run 3329: intensity cut > 80.0
+2026-03-17 12:33:11 INFO   [__main__]   Run 3329: 3740108 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:33:13 INFO   [__main__]   Run 3329: livetime = 0.326 h
+2026-03-17 12:33:14 INFO   [__main__]   Run 3329: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03329.pkl
+2026-03-17 12:33:14 INFO   [__main__] Processing Run 3330: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03330.h5
+2026-03-17 12:33:23 INFO   [__main__]   Run 3330: intensity cut > 80.0
+2026-03-17 12:33:24 INFO   [__main__]   Run 3330: 3757474 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:33:26 INFO   [__main__]   Run 3330: livetime = 0.327 h
+2026-03-17 12:33:26 INFO   [__main__]   Run 3330: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03330.pkl
+2026-03-17 12:33:26 INFO   [__main__] Processing Run 3338: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03338.h5
+2026-03-17 12:33:37 INFO   [__main__]   Run 3338: intensity cut > 80.0
+2026-03-17 12:33:37 INFO   [__main__]   Run 3338: 4025857 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:33:40 INFO   [__main__]   Run 3338: livetime = 0.345 h
+2026-03-17 12:33:40 INFO   [__main__]   Run 3338: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03338.pkl
+2026-03-17 12:33:40 INFO   [__main__] Processing Run 3339: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03339.h5
+2026-03-17 12:33:50 INFO   [__main__]   Run 3339: intensity cut > 80.0
+2026-03-17 12:33:50 INFO   [__main__]   Run 3339: 3662657 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:33:53 INFO   [__main__]   Run 3339: livetime = 0.318 h
+2026-03-17 12:33:53 INFO   [__main__]   Run 3339: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03339.pkl
+2026-03-17 12:33:53 INFO   [__main__] Processing Run 3340: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03340.h5
+2026-03-17 12:34:02 INFO   [__main__]   Run 3340: intensity cut > 80.0
+2026-03-17 12:34:02 INFO   [__main__]   Run 3340: 3375932 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:34:04 INFO   [__main__]   Run 3340: livetime = 0.295 h
+2026-03-17 12:34:04 INFO   [__main__]   Run 3340: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03340.pkl
+2026-03-17 12:34:04 INFO   [__main__] Processing Run 3355: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03355.h5
+2026-03-17 12:34:14 INFO   [__main__]   Run 3355: intensity cut > 80.0
+2026-03-17 12:34:14 INFO   [__main__]   Run 3355: 3834857 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:34:17 INFO   [__main__]   Run 3355: livetime = 0.327 h
+2026-03-17 12:34:17 INFO   [__main__]   Run 3355: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03355.pkl
+2026-03-17 12:34:17 INFO   [__main__] Processing Run 3356: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03356.h5
+2026-03-17 12:34:25 INFO   [__main__]   Run 3356: intensity cut > 80.0
+2026-03-17 12:34:25 INFO   [__main__]   Run 3356: 3143652 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:34:27 INFO   [__main__]   Run 3356: livetime = 0.273 h
+2026-03-17 12:34:27 INFO   [__main__]   Run 3356: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03356.pkl
+2026-03-17 12:34:27 INFO   [__main__] Processing Run 3373: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03373.h5
+2026-03-17 12:34:38 INFO   [__main__]   Run 3373: intensity cut > 80.0
+2026-03-17 12:34:38 INFO   [__main__]   Run 3373: 3721956 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:34:41 INFO   [__main__]   Run 3373: livetime = 0.333 h
+2026-03-17 12:34:42 INFO   [__main__]   Run 3373: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03373.pkl
+2026-03-17 12:34:42 INFO   [__main__] Processing Run 3598: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03598.h5
+2026-03-17 12:34:51 INFO   [__main__]   Run 3598: intensity cut > 80.0
+2026-03-17 12:34:51 INFO   [__main__]   Run 3598: 3494115 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:34:53 INFO   [__main__]   Run 3598: livetime = 0.301 h
+2026-03-17 12:34:53 INFO   [__main__]   Run 3598: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03598.pkl
+2026-03-17 12:34:53 INFO   [__main__] Processing Run 3599: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03599.h5
+2026-03-17 12:35:03 INFO   [__main__]   Run 3599: intensity cut > 80.0
+2026-03-17 12:35:03 INFO   [__main__]   Run 3599: 3728276 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:35:05 INFO   [__main__]   Run 3599: livetime = 0.326 h
+2026-03-17 12:35:06 INFO   [__main__]   Run 3599: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03599.pkl
+2026-03-17 12:35:06 INFO   [__main__] Processing Run 3600: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03600.h5
+2026-03-17 12:35:15 INFO   [__main__]   Run 3600: intensity cut > 80.0
+2026-03-17 12:35:16 INFO   [__main__]   Run 3600: 3860935 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:35:18 INFO   [__main__]   Run 3600: livetime = 0.339 h
+2026-03-17 12:35:19 INFO   [__main__]   Run 3600: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03600.pkl
+2026-03-17 12:35:19 INFO   [__main__] Processing Run 3601: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03601.h5
+2026-03-17 12:35:27 INFO   [__main__]   Run 3601: intensity cut > 80.0
+2026-03-17 12:35:27 INFO   [__main__]   Run 3601: 3452043 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:35:29 INFO   [__main__]   Run 3601: livetime = 0.314 h
+2026-03-17 12:35:29 INFO   [__main__]   Run 3601: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03601.pkl
+2026-03-17 12:35:29 INFO   [__main__] Processing Run 3615: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03615.h5
+2026-03-17 12:35:44 INFO   [__main__]   Run 3615: intensity cut > 80.0
+2026-03-17 12:35:44 INFO   [__main__]   Run 3615: 4757360 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:35:47 INFO   [__main__]   Run 3615: livetime = 0.326 h
+2026-03-17 12:35:48 INFO   [__main__]   Run 3615: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03615.pkl
+2026-03-17 12:35:48 INFO   [__main__] Processing Run 3632: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03632.h5
+2026-03-17 12:35:57 INFO   [__main__]   Run 3632: intensity cut > 80.0
+2026-03-17 12:35:58 INFO   [__main__]   Run 3632: 3270914 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:36:00 INFO   [__main__]   Run 3632: livetime = 0.286 h
+2026-03-17 12:36:00 INFO   [__main__]   Run 3632: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03632.pkl
+2026-03-17 12:36:00 INFO   [__main__] Processing Run 3633: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03633.h5
+2026-03-17 12:36:05 INFO   [__main__]   Run 3633: intensity cut > 80.0
+2026-03-17 12:36:05 INFO   [__main__]   Run 3633: 1859677 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:36:06 INFO   [__main__]   Run 3633: livetime = 0.166 h
+2026-03-17 12:36:06 INFO   [__main__]   Run 3633: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03633.pkl
+2026-03-17 12:36:06 INFO   [__main__] Processing Run 3634: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03634.h5
+2026-03-17 12:36:14 INFO   [__main__]   Run 3634: intensity cut > 80.0
+2026-03-17 12:36:14 INFO   [__main__]   Run 3634: 3362225 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:36:17 INFO   [__main__]   Run 3634: livetime = 0.302 h
+2026-03-17 12:36:17 INFO   [__main__]   Run 3634: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03634.pkl
+2026-03-17 12:36:17 INFO   [__main__] Processing Run 3635: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03635.h5
+2026-03-17 12:36:26 INFO   [__main__]   Run 3635: intensity cut > 80.0
+2026-03-17 12:36:26 INFO   [__main__]   Run 3635: 3052858 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:36:28 INFO   [__main__]   Run 3635: livetime = 0.279 h
+2026-03-17 12:36:28 INFO   [__main__]   Run 3635: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03635.pkl
+2026-03-17 12:36:28 INFO   [__main__] Processing Run 3672: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03672.h5
+2026-03-17 12:36:38 INFO   [__main__]   Run 3672: intensity cut > 80.0
+2026-03-17 12:36:38 INFO   [__main__]   Run 3672: 3318824 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:36:40 INFO   [__main__]   Run 3672: livetime = 0.284 h
+2026-03-17 12:36:40 INFO   [__main__]   Run 3672: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03672.pkl
+2026-03-17 12:36:40 INFO   [__main__] Processing Run 3673: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03673.h5
+2026-03-17 12:36:50 INFO   [__main__]   Run 3673: intensity cut > 80.0
+2026-03-17 12:36:50 INFO   [__main__]   Run 3673: 3749301 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:36:53 INFO   [__main__]   Run 3673: livetime = 0.322 h
+2026-03-17 12:36:53 INFO   [__main__]   Run 3673: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03673.pkl
+2026-03-17 12:36:53 INFO   [__main__] Processing Run 3674: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03674.h5
+2026-03-17 12:37:02 INFO   [__main__]   Run 3674: intensity cut > 80.0
+2026-03-17 12:37:02 INFO   [__main__]   Run 3674: 3606826 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:37:05 INFO   [__main__]   Run 3674: livetime = 0.314 h
+2026-03-17 12:37:05 INFO   [__main__]   Run 3674: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03674.pkl
+2026-03-17 12:37:05 INFO   [__main__] Processing Run 3675: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03675.h5
+2026-03-17 12:37:13 INFO   [__main__]   Run 3675: intensity cut > 80.0
+2026-03-17 12:37:13 INFO   [__main__]   Run 3675: 3233893 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:37:15 INFO   [__main__]   Run 3675: livetime = 0.284 h
+2026-03-17 12:37:15 INFO   [__main__]   Run 3675: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03675.pkl
+2026-03-17 12:37:15 INFO   [__main__] Processing Run 3676: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03676.h5
+2026-03-17 12:37:24 INFO   [__main__]   Run 3676: intensity cut > 80.0
+2026-03-17 12:37:24 INFO   [__main__]   Run 3676: 3450668 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:37:27 INFO   [__main__]   Run 3676: livetime = 0.308 h
+2026-03-17 12:37:27 INFO   [__main__]   Run 3676: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03676.pkl
+2026-03-17 12:37:27 INFO   [__main__] Processing Run 3677: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03677.h5
+2026-03-17 12:37:36 INFO   [__main__]   Run 3677: intensity cut > 80.0
+2026-03-17 12:37:36 INFO   [__main__]   Run 3677: 3584057 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:37:38 INFO   [__main__]   Run 3677: livetime = 0.324 h
+2026-03-17 12:37:39 INFO   [__main__]   Run 3677: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03677.pkl
+2026-03-17 12:37:39 INFO   [__main__] Processing Run 3706: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03706.h5
+2026-03-17 12:37:47 INFO   [__main__]   Run 3706: intensity cut > 80.0
+2026-03-17 12:37:48 INFO   [__main__]   Run 3706: 3684479 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:37:50 INFO   [__main__]   Run 3706: livetime = 0.327 h
+2026-03-17 12:37:50 INFO   [__main__]   Run 3706: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03706.pkl
+2026-03-17 12:37:50 INFO   [__main__] Processing Run 3707: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03707.h5
+2026-03-17 12:37:59 INFO   [__main__]   Run 3707: intensity cut > 80.0
+2026-03-17 12:38:00 INFO   [__main__]   Run 3707: 3567864 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:38:02 INFO   [__main__]   Run 3707: livetime = 0.322 h
+2026-03-17 12:38:02 INFO   [__main__]   Run 3707: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03707.pkl
+2026-03-17 12:38:02 INFO   [__main__] Processing Run 3708: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run03708.h5
+2026-03-17 12:38:12 INFO   [__main__]   Run 3708: intensity cut > 80.0
+2026-03-17 12:38:12 INFO   [__main__]   Run 3708: 3485090 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:38:15 INFO   [__main__]   Run 3708: livetime = 0.318 h
+2026-03-17 12:38:15 INFO   [__main__]   Run 3708: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run03708.pkl
+2026-03-17 12:38:15 INFO   [__main__] Processing Run 4067: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run04067.h5
+2026-03-17 12:38:23 INFO   [__main__]   Run 4067: intensity cut > 80.0
+2026-03-17 12:38:23 INFO   [__main__]   Run 4067: 2661944 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:38:25 INFO   [__main__]   Run 4067: livetime = 0.228 h
+2026-03-17 12:38:25 INFO   [__main__]   Run 4067: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run04067.pkl
+2026-03-17 12:38:25 INFO   [__main__] Processing Run 4068: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run04068.h5
+2026-03-17 12:38:37 INFO   [__main__]   Run 4068: intensity cut > 80.0
+2026-03-17 12:38:38 INFO   [__main__]   Run 4068: 3584841 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:38:41 INFO   [__main__]   Run 4068: livetime = 0.316 h
+2026-03-17 12:38:41 INFO   [__main__]   Run 4068: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run04068.pkl
+2026-03-17 12:38:41 INFO   [__main__] Processing Run 4086: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run04086.h5
+2026-03-17 12:38:52 INFO   [__main__]   Run 4086: intensity cut > 80.0
+2026-03-17 12:38:52 INFO   [__main__]   Run 4086: 3439568 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:38:55 INFO   [__main__]   Run 4086: livetime = 0.295 h
+2026-03-17 12:38:55 INFO   [__main__]   Run 4086: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run04086.pkl
+2026-03-17 12:38:55 INFO   [__main__] Processing Run 4087: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run04087.h5
+2026-03-17 12:39:07 INFO   [__main__]   Run 4087: intensity cut > 80.0
+2026-03-17 12:39:07 INFO   [__main__]   Run 4087: 3854567 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:39:10 INFO   [__main__]   Run 4087: livetime = 0.339 h
+2026-03-17 12:39:10 INFO   [__main__]   Run 4087: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run04087.pkl
+2026-03-17 12:39:10 INFO   [__main__] Processing Run 6045: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06045.h5
+2026-03-17 12:39:23 INFO   [__main__]   Run 6045: intensity cut > 50.0
+2026-03-17 12:39:24 INFO   [__main__]   Run 6045: 3529903 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:39:27 INFO   [__main__]   Run 6045: livetime = 0.251 h
+2026-03-17 12:39:27 INFO   [__main__]   Run 6045: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06045.pkl
+2026-03-17 12:39:27 INFO   [__main__] Processing Run 6073: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06073.h5
+2026-03-17 12:39:44 INFO   [__main__]   Run 6073: intensity cut > 50.0
+2026-03-17 12:39:44 INFO   [__main__]   Run 6073: 3416098 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:39:50 INFO   [__main__]   Run 6073: livetime = 0.249 h
+2026-03-17 12:39:50 INFO   [__main__]   Run 6073: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06073.pkl
+2026-03-17 12:39:50 INFO   [__main__] Processing Run 6304: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06304.h5
+2026-03-17 12:40:05 INFO   [__main__]   Run 6304: intensity cut > 50.0
+2026-03-17 12:40:05 INFO   [__main__]   Run 6304: 5316755 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:40:10 INFO   [__main__]   Run 6304: livetime = 0.371 h
+2026-03-17 12:40:10 INFO   [__main__]   Run 6304: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06304.pkl
+2026-03-17 12:40:10 INFO   [__main__] Processing Run 6872: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06872.h5
+2026-03-17 12:40:30 INFO   [__main__]   Run 6872: intensity cut > 50.0
+2026-03-17 12:40:30 INFO   [__main__]   Run 6872: 5025869 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:40:34 INFO   [__main__]   Run 6872: livetime = 0.335 h
+2026-03-17 12:40:35 INFO   [__main__]   Run 6872: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06872.pkl
+2026-03-17 12:40:35 INFO   [__main__] Processing Run 6873: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06873.h5
+2026-03-17 12:40:55 INFO   [__main__]   Run 6873: intensity cut > 50.0
+2026-03-17 12:40:55 INFO   [__main__]   Run 6873: 4963068 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:41:00 INFO   [__main__]   Run 6873: livetime = 0.335 h
+2026-03-17 12:41:00 INFO   [__main__]   Run 6873: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06873.pkl
+2026-03-17 12:41:00 INFO   [__main__] Processing Run 6874: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06874.h5
+2026-03-17 12:41:19 INFO   [__main__]   Run 6874: intensity cut > 50.0
+2026-03-17 12:41:19 INFO   [__main__]   Run 6874: 4884037 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:41:23 INFO   [__main__]   Run 6874: livetime = 0.335 h
+2026-03-17 12:41:24 INFO   [__main__]   Run 6874: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06874.pkl
+2026-03-17 12:41:24 INFO   [__main__] Processing Run 6875: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06875.h5
+2026-03-17 12:41:44 INFO   [__main__]   Run 6875: intensity cut > 50.0
+2026-03-17 12:41:44 INFO   [__main__]   Run 6875: 4817362 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:41:49 INFO   [__main__]   Run 6875: livetime = 0.335 h
+2026-03-17 12:41:49 INFO   [__main__]   Run 6875: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06875.pkl
+2026-03-17 12:41:49 INFO   [__main__] Processing Run 6892: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06892.h5
+2026-03-17 12:42:10 INFO   [__main__]   Run 6892: intensity cut > 50.0
+2026-03-17 12:42:10 INFO   [__main__]   Run 6892: 5036061 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:42:15 INFO   [__main__]   Run 6892: livetime = 0.334 h
+2026-03-17 12:42:15 INFO   [__main__]   Run 6892: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06892.pkl
+2026-03-17 12:42:15 INFO   [__main__] Processing Run 6893: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06893.h5
+2026-03-17 12:42:33 INFO   [__main__]   Run 6893: intensity cut > 50.0
+2026-03-17 12:42:33 INFO   [__main__]   Run 6893: 4919550 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:42:37 INFO   [__main__]   Run 6893: livetime = 0.335 h
+2026-03-17 12:42:38 INFO   [__main__]   Run 6893: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06893.pkl
+2026-03-17 12:42:38 INFO   [__main__] Processing Run 6894: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06894.h5
+2026-03-17 12:42:56 INFO   [__main__]   Run 6894: intensity cut > 50.0
+2026-03-17 12:42:56 INFO   [__main__]   Run 6894: 4709775 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:43:00 INFO   [__main__]   Run 6894: livetime = 0.334 h
+2026-03-17 12:43:01 INFO   [__main__]   Run 6894: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06894.pkl
+2026-03-17 12:43:01 INFO   [__main__] Processing Run 6895: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run06895.h5
+2026-03-17 12:43:19 INFO   [__main__]   Run 6895: intensity cut > 50.0
+2026-03-17 12:43:19 INFO   [__main__]   Run 6895: 4596788 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:43:23 INFO   [__main__]   Run 6895: livetime = 0.334 h
+2026-03-17 12:43:24 INFO   [__main__]   Run 6895: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run06895.pkl
+2026-03-17 12:43:24 INFO   [__main__] Processing Run 7097: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07097.h5
+2026-03-17 12:43:44 INFO   [__main__]   Run 7097: intensity cut > 50.0
+2026-03-17 12:43:44 INFO   [__main__]   Run 7097: 5135469 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:43:49 INFO   [__main__]   Run 7097: livetime = 0.334 h
+2026-03-17 12:43:49 INFO   [__main__]   Run 7097: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07097.pkl
+2026-03-17 12:43:49 INFO   [__main__] Processing Run 7098: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07098.h5
+2026-03-17 12:44:05 INFO   [__main__]   Run 7098: intensity cut > 50.0
+2026-03-17 12:44:05 INFO   [__main__]   Run 7098: 5057367 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:44:09 INFO   [__main__]   Run 7098: livetime = 0.337 h
+2026-03-17 12:44:10 INFO   [__main__]   Run 7098: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07098.pkl
+2026-03-17 12:44:10 INFO   [__main__] Processing Run 7099: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07099.h5
+2026-03-17 12:44:27 INFO   [__main__]   Run 7099: intensity cut > 50.0
+2026-03-17 12:44:27 INFO   [__main__]   Run 7099: 4970716 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:44:31 INFO   [__main__]   Run 7099: livetime = 0.338 h
+2026-03-17 12:44:31 INFO   [__main__]   Run 7099: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07099.pkl
+2026-03-17 12:44:31 INFO   [__main__] Processing Run 7133: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07133.h5
+2026-03-17 12:44:37 INFO   [__main__]   Run 7133: intensity cut > 50.0
+2026-03-17 12:44:37 INFO   [__main__]   Run 7133: 1863878 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:44:39 INFO   [__main__]   Run 7133: livetime = 0.117 h
+2026-03-17 12:44:39 INFO   [__main__]   Run 7133: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07133.pkl
+2026-03-17 12:44:39 INFO   [__main__] Processing Run 7136: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07136.h5
+2026-03-17 12:44:51 INFO   [__main__]   Run 7136: intensity cut > 50.0
+2026-03-17 12:44:51 INFO   [__main__]   Run 7136: 3187600 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:44:54 INFO   [__main__]   Run 7136: livetime = 0.227 h
+2026-03-17 12:44:54 INFO   [__main__]   Run 7136: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07136.pkl
+2026-03-17 12:44:54 INFO   [__main__] Processing Run 7161: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07161.h5
+2026-03-17 12:45:06 INFO   [__main__]   Run 7161: intensity cut > 50.0
+2026-03-17 12:45:06 INFO   [__main__]   Run 7161: 3821262 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:45:09 INFO   [__main__]   Run 7161: livetime = 0.241 h
+2026-03-17 12:45:09 INFO   [__main__]   Run 7161: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07161.pkl
+2026-03-17 12:45:09 INFO   [__main__] Processing Run 7195: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07195.h5
+2026-03-17 12:45:22 INFO   [__main__]   Run 7195: intensity cut > 50.0
+2026-03-17 12:45:22 INFO   [__main__]   Run 7195: 4283783 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:45:26 INFO   [__main__]   Run 7195: livetime = 0.274 h
+2026-03-17 12:45:26 INFO   [__main__]   Run 7195: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07195.pkl
+2026-03-17 12:45:26 INFO   [__main__] Processing Run 7196: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07196.h5
+2026-03-17 12:45:27 INFO   [__main__]   Run 7196: intensity cut > 50.0
+2026-03-17 12:45:27 INFO   [__main__]   Run 7196: 450656 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:45:28 INFO   [__main__]   Run 7196: livetime = 0.029 h
+2026-03-17 12:45:28 INFO   [__main__]   Run 7196: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07196.pkl
+2026-03-17 12:45:28 INFO   [__main__] Processing Run 7197: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07197.h5
+2026-03-17 12:45:42 INFO   [__main__]   Run 7197: intensity cut > 50.0
+2026-03-17 12:45:42 INFO   [__main__]   Run 7197: 3907298 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:45:46 INFO   [__main__]   Run 7197: livetime = 0.254 h
+2026-03-17 12:45:46 INFO   [__main__]   Run 7197: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07197.pkl
+2026-03-17 12:45:46 INFO   [__main__] Processing Run 7199: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07199.h5
+2026-03-17 12:45:55 INFO   [__main__]   Run 7199: intensity cut > 50.0
+2026-03-17 12:45:55 INFO   [__main__]   Run 7199: 3059600 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:45:58 INFO   [__main__]   Run 7199: livetime = 0.208 h
+2026-03-17 12:45:58 INFO   [__main__]   Run 7199: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07199.pkl
+2026-03-17 12:45:58 INFO   [__main__] Processing Run 7200: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07200.h5
+2026-03-17 12:46:08 INFO   [__main__]   Run 7200: intensity cut > 50.0
+2026-03-17 12:46:08 INFO   [__main__]   Run 7200: 2823726 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:46:11 INFO   [__main__]   Run 7200: livetime = 0.203 h
+2026-03-17 12:46:11 INFO   [__main__]   Run 7200: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07200.pkl
+2026-03-17 12:46:11 INFO   [__main__] Processing Run 7227: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07227.h5
+2026-03-17 12:46:29 INFO   [__main__]   Run 7227: intensity cut > 50.0
+2026-03-17 12:46:29 INFO   [__main__]   Run 7227: 4491951 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:46:33 INFO   [__main__]   Run 7227: livetime = 0.282 h
+2026-03-17 12:46:34 INFO   [__main__]   Run 7227: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07227.pkl
+2026-03-17 12:46:34 INFO   [__main__] Processing Run 7228: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07228.h5
+2026-03-17 12:46:47 INFO   [__main__]   Run 7228: intensity cut > 50.0
+2026-03-17 12:46:47 INFO   [__main__]   Run 7228: 3871511 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:46:50 INFO   [__main__]   Run 7228: livetime = 0.246 h
+2026-03-17 12:46:50 INFO   [__main__]   Run 7228: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07228.pkl
+2026-03-17 12:46:50 INFO   [__main__] Processing Run 7231: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07231.h5
+2026-03-17 12:47:01 INFO   [__main__]   Run 7231: intensity cut > 50.0
+2026-03-17 12:47:01 INFO   [__main__]   Run 7231: 2785247 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:47:04 INFO   [__main__]   Run 7231: livetime = 0.193 h
+2026-03-17 12:47:04 INFO   [__main__]   Run 7231: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07231.pkl
+2026-03-17 12:47:04 INFO   [__main__] Processing Run 7232: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07232.h5
+2026-03-17 12:47:16 INFO   [__main__]   Run 7232: intensity cut > 50.0
+2026-03-17 12:47:16 INFO   [__main__]   Run 7232: 3458640 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:47:19 INFO   [__main__]   Run 7232: livetime = 0.237 h
+2026-03-17 12:47:20 INFO   [__main__]   Run 7232: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07232.pkl
+2026-03-17 12:47:20 INFO   [__main__] Processing Run 7233: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07233.h5
+2026-03-17 12:47:32 INFO   [__main__]   Run 7233: intensity cut > 50.0
+2026-03-17 12:47:32 INFO   [__main__]   Run 7233: 3410265 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:47:35 INFO   [__main__]   Run 7233: livetime = 0.237 h
+2026-03-17 12:47:35 INFO   [__main__]   Run 7233: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07233.pkl
+2026-03-17 12:47:35 INFO   [__main__] Processing Run 7253: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07253.h5
+2026-03-17 12:47:55 INFO   [__main__]   Run 7253: intensity cut > 50.0
+2026-03-17 12:47:55 INFO   [__main__]   Run 7253: 5330355 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:48:00 INFO   [__main__]   Run 7253: livetime = 0.334 h
+2026-03-17 12:48:01 INFO   [__main__]   Run 7253: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07253.pkl
+2026-03-17 12:48:01 INFO   [__main__] Processing Run 7254: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07254.h5
+2026-03-17 12:48:19 INFO   [__main__]   Run 7254: intensity cut > 50.0
+2026-03-17 12:48:19 INFO   [__main__]   Run 7254: 5187408 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:48:23 INFO   [__main__]   Run 7254: livetime = 0.335 h
+2026-03-17 12:48:24 INFO   [__main__]   Run 7254: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07254.pkl
+2026-03-17 12:48:24 INFO   [__main__] Processing Run 7255: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07255.h5
+2026-03-17 12:48:37 INFO   [__main__]   Run 7255: intensity cut > 50.0
+2026-03-17 12:48:37 INFO   [__main__]   Run 7255: 3953603 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:48:41 INFO   [__main__]   Run 7255: livetime = 0.263 h
+2026-03-17 12:48:41 INFO   [__main__]   Run 7255: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07255.pkl
+2026-03-17 12:48:41 INFO   [__main__] Processing Run 7256: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07256.h5
+2026-03-17 12:48:47 INFO   [__main__]   Run 7256: intensity cut > 50.0
+2026-03-17 12:48:47 INFO   [__main__]   Run 7256: 1930904 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:48:49 INFO   [__main__]   Run 7256: livetime = 0.133 h
+2026-03-17 12:48:49 INFO   [__main__]   Run 7256: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07256.pkl
+2026-03-17 12:48:49 INFO   [__main__] Processing Run 7274: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07274.h5
+2026-03-17 12:49:01 INFO   [__main__]   Run 7274: intensity cut > 50.0
+2026-03-17 12:49:01 INFO   [__main__]   Run 7274: 3531374 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:49:05 INFO   [__main__]   Run 7274: livetime = 0.226 h
+2026-03-17 12:49:05 INFO   [__main__]   Run 7274: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07274.pkl
+2026-03-17 12:49:05 INFO   [__main__] Processing Run 7275: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07275.h5
+2026-03-17 12:49:22 INFO   [__main__]   Run 7275: intensity cut > 50.0
+2026-03-17 12:49:22 INFO   [__main__]   Run 7275: 4938392 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:49:27 INFO   [__main__]   Run 7275: livetime = 0.335 h
+2026-03-17 12:49:27 INFO   [__main__]   Run 7275: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07275.pkl
+2026-03-17 12:49:27 INFO   [__main__] Processing Run 7276: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07276.h5
+2026-03-17 12:49:33 INFO   [__main__]   Run 7276: intensity cut > 50.0
+2026-03-17 12:49:33 INFO   [__main__]   Run 7276: 1638067 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:49:34 INFO   [__main__]   Run 7276: livetime = 0.113 h
+2026-03-17 12:49:34 INFO   [__main__]   Run 7276: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07276.pkl
+2026-03-17 12:49:34 INFO   [__main__] Processing Run 7277: /top1/jbuces/pulsars/ctlearn_crab/DL2/merged_LST-1.Run07277.h5
+2026-03-17 12:49:46 INFO   [__main__]   Run 7277: intensity cut > 50.0
+2026-03-17 12:49:46 INFO   [__main__]   Run 7277: 3698463 events after ctlearn_valid + intensity + zd cuts
+2026-03-17 12:49:49 INFO   [__main__]   Run 7277: livetime = 0.259 h
+2026-03-17 12:49:49 INFO   [__main__]   Run 7277: saved to /top1/jbuces/pulsars/ctlearn_crab/histograms/histograms_Run07277.pkl
+2026-03-17 12:49:49 INFO   [__main__] Done.

@@ -170,8 +170,8 @@ def main():
         for x in os.listdir(args.directory):
             rel_dir = os.path.relpath(args.directory)
             rel_file = os.path.join(rel_dir, x)
-            if run in rel_file:
-                filelist.append(rel_file)
+            # if run in rel_file:
+            filelist.append(rel_file)
 
         filelist.sort()
         for i in range(0, len(filelist)):

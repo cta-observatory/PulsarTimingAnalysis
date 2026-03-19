@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["FilterPulsarAna"]
 
@@ -30,7 +33,7 @@ class FilterPulsarAna:
         if self.energy_binning_cut is None:
             self.check_cuts()
 
-    def apply_fixed_cut(self, events):
+    def apply_fixed_cut(self, events, run_number=None):
         dataframe = events.info
 
         if self.gammaness_cut is not None:
@@ -56,7 +59,12 @@ class FilterPulsarAna:
 
         if self.int_cut is not None:
             if isinstance(self.int_cut, float):
-                dataframe = dataframe[dataframe["intensity"] > self.int_cut]
+                if run_number is not None and run_number < 6045:
+                    int_cut = 80.0
+                    logger.info(f"Run {run_number} < 6045, using modified intensity cut: {int_cut}")
+                else:
+                    int_cut = self.int_cut
+                dataframe = dataframe[dataframe["intensity"] > int_cut]
 
         if self.energy_cut is not None:
             if isinstance(self.energy_cut[0], float):
@@ -152,6 +160,34 @@ class FilterPulsarAna:
                 global_mask = global_mask & mask_theta2
 
             dataframe_energy.append(dataframe[global_mask])
+
+        events.info = pd.concat(dataframe_energy)
+        events.info = events.info.sort_values(by=["dragon_time"])
+
+    def apply_energydep_cuts_on_even_odd(self, events):
+        dataframe_energy = []
+        dataframe = events.info
+        mask_even = dataframe["event_id"] % 2 == 0
+        mask_odd  = dataframe["event_id"] % 2 != 0
+
+        for i in range(0, len(self.energy_binning_cut) - 1):
+            mask_energy_bin = (
+                (dataframe["energy"] > self.energy_binning_cut[i])
+                & (dataframe["energy"] < self.energy_binning_cut[i + 1])
+            )
+            for parity_idx, mask_parity in enumerate([mask_even, mask_odd]):
+                global_mask = mask_energy_bin & mask_parity
+
+                if isinstance(self.gammaness_cut, list):
+                    global_mask = global_mask & (dataframe["gammaness"] > self.gammaness_cut[parity_idx][i])
+
+                if isinstance(self.alpha_cut, list):
+                    global_mask = global_mask & (dataframe["alpha"] < self.alpha_cut[parity_idx][i])
+
+                if isinstance(self.theta2_cut, list):
+                    global_mask = global_mask & (dataframe["theta2"] < self.theta2_cut[parity_idx][i])
+
+                dataframe_energy.append(dataframe[global_mask])
 
         events.info = pd.concat(dataframe_energy)
         events.info = events.info.sort_values(by=["dragon_time"])

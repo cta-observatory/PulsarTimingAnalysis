@@ -26,6 +26,9 @@ class PulsarTimeAnalysis:
         self.P2sTime = [0]
         self.P2exTime = [0]
         self.P2exerror = [0]
+        self.P3sTime = [0]
+        self.P3exTime = [0]
+        self.P3exerror = [0]
         self.P1P2sTime = [0]
         self.P1P2exTime = [0]
         self.P1P2exerror = [0]
@@ -53,6 +56,11 @@ class PulsarTimeAnalysis:
             self.P2sTime.append(pulsar_phases.regions.P2.sign)
             self.P2exTime.append(pulsar_phases.regions.P2.Nex)
             self.P2exerror.append(pulsar_phases.regions.P2.yerr)
+
+        if pulsar_phases.regions.P3 is not None:
+            self.P3sTime.append(pulsar_phases.regions.P3.sign)
+            self.P3exTime.append(pulsar_phases.regions.P3.Nex)
+            self.P3exerror.append(pulsar_phases.regions.P3.yerr)
 
         if pulsar_phases.regions.P1P2 is not None:
             self.P1P2sTime.append(pulsar_phases.regions.P1P2.sign)
@@ -162,6 +170,15 @@ class PulsarTimeAnalysis:
                 label="P2",
             )
 
+        if len(self.P3sTime) > 1:
+            plt.plot(
+                np.array(self.t) / 3600,
+                self.P3sTime,
+                "o-",
+                color="tab:purple",
+                label="P3",
+            )
+
         plt.xlabel("Time of observation (h)")
         plt.ylabel("Significance ($\sigma$)")
         plt.grid()
@@ -174,9 +191,9 @@ class PulsarTimeAnalysis:
     def PsigVsTime(self):
         xi = np.linspace(self.t[0] / 3600, self.t[-1] / 3600, 1000)
 
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+        fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4)
         fig.set_figheight(3)
-        fig.set_figwidth(12)
+        fig.set_figwidth(16)
 
         #####################################
         # First plot: P1Sig vs Time
@@ -353,6 +370,65 @@ class PulsarTimeAnalysis:
         ax3.set_ylabel("Significance (sigma)")
         ax3.set_title("P1+P2")
 
+        #####################################
+
+        # Fourth plot: P3Sig vs Time
+
+        if len(self.P3sTime) > 1:
+            ax4.plot(
+                np.array(self.t) / 3600,
+                self.P3sTime,
+                "o-",
+                color="tab:purple",
+                label="P3",
+            )
+            ax4.grid()
+
+            # Fit to the points
+            ppot, pcov = curve_fit(
+                function_sqrt,
+                np.array(self.t) / 3600,
+                self.P3sTime,
+                p0=[0.1],
+                maxfev=5000,
+            )
+            ax4.plot(xi, function_sqrt(xi, *ppot), "--", color="tab:purple")
+
+            ax4.annotate(
+                "Sig=A"
+                + r"$\sqrt{t}$"
+                + f" \n A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
+                + r"h$^{-1/2}$",
+                xy=(0.95, 0.35),
+                xytext=(0.95, 0.35),
+                fontsize=10,
+                xycoords="axes fraction",
+                textcoords="offset points",
+                color="k",
+                bbox=dict(facecolor="white", edgecolor="k", alpha=0.8),
+                horizontalalignment="right",
+                verticalalignment="top",
+            )
+
+        else:
+            # Plot not available if some signal is not valid
+            ax4.annotate(
+                "Plot not available",
+                xy=(0.8, 0.6),
+                xytext=(0.8, 0.6),
+                fontsize=10,
+                xycoords="axes fraction",
+                textcoords="offset points",
+                color="k",
+                bbox=dict(facecolor="white", alpha=0.8),
+                horizontalalignment="right",
+                verticalalignment="top",
+            )
+
+        ax4.set_xlabel("Time of observation (h)")
+        ax4.set_ylabel("Significance (sigma)")
+        ax4.set_title("P3")
+
         plt.tight_layout()
         plt.show()
 
@@ -361,9 +437,9 @@ class PulsarTimeAnalysis:
     def PexVsTime(self):
         xi = np.linspace(self.t[0] / 3600, self.t[-1] / 3600, 1000)
 
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+        fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4)
         fig.set_figheight(3)
-        fig.set_figwidth(12)
+        fig.set_figwidth(16)
 
         #####################################
 
@@ -541,6 +617,64 @@ class PulsarTimeAnalysis:
         ax3.set_ylabel("Number of excess events")
         ax3.set_title("P1+P2")
 
+        #####################################
+
+        # Fourth plot: P3Ex vs time.
+
+        if len(self.P3exTime) > 1:
+            ax4.errorbar(
+                np.array(self.t) / 3600,
+                self.P3exTime,
+                yerr=self.P1P2exerror,
+                fmt="o-",
+                color="tab:purple",
+                label="P3",
+            )
+            ax4.grid()
+
+            # Fit to the points
+            ppot, pcov = curve_fit(
+                function_lin,
+                np.array(self.t) / 3600,
+                self.P3exTime,
+                p0=[0.1],
+                maxfev=5000,
+            )
+            ax4.plot(xi, function_lin(xi, *ppot), "--", color="tab:purple")
+
+            ax4.annotate(
+                "Nex=At"
+                + f" \n A=({ppot[0]:.2f}$\pm$ {np.sqrt(pcov[0][0]):.2f})"
+                + r"h$^{-1}$",
+                xy=(0.95, 0.35),
+                xytext=(0.95, 0.35),
+                fontsize=10,
+                xycoords="axes fraction",
+                textcoords="offset points",
+                color="k",
+                bbox=dict(facecolor="white", edgecolor="k", alpha=0.8),
+                horizontalalignment="right",
+                verticalalignment="top",
+            )
+
+        else:
+            # Plot not available if some signal is not valid
+            ax4.annotate(
+                "Plot not available",
+                xy=(0.8, 0.6),
+                xytext=(0.8, 0.6),
+                fontsize=10,
+                xycoords="axes fraction",
+                textcoords="offset points",
+                color="k",
+                bbox=dict(facecolor="white", alpha=0.8),
+                horizontalalignment="right",
+                verticalalignment="top",
+            )
+
+        ax4.set_xlabel("Time of observation (h)")
+        ax4.set_ylabel("Number of excess events")
+        ax4.set_title("P3")
         plt.tight_layout()
         plt.show()
 

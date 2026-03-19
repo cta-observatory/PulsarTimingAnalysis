@@ -222,6 +222,7 @@ class PulsarAnalysis:
 
         # Read files
         self.filter_data = conf["cuts"]["filter_data"]
+        self.filter_even_odd = conf["cuts"]["filter_even_odd"]
         if conf["flags"]["DL2_format"]:
             if os.path.isdir(conf["pulsar_file_dir"]):
                 self.setLSTInputFile(

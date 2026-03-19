@@ -16,13 +16,13 @@ import pint.toa as toa
 from pint.fermi_toas import load_Fermi_TOAs
 from ptiming_ana.cphase.utils import (
     add_mjd,
-    add_mjd_ctlearn,
     dl2time_totim,
     model_fromephem,
 )
 from lstchain.io.io import dl2_params_lstcam_key
 from ctapipe.io import TableLoader
-
+from ctapipe.time import ctao_high_res_to_time
+import h5py
 import pint.models as models
 
 from gammapy.data import DataStore, EventList
@@ -487,21 +487,31 @@ def DL2_calphase(
     # Read the file
     logger.info("Input file:" + str(dl2file))
     if ctlearn is True:
-        with TableLoader(input_url=dl2file) as loader:
-            df_i = loader.read_telescope_events(
-                start=None,
-                stop=None,
-                dl2=True,
-                simulated=False,
-                observation_info=True,
-            )
-            add_mjd_ctlearn(df_i)
-            timelist = df_i['mjd_time'].tolist()
+        with h5py.File(dl2file, "r") as f:
+            trigger = f["dl1/event/subarray/trigger"][:]
+            obs_id = trigger["obs_id"]
+            event_id = trigger["event_id"]
+            t_sec = trigger["time"][:, 0]
+            t_ns  = trigger["time"][:, 1]
+            
+
+            t = ctao_high_res_to_time(t_sec, t_ns)
+            # t = t_sec + t_ns * 0.25e-9
+            # t = Time(t, scale="tai", format="unix_tai")
+            dragon_time = t.to_value("unix", "long")
+            t_bueno = t.utc.to_value("mjd", "long")
+            df_i = pd.DataFrame({
+                "obs_id": obs_id,
+                "event_id": event_id,
+                "dragon_time": dragon_time,
+                "mjd_time": t_bueno,
+            })
+            # add_mjd(df_i)
     else:
         df_i = pd.read_hdf(dl2file, key=dl2_params_lstcam_key, float_precision=20)
         add_mjd(df_i)
         # Create the .tim file
-        timelist = df_i.mjd_time.tolist()
+    timelist = df_i.mjd_time.tolist()
 
     # Name of the files
     timname = str(os.path.basename(dl2file).replace(".h5", "")) + ".tim"
