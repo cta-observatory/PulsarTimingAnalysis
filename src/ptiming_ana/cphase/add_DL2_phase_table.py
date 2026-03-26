@@ -178,7 +178,7 @@ def main():
             # Calculate the phases
             DL2_calphase(filelist[i], ephem, "lst", interpolation, ninterp, pickle, ctlearn)
             if include_theta:
-                add_source_info_dl2(filelist[i], "Crab", ctlearn)
+                add_source_info_dl2(filelist[i], "Crab pulsar", ctlearn)
 
     else:
         if in_file is not None:

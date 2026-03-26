@@ -91,11 +91,8 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
         )
 
 def add_source_info_dl2(dl2file, source_name, ctlearn):
-    # Define lst location
+ 
     print("Adding source information in" + str(dl2file))
-
-    sa = LSTEventSource.create_subarray(tel_id=1)
-    focal = sa.tel[1].optics.effective_focal_length
     source_pos = SkyCoord.from_name(source_name)
 
     if ctlearn is True:
@@ -105,9 +102,6 @@ def add_source_info_dl2(dl2file, source_name, ctlearn):
             t_ns  = trigger["time"][:, 1]
             t = ctao_high_res_to_time(t_sec, t_ns)
             dragon_time = t.to_value("unix", "long")
-            # dragon_time = t_sec + t_ns * 0.25e-9
-            # dragon_time = Time(dragon_time, scale="tai", format="unix_tai")
-            # dragon_time = dragon_time.utc.unix 
             pointing = f["dl1/monitoring/telescope/pointing/tel_001"][:]
             alt_tel = pointing["altitude"]
             az_tel = pointing["azimuth"]
@@ -126,76 +120,36 @@ def add_source_info_dl2(dl2file, source_name, ctlearn):
         df_i = pd.read_hdf(dl2file, key=dl2_params_lstcam_key)
         times = Time(df_i["dragon_time"], format="unix", scale="utc")
 
-    tel_pos = SkyCoord(
-        alt=np.array(df_i["alt_tel"]) * u.rad,
-        az=np.array(df_i["az_tel"]) * u.rad,
-        frame=AltAz(obstime=times, location=LST1_LOCATION),
-    )
-
-    with erfa_astrom.set(ErfaAstromInterpolator(300 * u.s)):
-        camera_frame = CameraFrame(
-            focal_length=focal,
-            telescope_pointing=tel_pos,
-            location=LST1_LOCATION,
-            obstime=times,
-        )
-        source_campos = source_pos.transform_to(camera_frame)
-
-    src_x = source_campos.data.x.value
-    src_y = source_campos.data.y.value
+    print("Computing theta2...")
+    print("Reconstructed position in alt-az:")
     if ctlearn is False:
-        reco_src_x = df_i["reco_src_x"]
-        reco_src_y = df_i["reco_src_y"]
-
-        print("Computing theta2...")
-        theta_meters = np.sqrt(
-            np.power(reco_src_x - src_x, 2) + np.power(reco_src_y - src_y, 2)
-        )
-
-        theta_meters_off = np.sqrt(
-            np.power(reco_src_x + src_x, 2) + np.power(reco_src_y + src_y, 2)
-        )
-        theta_on = np.rad2deg(np.arctan2(theta_meters, focal.value))
-        theta2 = np.power(theta_on, 2)
-
-        theta_off = np.rad2deg(np.arctan2(theta_meters_off, focal.value))
-        theta2_off = np.power(theta_off, 2)
-
-        print("Writing in new table...")
-        table_source = pd.DataFrame(
-            {
-                "src_x": list(src_x),
-                "src_y": list(src_y),
-                "theta2": list(theta2),
-                "theta2_off": list(theta2_off),
-            }
+        reco_coord = SkyCoord(
+            alt=df_i["reco_alt"].values * u.rad,
+            az=df_i["reco_az"].values * u.rad,
+            frame=AltAz(obstime=times, location=LST1_LOCATION),
         )
     else:
-        print("Computing theta2 ctlearn...")
-        print("Reconstructed position in alt-az:")
         reco_coord = SkyCoord(
             alt=df_i["CTLearn_alt"].values * u.deg,
             az=df_i["CTLearn_az"].values * u.deg,
             frame=AltAz(obstime=times, location=LST1_LOCATION),
         )
-        print("Source position in alt-az:")
-        # Posición de la fuente en cada tiempo
-        with erfa_astrom.set(ErfaAstromInterpolator(300 * u.s)):
-            aa_frame = AltAz(obstime=times, location=LST1_LOCATION)
-            source_altaz = source_pos.transform_to(aa_frame)
-            print("Calculating separation...")
-            # separación angular real
-            theta = reco_coord.separation(source_altaz)
+    print("Source position in alt-az:")
+    # Posición de la fuente en cada tiempo igual que lstchian
+    with erfa_astrom.set(ErfaAstromInterpolator(300 * u.s)):
+        reco_icrs = reco_coord.transform_to(frame="icrs")
+    print("Calculating separation...")
+    # separación angular en icrs
+    theta = reco_icrs.separation(source_pos)
 
-        theta2 = theta.to(u.deg).value**2
-        print("Writing in new table...")
-        table_source = pd.DataFrame(
-            {
-                "src_x": list(src_x),
-                "src_y": list(src_y),
-                "theta2": list(theta2),
-            }
-        )
+    theta2 = theta.to(u.deg).value**2
+    print("Writing in new table...")
+    table_source = pd.DataFrame(
+        {
+            "dragon_time": list(times.to_value("unix")),
+            "theta2": list(theta2),
+        }
+    )
     table_source.to_hdf(dl2file, key="source_position")
 
 
