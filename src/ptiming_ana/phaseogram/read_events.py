@@ -11,6 +11,7 @@ from lstchain.io.io import (
 import os
 from ctapipe.io import TableLoader
 from ctapipe.io import read_table
+from ctapipe.time import ctao_high_res_to_time
 from gammapy.data import DataStore
 from gammapy.utils.regions import CircleSkyRegion
 from astropy.coordinates import SkyCoord
@@ -105,6 +106,8 @@ class ReadDL3File:
         self.energydep_radmax = energy_dependent_theta
         self.info = None
 
+        self._default_filter_h5 = "/top1/jbuces/pulsars/performance_crab/ctlearn_filter.h5"
+
         d_zen_max = [self.datastore.obs_table["ZEN_PNT"] < zd_cuts[1]]
         d_zen_min = [self.datastore.obs_table["ZEN_PNT"] > zd_cuts[0]]
 
@@ -113,6 +116,33 @@ class ReadDL3File:
 
         if not self.energydep_radmax:
             self.max_rad = max_rad
+
+    def _load_valid_ids(self, obs_id):
+        """
+        Devuelve un set con los event_id que tienen in_both == 1
+        para este obs_id. Si no hay HDF5 configurado, devuelve None
+        (sin filtro).
+        """
+        h5_path = self._default_filter_h5
+        key = f"run_{obs_id:05d}"
+        try:
+            df = pd.read_hdf(h5_path, key=key)
+            valid = set(df.loc[df["in_both"] == 1, "event_id"].values)
+            logger.info(f"  Filtro cruzado run {obs_id}: {len(valid)} eventos válidos")
+            return valid
+        except KeyError:
+            logger.warning(f"  Run {obs_id} no encontrado en {h5_path}, se omite filtro cruzado")
+            return None
+        
+    def _apply_cross_filter(self, obs_id):
+        valid_ids = self._load_valid_ids(obs_id)
+        if valid_ids is None:
+            return
+        n_before = len(self.events)
+        mask = np.isin(self.events["EVENT_ID"], list(valid_ids))
+        self.events = self.events[mask]
+        n_after = len(self.events)
+        logger.info(f"  Filtro cruzado: {n_before} → {n_after} eventos ({n_before - n_after} eliminados)")
 
     def read_all_DL3file(self):
         obs = self.datastore.get_observations(self.ids, required_irf="point-like")
@@ -152,14 +182,14 @@ class ReadDL3File:
             rad_max_irf = RadMax2D.read(fits_files[0], hdu="RAD_MAX")
             self.events = obs[0].events.select_rad_max(rad_max_irf, position=pos_target).table
 
-
+        # self._apply_cross_filter(obs_id)
         info = self.create_dataframe()
         return info
 
     def calculate_tobs(self, mask=None):
         if mask is None:
             mask = self.zd_mask
-        tobs = self.datastore.obs_table[mask]["LIVETIME"].data.sum()
+        tobs = self.datastore.obs_table[mask]["LIVETIME"].data.sum() / 3600
         logger.info(f"Total livetime: {tobs:.3f} h")
         return tobs
 
@@ -191,6 +221,7 @@ class ReadDL3File:
     def run(self, pulsarana):
         logger.info("Reading DL3 data files")
         info_list = []
+        logger.info(f"Runs DL3 to process: {len(self.ids)}")
         for obs_id in self.ids:
             logger.info("Reading run number " + str(obs_id))
             try:
@@ -221,7 +252,7 @@ class ReadLSTFile:
             for x in os.listdir(self.direc):
                 rel_dir = os.path.relpath(self.direc)
                 rel_file = os.path.join(rel_dir, x)
-                if "h5" in rel_file:
+                if x.startswith("dl2") and x.endswith(".h5"):
                     self.fname.append(rel_file)
                     self.fname.sort()
 
@@ -250,11 +281,14 @@ class ReadLSTFile:
                         trigger = f["dl1/event/subarray/trigger"][:]
                         event_id = trigger["event_id"][ctlearn_mask]
                         event_type = trigger["event_type"][ctlearn_mask]
-                        t_sec = trigger["time"][:, 0][ctlearn_mask]
-                        t_ns  = trigger["time"][:, 1][ctlearn_mask]
-                        dragon_time = t_sec + t_ns * 0.25e-9       # segundos de alta resolución
-                        dragon_time = Time(dragon_time, scale="tai", format="unix_tai")
-                        dragon_time = dragon_time.utc.unix         # float en segundos
+                        t_sec_all = trigger["time"][:, 0]
+                        t_ns_all  = trigger["time"][:, 1]
+                        dragon_time = ctao_high_res_to_time(t_sec_all, t_ns_all)
+                        dragon_time = dragon_time.utc.unix
+                        logger.info("Adding delta key")
+                        delta_t = np.insert(np.diff(dragon_time), 0, 0)
+                        dragon_time = dragon_time[ctlearn_mask]
+                        delta_t = delta_t[ctlearn_mask]
                         # --- Hillas intensity (tel_001) ---
                         tel = f["dl1/event/telescope/parameters/tel_001"][:]
                         intensity = tel["hillas_intensity"][ctlearn_mask]
@@ -276,13 +310,18 @@ class ReadLSTFile:
                             "dragon_time": dragon_time,
                             "gammaness": gammaness,
                             "alt_tel": alt_tel,
-                            "reco_energy": reco_energy
+                            "reco_energy": reco_energy,
+                            "delta_t": delta_t
                         })
+                        
                 else:
                     df_or = pd.read_hdf(fname, key=dl2_params_lstcam_key)
+                    logger.info("Adding delta key")
+                    df_or = add_delta_t_key(df_or)
                 if "pulsar_phase" not in df_or.columns:
                     df_pulsar = pd.read_hdf(fname, key="phase_info")
-                    df_pulsar = df_pulsar[ctlearn_mask].reset_index(drop=True) 
+                    if self.ctlearn:
+                        df_pulsar = df_pulsar[ctlearn_mask].reset_index(drop=True) 
                     df_or["pulsar_phase"] = df_pulsar["pulsar_phase"].values
                     df_or["mjd_time"] = df_pulsar["mjd_barycenter_time"].values
                     logger.info("Including phase column from phase position table")
@@ -292,10 +331,9 @@ class ReadLSTFile:
                     if "theta2" not in df.columns:
                         try:
                             df_pos = pd.read_hdf(fname, "source_position")
-                            # CRITICAL FIX: align indices correctly
-                            # df_pos is the original full table (5.9M), df_or is filtered by ctlearn_mask (4.3M)
-                            # Apply ctlearn_mask FIRST to get same length as df_or
-                            df_pos = df_pos[ctlearn_mask].reset_index(drop=True)
+                            if self.ctlearn:
+                                # Apply ctlearn_mask FIRST to get same length as df_or
+                                df_pos = df_pos[ctlearn_mask].reset_index(drop=True)
                             # Now both df_pos and df_or have same length, apply event_type filter
                             event_type_mask = (df_or["event_type"] == 32).values
                             df_pos = df_pos[event_type_mask].reset_index(drop=True)
@@ -321,6 +359,8 @@ class ReadLSTFile:
                 srcindep_df = pd.read_hdf(
                     fname, key=dl2_params_lstcam_key, float_precision=20
                 )
+                logger.info("Adding delta key")
+                srcindep_df = add_delta_t_key(srcindep_df)
                 on_df_srcdep = get_srcdep_params(fname, "on")
 
                 if "pulsar_phase" not in srcindep_df:
@@ -351,6 +391,7 @@ class ReadLSTFile:
                             "gammaness",
                             "theta2",
                             "alt_tel",
+                            "delta_t",
                         ]
                     ]
                 elif "alpha" in df and "theta2" in df:
@@ -359,12 +400,14 @@ class ReadLSTFile:
                             "event_id",
                             "intensity",
                             "mjd_time",
+                            "event_type",
                             "pulsar_phase",
                             "dragon_time",
                             "gammaness",
                             "alpha",
                             "theta2",
                             "alt_tel",
+                            "delta_t",
                         ]
                     ]
                 elif "alpha" in df and "theta2" not in df:
@@ -373,11 +416,13 @@ class ReadLSTFile:
                             "event_id",
                             "intensity",
                             "mjd_time",
+                            "event_type",
                             "pulsar_phase",
                             "dragon_time",
                             "gammaness",
                             "alpha",
                             "alt_tel",
+                            "delta_t",
                         ]
                     ]
                 elif "theta2" in df and "alpha" not in df:
@@ -385,12 +430,15 @@ class ReadLSTFile:
                         [
                             "event_id",
                             "intensity",
+                            "r",
                             "mjd_time",
+                            "event_type",
                             "pulsar_phase",
                             "dragon_time",
                             "gammaness",
                             "theta2",
                             "alt_tel",
+                            "delta_t",
                         ]
                     ]
                 else:
@@ -399,10 +447,12 @@ class ReadLSTFile:
                             "event_id",
                             "intensity",
                             "mjd_time",
+                            "event_type",
                             "pulsar_phase",
                             "dragon_time",
                             "gammaness",
                             "alt_tel",
+                            "delta_t",
                         ]
                     ]
 
@@ -413,15 +463,14 @@ class ReadLSTFile:
             else:
                 df_filtered = df
                 df_filtered["energy"] = df["reco_energy"]
-            logger.info("Adding delta key")
-            df_filtered = add_delta_t_key(df_filtered)
+            self.tobs = self.calculate_tobs(df_filtered)
             logger.info("Finishing reading and filtering LST-1 data file")
         else:
             df_filtered = pd.read_hdf(fname, key=dl2_params_lstcam_key)
         return df_filtered
 
-    def calculate_tobs(self):
-        dataframe = add_delta_t_key(self.info)
+    def calculate_tobs(self, dataframe):
+        # dataframe = add_delta_t_key(dataframe)
         return get_effective_time(dataframe)[1].value / 3600
 
     def save_memory(self):
@@ -444,17 +493,19 @@ class ReadLSTFile:
         logger.info("Reading LST-1 data file")
         if isinstance(self.fname, list):
             info_list = []
+            total_obs = 0.0
+            logger.info(f"Runs DL2 a procesar: {len(self.fname)}")
             for name in self.fname:
                 logger.info("Reading file: " + name)
                 try:
                     info_file = self.read_LSTfile(name, df_type, filter_data)
                     self.info = info_file
-                    self.tobs = self.calculate_tobs()
+                    total_obs += self.tobs
                     run_number = int(name.split(".h5")[0][-5:])
                     if filter_data:
                         pulsarana.cuts.apply_fixed_cut(self, run_number)
                         if pulsarana.cuts.energy_binning_cut is not None:
-                            if even_odd_cuts is not None:
+                            if even_odd_cuts is True:
                                 pulsarana.cuts.apply_energydep_cuts_on_even_odd(self)
                             else:
                                 pulsarana.cuts.apply_energydep_cuts(self)
@@ -474,11 +525,12 @@ class ReadLSTFile:
                     info_list = []
 
                 self.info = pd.concat([self.info, chunk_df])
-            self.tobs = self.calculate_tobs()
+
+            self.tobs = total_obs
 
         else:
             self.info = self.read_LSTfile(self.fname, df_type, filter_data)
-            self.tobs = self.calculate_tobs()
+            self.tobs = self.calculate_tobs(self.info)
 
             if filter_data:
                 pulsarana.cuts.apply_fixed_cut(self)

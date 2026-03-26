@@ -57,6 +57,7 @@ class FilterPulsarAna:
                     (90 - np.rad2deg(dataframe["alt_tel"])) < self.zd_cut_max
                 ]
 
+        # dataframe = dataframe[(dataframe['r'] >= 0) & (dataframe['r'] <= 1)]
         if self.int_cut is not None:
             if isinstance(self.int_cut, float):
                 if run_number is not None and run_number < 6045:
