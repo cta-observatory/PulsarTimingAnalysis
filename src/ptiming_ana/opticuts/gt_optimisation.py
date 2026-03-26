@@ -502,33 +502,12 @@ class PulsarCutOptimizer:
                 sig_smooth = gaussian_filter(sig_filled, sigma=[sigma_g_bins, sigma_t_bins], mode='constant', cval=0.0)
                 sig_smooth = np.where(mask, sig_smooth, np.nan)
 
-                # # Step 1: theta2 fijo → optimizar gammaness
-                # snr_g = sig_smooth[:, t_idx_fixed]
-                # if np.all(np.isnan(snr_g)):
-                #     logger.warning(
-                #         f"[{'EVEN' if evtid==0 else 'ODD'}] "
-                #         f"{band_label}: no valid gammaness cut"
-                #     )
-                #     continue
-                # best_g_idx = np.nanargmax(snr_g)
-
-                # # Step 2: gammaness óptima → optimizar theta2
-                # snr_t = sig_smooth[best_g_idx, :]
-                # if np.all(np.isnan(snr_t)):
-                #     logger.warning(
-                #         f"[{'EVEN' if evtid==0 else 'ODD'}] "
-                #         f"{band_label}: no valid theta2 cut"
-                #     )
-                #     continue
-                # best_t_idx = np.nanargmax(snr_t)
-
-
                 # Máximo global directo sobre el mapa suavizado
                 best_idx   = np.nanargmax(sig_smooth)
                 best_g_idx, best_t_idx = np.unravel_index(best_idx, sig_smooth.shape)
                 best_g   = self.gammaness_bins[best_g_idx]
                 best_t   = self.theta2_bins[best_t_idx]
-                best_sig = sig_2d_masked[best_g_idx, best_t_idx]
+                best_sig = sig_smooth[best_g_idx, best_t_idx]
 
                 evtlabel = "EVEN" if evtid == 0 else "ODD"
                 logger.info(
@@ -685,7 +664,7 @@ class PulsarCutOptimizer:
 
             fig, axes = plt.subplots(nrows, ncols, figsize=(ncols*4, nrows*3.5), squeeze=False)
             axes = axes.flatten()
-            fig.suptitle(f"[C2] SNR map 2D (suavizado) — {metric} — {label}")
+            fig.suptitle(f"Li&Ma map 2D — {metric} — {label}")
 
             for bidx in range(n_bands):
                 ax  = axes[bidx]
@@ -701,13 +680,13 @@ class PulsarCutOptimizer:
 
                     vmax = np.nanpercentile(sig_smooth, 98)
                     vmax = max(vmax, 0.1)
-                    im = ax.pcolormesh(t_centers, g_centers, sig_smooth,
+                    im = ax.pcolormesh(t_centers, g_centers, sig_smooth, #sig
                                     cmap="viridis", vmin=0, vmax=vmax, shading="auto")
-                    plt.colorbar(im, ax=ax, label="SNR (suavizado)", pad=0.02)
+                    plt.colorbar(im, ax=ax, label="Li&Ma", pad=0.02)
 
                 # marcar óptimo
                 if not np.isnan(g_opt[bidx]) and not np.isnan(t_opt[bidx]):
-                    ax.plot(t_opt[bidx], g_opt[bidx], "r+", ms=12, mew=2.0, label="óptimo")
+                    ax.plot(t_opt[bidx], g_opt[bidx], "r+", ms=12, mew=2.0, label="optimum")
                     ax.legend(fontsize=7)
 
                 ax.set_title(bands[bidx], fontsize=8)
