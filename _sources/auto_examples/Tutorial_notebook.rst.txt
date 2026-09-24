@@ -172,7 +172,7 @@ Run the code
 
  .. code-block:: none
 
-    /home/runner/work/PulsarTimingAnalysis/PulsarTimingAnalysis/src/ptiming_ana/phaseogram/phase_regions.py:226: RuntimeWarning: divide by zero encountered in scalar divide
+    /home/runner/work/PulsarTimingAnalysis/PulsarTimingAnalysis/src/ptiming_ana/phaseogram/phase_regions.py:229: RuntimeWarning: divide by zero encountered in scalar divide
       self.sign_ratio = self.sign / np.sqrt(tobs)
 
 
@@ -223,32 +223,6 @@ Overall results
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    RESULTS FOR THE PEAK STATISTICS:
-
-                           P1           P2         P1+P2
-    Significance   108.591359    58.006568    110.165719
-    Nex           5959.237143  2677.271429   8636.508571
-    Nex_error       84.220286    62.208240    105.936656
-    Number        6969.000000  3734.000000  10703.000000
-    noff          1009.762857  1056.728571   2066.491429
-    sign_t_ratio   451.841088   241.361292    458.391889
-    s/n ratio      187.534413    82.358927    189.985915
-
-    P1/P2 ratio=2.23+/-0.06
-
-
- 
-    RESULTS FOR THE PERIODICITY SEARCH:
-
-                        Chi_square_test       Zn_test        H_test
-    Statistic              2.697743e+04  2.599217e+04  2.810141e+04
-    p-value                0.000000e+00  0.000000e+00  0.000000e+00
-    Number of $\sigma$              inf           inf           inf
-
 
 
 
@@ -287,19 +261,6 @@ Result of the fitting
 
 
 
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-          Name       Value      Error
-    0       mu    0.992423   0.001566
-    1    sigma    0.026305   0.001470
-    2     mu_2    1.376341   0.004402
-    3  sigma_2    0.050986   0.004192
-    4        A  466.437500   0.000000
-    5        B  200.237289  10.903034
-    6        C  145.133366  11.041673
 
 
 
@@ -459,65 +420,6 @@ Results vs Energy
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Energies(GeV):0-0
-
-    RESULTS FOR THE PEAK STATISTICS:
-
-                           P1           P2        P1+P2
-    Significance    64.283110    32.326941    64.254439
-    Nex           2329.814286   994.642857  3324.457143
-    Nex_error       53.751332    39.787330    67.825823
-    Number        2828.000000  1516.000000  4344.000000
-    noff           498.185714   521.357143  1019.542857
-    sign_t_ratio   621.192620   312.387765   620.915556
-    s/n ratio      104.382013    43.561167   104.116125
-
-    P1/P2 ratio=2.34+/-0.11
-
-
- 
-    RESULTS FOR THE PERIODICITY SEARCH:
-
-                        Chi_square_test      Zn_test        H_test
-    Statistic               9894.812087  9539.380325  1.016913e+04
-    p-value                    0.000000     0.000000  0.000000e+00
-    Number of $\sigma$              inf          inf           inf
-
- 
-
-    -------------------------------------------------------------------
-    Energies(GeV):0-1
-
-    RESULTS FOR THE PEAK STATISTICS:
-
-                           P1           P2        P1+P2
-    Significance    72.157101    39.603539    73.624074
-    Nex           2428.965714  1109.057143  3538.022857
-    Nex_error       53.037924    38.897574    66.437898
-    Number        2771.000000  1467.000000  4238.000000
-    noff           342.034286   357.942857   699.977143
-    sign_t_ratio   753.379730   413.493661   768.696142
-    s/n ratio      131.336840    58.620170   133.726878
-
-    P1/P2 ratio=2.19+/-0.09
-
-
- 
-    RESULTS FOR THE PERIODICITY SEARCH:
-
-                        Chi_square_test       Zn_test        H_test
-    Statistic              1.236040e+04  1.193614e+04  1.290660e+04
-    p-value                0.000000e+00  0.000000e+00  0.000000e+00
-    Number of $\sigma$              inf           inf           inf
-
- 
-
-    -------------------------------------------------------------------
-
 
 
 
@@ -568,34 +470,6 @@ Fit vs Energy
 
  .. code-block:: none
 
-    Energies(GeV):0.10-0.32
-
-          Name       Value     Error
-    0       mu    0.990064  0.001285
-    1    sigma    0.025658  0.001199
-    2     mu_2    1.384944  0.003914
-    3  sigma_2    0.048394  0.003781
-    4        A  231.375000  0.000000
-    5        B   80.804887  3.667207
-    6        C   51.361385  3.643919
-
- 
-
-    -------------------------------------------------------------------
-    Energies(GeV):0.32-1.00
-
-          Name       Value     Error
-    0       mu    0.991737  0.001711
-    1    sigma    0.026729  0.001598
-    2     mu_2    1.376496  0.004604
-    3  sigma_2    0.050032  0.004348
-    4        A  156.375000  0.000000
-    5        B   83.366327  4.920670
-    6        C   58.966419  4.808841
-
- 
-
-    -------------------------------------------------------------------
 
     [      Name       Value     Error
     0       mu    0.990064  0.001285
@@ -618,7 +492,7 @@ Fit vs Energy
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 18.994 seconds)
+   **Total running time of the script:** (0 minutes 14.994 seconds)
 
 
 .. _sphx_glr_download_auto_examples_Tutorial_notebook.py:
