@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import chisquare, norm
+import logging
+
+logger = logging.getLogger(__name__)
+
 from .models import (
     gaussian,
     double_gaussian,
@@ -410,7 +414,7 @@ class Lightcurve:
             try:
                 self.draw_fitting(pulsar_phases, color=colorfit)
             except AttributeError:
-                print("No good fit available")
+                logger.warning("No good fit available")
 
         # Add Tobs label
         if time_label:

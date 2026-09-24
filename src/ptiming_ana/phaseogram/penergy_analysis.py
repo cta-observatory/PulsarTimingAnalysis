@@ -271,7 +271,7 @@ class PEnergyAnalysis:
                 i == len(histogram_array) - 1
                 and not histogram_array[i].fitting.check_fit_result()
             ):
-                print("No fit available for any energy bin")
+                logger.warning("No fit available for any energy bin")
                 return
         for i in range(0, len(histogram_array)):
             if histogram_array[i].fitting.check_fit_result():
@@ -352,14 +352,12 @@ class PEnergyAnalysis:
         p_stat = [0] * (len(self.energy_edges) - 1)
 
         for i in range(0, len(self.energy_edges) - 1):
-            print(
-                "Energies(GeV):"
-                + f"{self.energy_edges[i]*1000:.0f}-{self.energy_edges[i+1]*1000:.0f}"
-                + "\n"
+            logger.info(
+                "Energies(GeV): %.0f-%.0f",
+                self.energy_edges[i] * 1000,
+                self.energy_edges[i + 1] * 1000,
             )
             peak_stat[i], p_stat[i] = histogram_array[i].show_Presults()
-            print("\n \n")
-            print("-------------------------------------------------------------------")
 
         return peak_stat, p_stat
 
@@ -385,17 +383,15 @@ class PEnergyAnalysis:
         fit_results = [0] * (len(self.energy_edges) - 1)
 
         for i in range(0, len(self.energy_edges) - 1):
-            print(
-                "Energies(GeV):"
-                + f"{self.energy_edges[i]*1000:.2f}-{self.energy_edges[i+1]*1000:.2f}"
-                + "\n"
+            logger.info(
+                "Energies(GeV): %.2f-%.2f",
+                self.energy_edges[i] * 1000,
+                self.energy_edges[i + 1] * 1000,
             )
             if histogram_array[i].fitting.check_fit_result():
                 fit_results[i] = histogram_array[i].show_fit_results()
             else:
-                print("No fit available for this energy range")
-            print("\n \n")
-            print("-------------------------------------------------------------------")
+                logger.warning("No fit available for this energy range")
 
         return fit_results
 
@@ -477,7 +473,7 @@ class PEnergyAnalysis:
                 P1P2E.append(histogram_array[i].regions.P1P2_ratio)
                 P1P2E_error.append(histogram_array[i].regions.P1P2_ratio_error)
         else:
-            print("Cannot calculate P1/P2 since one of the peaks is not defined")
+            logger.warning("Cannot calculate P1/P2 since one of the peaks is not defined")
 
         return (P1P2E, P1P2E_error)
 
@@ -742,7 +738,7 @@ class PEnergyAnalysis:
                     pass
 
         if len(M1) == 0 and len(M2) == 0:
-            print("No fit available for plotting")
+            logger.warning("No fit available for plotting")
             return
         elif len(M1) > 0 and len(M2) > 0:
             nplots = 2

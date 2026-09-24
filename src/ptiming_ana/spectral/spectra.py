@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pylab as plt
+import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import logging
 from .gammapy_utils import (
@@ -365,9 +365,9 @@ class SpectralPulsarAnalysis:
         ax.set_xlim([self.config_params.e_min_points, self.config_params.e_max_points])
 
     def get_flux_points(self, sed_type="e2dnde"):
-        print("\n" + "Flux points using " + str(sed_type) + " format")
+        logger.info("Flux points using %s format", sed_type)
         table = self.flux_points.to_table(sed_type=sed_type)
-        print(table)
+        logger.info("\n%s", table)
         return table
 
     def plot_ref_model(
@@ -394,8 +394,7 @@ class SpectralPulsarAnalysis:
         ref_spec_model.plot(ax=ax, **kwargs_ref)
 
     def show_fitting_results(self):
-        print("RESULTS of the fitting:" + "\n")
-        print(self.fitting_result)
+        logger.info("RESULTS of the fitting:\n%s", self.fitting_result)
         display(self.fitting_result.models.to_parameters_table())
 
     def plot_excess_counts(self, index=0):
@@ -448,10 +447,9 @@ class SpectralPulsarAnalysis:
             ax.set_title(f"{name}:\n {par.value:.1e} +- {par.error:.1e}")
 
     def get_covariance_matrix(self):
-        print("\n" + "Covariance matrix data:" + "\n")
-        print(self.fitting_result.models.covariance)
+        logger.info("Covariance matrix data:\n%s", self.fitting_result.models.covariance)
 
-        print("\n" + "Total Correlation matrix:" + "\n")
+        logger.info("Total Correlation matrix:")
         fig, ax = plt.subplots(figsize=(6, 6))
         self.fitting_result.models.covariance.plot_correlation(ax)
 

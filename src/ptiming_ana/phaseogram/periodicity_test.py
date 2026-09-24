@@ -1,7 +1,5 @@
 import numpy as np
 
-# from decimal import *
-from pylab import sum
 from scipy.stats import chi2, norm
 import pandas as pd
 
@@ -17,7 +15,7 @@ class PeriodicityTest:
 
     Attributes
     ----------
-    chisqr_test :
+    chisqr_res :
         Results of the chi square tests. Format: [Statistic, p_value, nsigmas]
     number : int
         Number of phases used in the analysis
@@ -57,8 +55,8 @@ class PeriodicityTest:
 
         # Calculate moments
         k = np.arange(1, n + 1)
-        cos_moment = sum(np.cos(np.outer(plist, k)), axis=0)
-        sin_moment = sum(np.sin(np.outer(plist, k)), axis=0)
+        cos_moment = np.sum(np.cos(np.outer(plist, k)), axis=0)
+        sin_moment = np.sum(np.sin(np.outer(plist, k)), axis=0)
 
         # Store the information
         self.number = len(plist)
@@ -73,7 +71,7 @@ class PeriodicityTest:
         self.Zn_n = n
 
         # Calculate statistic and pvalue
-        Zn = 2 / self.number * sum(np.power(cos_moment, 2) + np.power(sin_moment, 2))
+        Zn = 2 / self.number * np.sum(np.power(cos_moment, 2) + np.power(sin_moment, 2))
         pvalue_zn = chi2.sf(float(Zn), 2 * n)
         sigmas_zn = norm.isf(pvalue_zn, loc=0, scale=1)
 
@@ -91,7 +89,7 @@ class PeriodicityTest:
             h.append(
                 2
                 / self.number
-                * sum(np.power(self.cos[0:m], 2) + np.power(self.sin[0:m], 2))
+                * np.sum(np.power(self.cos[0:m], 2) + np.power(self.sin[0:m], 2))
                 - 4 * m
                 + 4
             )

@@ -11,6 +11,7 @@ import os
 import numpy as np
 from astropy.time import Time
 from astropy.io import fits
+from pathlib import Path
 from pint.observatory.satellite_obs import get_satellite_observatory
 import pint.toa as toa
 from pint.fermi_toas import load_Fermi_TOAs
@@ -211,11 +212,11 @@ def DL3_calphase_gammapy(
 
         # Removing tim file
         if timname is not None:
-            os.remove(str(os.getcwd()) + "/" + timname)
+            Path(timname).unlink(missing_ok=True)
 
         # Removing .par file if it was created during execution
         if ephem.endswith(".gro"):
-            os.remove(str(os.getcwd()) + "/" + parname)
+            Path(parname).unlink(missing_ok=True)
 
 
 def DL3_calphase(
@@ -349,11 +350,11 @@ def DL3_calphase(
 
     # Removing tim file
     if create_tim_file:
-        os.remove(str(os.getcwd()) + "/" + timname)
+        Path(timname).unlink(missing_ok=True)
 
     # Removing .par file if it was created during execution
     if ephem.endswith(".gro"):
-        os.remove(str(os.getcwd()) + "/" + parname)
+        Path(parname).unlink(missing_ok=True)
 
 
 def save_new_DL3_file(orig_file, new_table, output_dir):
@@ -505,11 +506,11 @@ def DL2_calphase(
         )
 
     # Removing tim file
-    os.remove(str(os.getcwd()) + "/" + timname)
+    Path(timname).unlink(missing_ok=True)
 
     # Removing .par file if it was created during execution
     if ephem.endswith(".gro"):
-        os.remove(str(os.getcwd()) + "/" + parname)
+        Path(parname).unlink(missing_ok=True)
 
     # Create new dataframe:
     df_phase = pd.DataFrame(
@@ -651,7 +652,7 @@ def get_phase_list(timname, timelist, ephem, parname, obs="lst", pickle=False):
     barycent_toas = m.get_barycentric_toas(t)
     phase = m.phase(t, abs_phase=True)
 
-    os.remove(str(os.getcwd()) + "/" + timname)
+    Path(timname).unlink(missing_ok=True)
 
     return (barycent_toas, phase)
 
@@ -661,7 +662,7 @@ def get_phase_list_from_tim(timname, model, pickle=False):
     # Upload TOAs and model
     m, t = models.get_model_and_toas(model, timname, planets=True, usepickle=pickle)
 
-    print(m)
+    logger.debug("%s", m)
     # Calculate the phases
     logger.info("Calculating barycentric time and absolute phase")
     barycent_toas = m.get_barycentric_toas(t)

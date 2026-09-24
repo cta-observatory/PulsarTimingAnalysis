@@ -2,6 +2,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 from iminuit import Minuit, cost
 import pandas as pd
+import logging
 from .models import (
     get_model_list,
     gaussian,
@@ -12,6 +13,8 @@ from .models import (
     lorentzian,
 )
 from more_itertools import sort_together
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["PeakFitting"]
 
@@ -433,4 +436,4 @@ class PeakFitting:
         try:
             return self.df_result
         except AttributeError:
-            print("No fit has been done so far")
+            logger.warning("No fit has been done so far")

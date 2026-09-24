@@ -17,6 +17,7 @@ from pint.models.timing_model import (
 )
 import astropy.units as u
 import os
+import logging
 from lstchain.io import global_metadata, write_metadata
 from lstchain.io.io import (
     write_dataframe,
@@ -28,6 +29,8 @@ from astropy.coordinates import SkyCoord, AltAz
 from astropy.coordinates.erfa_astrom import ErfaAstromInterpolator, erfa_astrom
 from ctapipe.coordinates import CameraFrame
 from lstchain.reco.utils import location
+
+logger = logging.getLogger(__name__)
 
 
 __all__ = [
@@ -87,7 +90,7 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
 
 
 def add_source_info_dl2(file, source_name):
-    print("Adding source information in" + str(file))
+    logger.info("Adding source information in %s", file)
 
     coma_factor = 1.0466
     focal = coma_factor * 28 * u.m
@@ -118,7 +121,7 @@ def add_source_info_dl2(file, source_name):
     reco_src_x = df1["reco_src_x"]
     reco_src_y = df1["reco_src_y"]
 
-    print("Computing theta2...")
+    logger.info("Computing theta2...")
     theta_meters = np.sqrt(
         np.power(reco_src_x - src_x, 2) + np.power(reco_src_y - src_y, 2)
     )
@@ -131,7 +134,7 @@ def add_source_info_dl2(file, source_name):
     theta_off = np.rad2deg(np.arctan2(theta_meters, focal.value))
     theta2_off = np.power(theta_off, 2)
 
-    print("Writing in new table...")
+    logger.info("Writing in new table...")
     table_source = pd.DataFrame(
         {
             "src_x": list(src_x),
@@ -233,13 +236,13 @@ def model_fromephem(times, ephem, model_name):
         if (times[0] > df_ephem["START"][i]) & (times[0] < df_ephem["FINISH"][i]):
             break
         elif (times[0] < df_ephem["START"][i]) & (i == 0):
-            print("No ephemeris available")
+            logger.warning("No ephemeris available")
         elif (
             (times[0] > df_ephem["START"][i])
             & (times[0] > df_ephem["FINISH"][i])
             & (i == len(df_ephem["START"]))
         ):
-            print("No ephemeris available")
+            logger.warning("No ephemeris available")
 
     # Select componentes of the model
     all_components = Component.component_types
@@ -334,7 +337,7 @@ def model_fromephem(times, ephem, model_name):
                 par.uncertainty = info[2]
 
     tm.validate()
-    print("New model generated")
+    logger.info("New model generated")
 
     # Create the .par file
     tm.as_parfile()
@@ -353,7 +356,7 @@ def add_mjd(file_dataframe):
     mjd_time = t.to_value("mjd", "long")
 
     # Add time in MJD
-    print("Adding MJD time")
+    logger.info("Adding MJD time")
     file_dataframe["mjd_time"] = mjd_time.tolist()
 
     return mjd_time.tolist()

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pylab as plt
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from astropy import units as u
 from dataclasses import dataclass
@@ -527,23 +527,20 @@ class PulsarAnalysis:
         rpeaks = self.regions.show_peak_results()
         rstats = self.stats.show_Pstats()
 
-        print("RESULTS FOR THE PEAK STATISTICS:" + "\n")
-        print(rpeaks)
+        logger.info("RESULTS FOR THE PEAK STATISTICS:\n%s", rpeaks)
         if self.regions.P1P2_ratio is not None:
-            print(
-                "\n"
-                + f"P1/P2 ratio={self.regions.P1P2_ratio:.2f}"
-                + f"+/-{self.regions.P1P2_ratio_error:.2f}"
-                + "\n"
+            logger.info(
+                "P1/P2 ratio=%.2f +/- %.2f",
+                self.regions.P1P2_ratio,
+                self.regions.P1P2_ratio_error,
             )
-        print("\n \n" + "RESULTS FOR THE PERIODICITY SEARCH:" + "\n")
-        print(rstats)
+        logger.info("RESULTS FOR THE PERIODICITY SEARCH:\n%s", rstats)
 
         return rpeaks, rstats
 
     def show_fit_results(self):
         fresult = self.fitting.show_result()
-        print(fresult)
+        logger.info("FITTING RESULTS:\n%s", fresult)
         return fresult
 
     def show_timeEvolution(self):

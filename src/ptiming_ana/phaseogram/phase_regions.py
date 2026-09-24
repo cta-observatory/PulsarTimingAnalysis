@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
 from gammapy.stats import WStatCountsStatistic
+import logging
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["calculate_CountStats", "PhaseRegions", "PulsarPeak"]
 
@@ -28,7 +31,7 @@ class PhaseRegions:
     ):
         # Define background and null regions for both peaks and
         if OFF_object is None:
-            print("No peak statistics available since no background is provided")
+            logger.debug("No peak statistics available since no background is provided")
         else:
             self.OFF = OFF_object
 
@@ -48,14 +51,14 @@ class PhaseRegions:
         else:
             npeaks = 0
             self.P1 = None
-            print("No P1 limits. Cant create P1 object")
+            logger.debug("No P1 limits. Cant create P1 object")
 
         if P2_object is not None:
             self.P2 = P2_object
             npeaks = npeaks + 1
         else:
             self.P2 = None
-            print("No P2 limits. Cant create P2 object")
+            logger.debug("No P2 limits. Cant create P2 object")
 
         if P1P2_object is not None:
             self.P1P2 = P1P2_object
@@ -228,4 +231,4 @@ class PulsarPeak:
             self.noff = noff
 
         else:
-            print("Cannot calculate statistics for a background region")
+            logger.warning("Cannot calculate statistics for a background region")
