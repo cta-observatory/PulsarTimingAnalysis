@@ -1,31 +1,61 @@
 name: CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "**"
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly run to detect incompatibilities with new versions of the dependencies
+    - cron: "0 4 * * 1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  MPLBACKEND: Agg
+  PYTEST_ADDOPTS: --color=yes
 
 jobs:
   tests:
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - name: Linux (3.9, pip)
-            os: ubuntu-latest
-            python-version: "3.9"
-            install-method: "pip"
-
-          - name: Linux (3.10, mamba)
+          - name: Linux (3.10, pip, oldest lstchain)
             os: ubuntu-latest
             python-version: "3.10"
-            install-method: "mamba"
+            install-method: "pip"
+            extra-requirements: "lstchain==0.10.6 numpy<2 setuptools<81"
 
           - name: Linux (3.11, pip)
             os: ubuntu-latest
             python-version: "3.11"
             install-method: "pip"
-          
-          - name: MacOS (3.11, mamba)
-            os: macos-latest
+
+          - name: Linux (3.12, pip)
+            os: ubuntu-latest
+            python-version: "3.12"
+            install-method: "pip"
+            network-tests: true
+
+          - name: Linux (3.11, mamba)
+            os: ubuntu-latest
             python-version: "3.11"
+            install-method: "mamba"
+
+          - name: macOS arm64 (3.12, mamba)
+            os: macos-latest
+            python-version: "3.12"
             install-method: "mamba"
 
     defaults:
@@ -34,67 +64,54 @@ jobs:
         shell: bash -leo pipefail {0}
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-            fetch-depth: 0
-    
-    - name: Prepare mamba installation
-      if: matrix.install-method == 'mamba'
-      env:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mamba setup
+        if: matrix.install-method == 'mamba'
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          init-shell: bash
+          environment-file: environment.yml
+          cache-downloads: true
+          create-args: >-
+            python=${{ matrix.python-version }}
+
+      - name: Python setup
+        if: matrix.install-method == 'pip'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package and dependencies
+        env:
           PYTHON_VERSION: ${{ matrix.python-version }}
-      run: |
-          # setup correct python version
-          sed -i -e "s/- python=.*/- python=$PYTHON_VERSION/g" environment.yml
-    
-    - name: Mamba setup for MacOS (M chip, arm64)
-      if: runner.os == 'macOS'
-      uses: mamba-org/setup-micromamba@v2
-      with:
-        init-shell: bash
-        environment-name: pulsar-lst1
-        # We have to install c-blosc2 and protozfits manually because
-        # the recipe in conda-forge for lstchain comes with python-blosc2,
-        # which is not available for arm64.
-        # FIXME: once we upgrade to a newer version of lstchain, this
-        # should not be necessary since python-blosc2 will not be fixed 
-        # in lstchain installation.
-        create-args: >-
-          python=3.11
-          c-blosc2
-          protozfits=2
-          protobuf=3.20
+          EXTRA_REQUIREMENTS: ${{ matrix.extra-requirements }}
+        run: |
+          python --version | grep "Python ${PYTHON_VERSION}"
+          pip install ".[test]" ${EXTRA_REQUIREMENTS}
+          pip list
 
-    - name: Mamba setup for Linux
-      if: matrix.install-method == 'mamba' && runner.os != 'macOS'
-      uses: mamba-org/setup-micromamba@v2
-      with:
-        init-shell: bash
-        environment-file: environment.yml
-        cache-downloads: true
-  
-    - name: Python setup
-      if: matrix.install-method == 'pip'
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Tests
+        run: |
+          pytest --cov --cov-report=xml --cov-report=term
 
-    - name: Install package and dependencies
-      run: |
-        python --version | grep "Python ${PYTHON_VERSION}"
-        pip install .[test]
+      - name: Tests that need network access
+        if: matrix.network-tests
+        run: |
+          pytest --run-network -m network --cov --cov-append --cov-report=xml
 
-    - name: Tests
-      run: |
-        pytest --cov --cov-report=xml
-
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v5
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   docs:
-    name: Build and deploy documentation
+    name: Build documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -103,18 +120,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install doc dependencies
         run: |
-          pip install -e .[doc]
-          git describe --tags
+          pip install -e ".[doc]"
           python -c 'import ptiming_ana; print(ptiming_ana.__version__)'
 
       - name: Build docs
         run: cd docs && make html SPHINXOPTS="-W --keep-going -n --color -j auto"
 
       - name: Deploy to github pages
+        # Only the documentation of the main branch is published
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: docs/build/html
