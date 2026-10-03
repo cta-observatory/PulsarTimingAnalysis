@@ -1,13 +1,27 @@
-from .utils import add_mjd, dl2time_totim, merge_dl2_pulsar, model_fromephem
-from .pulsarphase_cal import DL2_calphase, DL3_calphase, fermi_calphase
-
+from .pulsarphase_cal import (
+    DL2_calphase,
+    DL3_calphase,
+    DL3_calphase_gammapy,
+    fermi_calphase,
+)
+from .utils import (
+    add_mjd,
+    add_source_info_dl2,
+    dl2time_totim,
+    merge_dl2_pulsar,
+    model_fromephem,
+    read_ephemfile,
+)
 
 __all__ = [
-    "dl2time_totim",
-    "model_fromephem",
-    "add_mjd",
-    "DL3_calphase",
     "DL2_calphase",
-    "merge_dl2_pulsar",
+    "DL3_calphase",
+    "DL3_calphase_gammapy",
+    "add_mjd",
+    "add_source_info_dl2",
+    "dl2time_totim",
     "fermi_calphase",
+    "merge_dl2_pulsar",
+    "model_fromephem",
+    "read_ephemfile",
 ]
