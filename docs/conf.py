@@ -54,11 +54,19 @@ extensions = [
 numpydoc_show_class_members = False
 numpydoc_class_members_toctree = False
 
-exclude_patterns = []
+exclude_patterns = ["build"]
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
+    "astropy": ("https://docs.astropy.org/en/stable/", None),
+    "gammapy": ("https://docs.gammapy.org/1.3/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
 }
+
+# Interpret `text` as a reference to a Python object
+default_role = "py:obj"
 
 sphinx_gallery_conf = {
     'examples_dirs': '../tutorial',
@@ -67,6 +75,8 @@ sphinx_gallery_conf = {
     'copyfile_regex': r'.*\.png',
     'promote_jupyter_magic': True,
     'line_numbers': True,
+    'matplotlib_animations': False,
+    'remove_config_comments': True,
 }
 
 
