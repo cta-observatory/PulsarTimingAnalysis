@@ -1,25 +1,50 @@
-import numpy as np
-from scipy.optimize import curve_fit
-from iminuit import Minuit, cost
-import pandas as pd
 import logging
-from .models import (
-    get_model_list,
-    gaussian,
-    double_gaussian,
-    triple_gaussian,
-    assymetric_double_gaussian,
-    double_lorentz,
-    lorentzian,
-)
-from more_itertools import sort_together
+
+import numpy as np
+import pandas as pd
+from iminuit import Minuit, cost
+from scipy.integrate import trapezoid
+from scipy.optimize import curve_fit
+
+from .models import MODELS, get_model_list
 
 logger = logging.getLogger(__name__)
 
 __all__ = ["PeakFitting"]
 
+# Number of points used to integrate the model over one period in the
+# unbinned (extended likelihood) fit.
+_N_INTEGRATION_POINTS = 4001
+
 
 class PeakFitting:
+    """
+    Fit of the pulse profile to one of the models in ``ptiming_ana.phaseogram.models``.
+
+    Parameters
+    ----------
+    binned : bool
+        If True, a least-squares fit to the phaseogram is done. If False, an
+        unbinned extended maximum likelihood fit to the list of phases is done.
+    model : str
+        Name of the model. See `~ptiming_ana.phaseogram.get_model_list`.
+    peak : {"both", "P1", "P2"}
+        Peak(s) to fit. Models with a single peak need "P1" or "P2", the rest
+        of the models need "both".
+
+    Attributes
+    ----------
+    parnames : list of str
+        Name of the parameters of the model.
+    params, errors : list of float
+        Best-fit values and uncertainties, in the same order as ``parnames``.
+        The amplitudes are given in counts per phase bin times phase and the
+        background in counts per phase bin, for both the binned and the
+        unbinned fit.
+    df_result : `pandas.DataFrame`
+        Table with the result of the fit.
+    """
+
     def __init__(self, binned, model, peak="both"):
         # Define and check model
         self.model = model
@@ -34,8 +59,8 @@ class PeakFitting:
 
     def run(self, pulsar_phases):
         # Estimate initial values
-
         self.est_initial_values(pulsar_phases)
+
         # Do the fitting
         if self.binned:
             self.fit_Binned(pulsar_phases)
@@ -43,397 +68,203 @@ class PeakFitting:
             self.fit_ULmodel(pulsar_phases)
 
     def check_model(self):
-        model_list = get_model_list()
-        if self.model not in model_list:
-            raise ValueError("The model is not in the available model list")
+        if self.model not in get_model_list():
+            raise ValueError(
+                f"The model '{self.model}' is not in the available model list: "
+                f"{get_model_list()}"
+            )
 
-        if self.peak_tofit == "both" and self.model == "gaussian":
-            raise ValueError("Gaussian model can only fit one peak")
+        if self.peak_tofit not in ("both", "P1", "P2"):
+            raise ValueError("The peak to fit must be one of 'both', 'P1' or 'P2'")
 
-        if self.peak_tofit == "P1" and self.model == "dgaussian":
-            raise ValueError("Dgaussian model needs two peaks")
+        npeaks = MODELS[self.model]["npeaks"]
+        if npeaks == 1 and self.peak_tofit == "both":
+            raise ValueError(
+                f"The '{self.model}' model can only fit one peak (P1 or P2)"
+            )
 
-        if self.peak_tofit == "P2" and self.model == "dgaussian":
-            raise ValueError("Gaussian model needs two peaks")
+        if npeaks > 1 and self.peak_tofit != "both":
+            raise ValueError(
+                f"The '{self.model}' model needs {npeaks} peaks, "
+                f"but only {self.peak_tofit} is set to be fitted"
+            )
+
+    def _region_names(self):
+        npeaks = MODELS[self.model]["npeaks"]
+        if npeaks == 1:
+            return [self.peak_tofit]
+        return ["P1", "P2", "P3"][:npeaks]
 
     def est_initial_values(self, pulsar_phases):
         self.check_model()
         self.init = []
-        intensity = []
         height = []
 
-        # Set different initial values for different models
-        if self.model == "tgaussian":
-            regions_names = ["P1", "P2", "P3"]
-        elif self.model == "gaussian":
-            regions_names = ["P2"]
-        else:
-            regions_names = ["P1", "P2"]
+        # Mean and width of each peak estimated from the signal regions
+        for name in self._region_names():
+            P_info = pulsar_phases.regions.dic.get(name)
+            if P_info is None:
+                raise ValueError(
+                    f"The '{self.model}' model needs the {name} region to be defined"
+                )
 
-        for name in regions_names:
-            P_info = pulsar_phases.regions.dic[name]
-            if P_info is not None:
-                if name == self.peak_tofit or self.peak_tofit == "both":
-                    intensity.append(P_info.Nex / P_info.noff)
-                    height.append(P_info.Nex)
-                    self.shift = (
-                        pulsar_phases.regions.OFF.limits[1]
-                        + pulsar_phases.regions.OFF.limits[0]
-                    ) / 2
+            height.append(P_info.Nex)
+            self.shift = (
+                pulsar_phases.regions.OFF.limits[1]
+                + pulsar_phases.regions.OFF.limits[0]
+            ) / 2
 
-                    if len(P_info.limits) > 2:
-                        extension = (P_info.limits[0] + 1 + P_info.limits[3]) / 2
-                    else:
-                        extension = (P_info.limits[0] + P_info.limits[1]) / 2
-
-                    if extension < self.shift:
-                        extension = extension + 1
-
-                    self.init.extend([extension, P_info.deltaP / 2])
-
-                    if self.model == "asym_dgaussian":
-                        self.init.append(P_info.deltaP / 2)
+            if len(P_info.limits) > 2:
+                extension = (P_info.limits[0] + 1 + P_info.limits[3]) / 2
             else:
-                if self.model != "gaussian" and self.model != "lorentzian":
-                    raise ValueError("Double Gaussian model needs two peaks")
+                extension = (P_info.limits[0] + P_info.limits[1]) / 2
 
-        bkg = np.mean(
-            (
-                pulsar_phases.histogram.lc[0][
-                    (
-                        pulsar_phases.histogram.lc[1][:-1]
-                        > (pulsar_phases.regions.OFF.limits[0])
-                    )
-                    & (
-                        pulsar_phases.histogram.lc[1][1:]
-                        < pulsar_phases.regions.OFF.limits[1]
-                    )
-                ]
-            )
-        )
+            if extension < self.shift:
+                extension = extension + 1
+
+            self.init.extend([extension, P_info.deltaP / 2])
+
+            if self.model == "asym_dgaussian":
+                self.init.append(P_info.deltaP / 2)
+
+        # Background level estimated from the OFF region
+        lc = pulsar_phases.histogram.lc
+        off_limits = pulsar_phases.regions.OFF.limits
+        bkg = np.mean(lc[0][(lc[1][:-1] > off_limits[0]) & (lc[1][1:] < off_limits[1])])
 
         self.init.extend(height)
         self.init.append(bkg)
 
+    def _model_with_fixed_background(self):
+        """Model as a function of the free parameters (background is fixed)."""
+        spec = MODELS[self.model]
+        function = spec["function"]
+        bkg_index = spec["parnames"].index(spec["background"])
+        bkg = float(self.init[-1])
+
+        def model(x, *free_params):
+            params = list(free_params)
+            params.insert(bkg_index, bkg)
+            return function(x, *params)
+
+        return model, bkg_index
+
+    def _store_result(self, values, errors):
+        self.parnames = list(MODELS[self.model]["parnames"])
+        self.params = [float(value) for value in values]
+        self.errors = [float(error) for error in errors]
+        self.create_result_df()
+
     # Unbinned fitting
     def fit_ULmodel(self, pulsar_phases):
+        """Unbinned extended maximum likelihood fit to the list of phases."""
         self.check_model()
+        spec = MODELS[self.model]
+        function = spec["function"]
+        parnames = list(spec["parnames"])
+        bkg_index = parnames.index(spec["background"])
 
-        # Shift the phases if one of the peak is near the interval edge
-        shift_phases = pulsar_phases.phases
+        # Shift the phases if one of the peak is near the interval edge.
+        # A copy is used so the phases of the analysis are not modified.
+        phases = np.array(pulsar_phases.phases, dtype=float)
         if self.shift != 0:
-            for i in range(0, len(shift_phases)):
-                if shift_phases[i] < self.shift:
-                    shift_phases[i] = shift_phases[i] + 1
+            phases[phases < self.shift] += 1
 
-        if self.model == "dgaussian":
-            unbinned_likelihood = cost.UnbinnedNLL(
-                double_gaussian, np.array(shift_phases)
-            )
-            minuit = Minuit(
-                unbinned_likelihood,
-                mu=self.init[0],
-                sigma=self.init[1],
-                mu_2=self.init[2],
-                sigma_2=self.init[3],
-                A=self.init[4],
-                B=self.init[5],
-                C=self.init[6],
-            )
+        # The models are expressed in counts per phase bin, so the density
+        # of events per unit phase is the model times the number of bins.
+        nbins = len(pulsar_phases.histogram.lc[0])
+        grid = np.linspace(self.shift, self.shift + 1, _N_INTEGRATION_POINTS)
 
-            self.parnames = ["mu", "sigma", "mu_2", "sigma_2", "A", "B", "C"]
-            for par in ["mu", "sigma", "mu_2", "sigma_2", "B", "C"]:
-                minuit.fixed[par] = False
-            minuit.fixed["A"] = True
+        def scaled_pdf(x, *params):
+            integral = nbins * trapezoid(function(grid, *params), grid)
+            return integral, nbins * function(x, *params)
 
-        if self.model == "tgaussian":
-            unbinned_likelihood = cost.UnbinnedNLL(
-                triple_gaussian, np.array(shift_phases)
-            )
-            minuit = Minuit(
-                unbinned_likelihood,
-                Bkg=self.init[-1],
-                mu=self.init[0],
-                sigma=self.init[1],
-                mu_2=self.init[2],
-                sigma_2=self.init[3],
-                mu_3=self.init[4],
-                sigma_3=self.init[5],
-                A=self.init[6],
-                B=self.init[7],
-                C=self.init[8],
-            )
+        # Initial values: the excess counts are converted to the units of the
+        # amplitude parameters (counts per bin x phase).
+        npeaks = spec["npeaks"]
+        nshape = len(self.init) - npeaks - 1
+        start = list(self.init[:nshape])
+        start.extend(np.array(self.init[nshape:-1]) / nbins)
+        start.insert(bkg_index, self.init[-1])
 
-            self.parnames = [
-                "Bkg",
-                "mu",
-                "sigma",
-                "mu_2",
-                "sigma_2",
-                "mu_3",
-                "sigma_3",
-                "A",
-                "B",
-                "C",
-            ]
-            for par in self.parnames:
-                minuit.fixed[par] = False
+        minuit = Minuit(
+            cost.ExtendedUnbinnedNLL(phases, scaled_pdf), *start, name=parnames
+        )
+        for name in parnames:
+            if name.startswith("mu"):
+                minuit.limits[name] = (self.shift, self.shift + 1)
+            elif name.startswith(("sigma", "gamma")):
+                minuit.limits[name] = (1e-4, 0.5)
+            else:
+                minuit.limits[name] = (0, None)
 
-            minuit.fixed["Bkg"] = True
-
-        elif self.model == "asym_dgaussian":
-            unbinned_likelihood = cost.UnbinnedNLL(
-                assymetric_double_gaussian, np.array(shift_phases)
-            )
-            minuit = Minuit(
-                unbinned_likelihood,
-                mu=self.init[0],
-                sigma1=self.init[1],
-                sigma2=self.init[2],
-                mu_2=self.init[3],
-                sigma1_2=self.init[4],
-                sigma2_2=self.init[5],
-                A=self.init[6],
-                B=self.init[7],
-                C=self.init[8],
-            )
-            self.parnames = [
-                "mu",
-                "sigma1",
-                "sigma2",
-                "mu_2",
-                "sigma1_2",
-                "sigma2_2",
-                "A",
-                "B",
-                "C",
-            ]
-
-        elif self.model == "double_lorentz":
-            unbinned_likelihood = cost.UnbinnedNLL(
-                double_lorentz, np.array(shift_phases)
-            )
-            minuit = Minuit(
-                unbinned_likelihood,
-                mu_1=self.init[0],
-                gamma_1=self.init[1],
-                mu_2=self.init[2],
-                gamma_2=self.init[3],
-                A=self.init[4],
-                B=self.init[5],
-                C=self.init[6],
-            )
-            self.parnames = ["mu_1", "gamma_1", "mu_2", "gamma_2", "A", "B", "C"]
-
-        elif self.model == "lorentzian":
-            unbinned_likelihood = cost.UnbinnedNLL(lorentzian, np.array(shift_phases))
-            minuit = Minuit(
-                unbinned_likelihood,
-                mu_1=self.init[0],
-                gamma_1=self.init[1],
-                A=self.init[4],
-                B=self.init[5],
-            )
-            self.parnames = ["mu_1", "gamma_1", "A", "B"]
-
-        elif self.model == "gaussian":
-            unbinned_likelihood = cost.UnbinnedNLL(gaussian, np.array(shift_phases))
-            minuit = Minuit(
-                unbinned_likelihood,
-                mu=self.init[0],
-                sigma=self.init[1],
-                A=self.init[2],
-                B=self.init[3],
-            )
-            self.parnames = ["mu", "sigma", "A", "B"]
-
-        minuit.errordef = 0.5
         minuit.migrad()
+        minuit.hesse()
+        if not minuit.valid:
+            logger.warning("The unbinned fit did not converge to a valid minimum")
 
         # Store results as minuit object
         self.minuit = minuit
-        self.unbinned_lk = unbinned_likelihood
+        self.unbinned_lk = minuit.fcn
 
-        # Store the result of params and errors
-        self.params = []
-        self.errors = []
-        for name in self.parnames:
-            self.params.append(self.minuit.values[name])
-            self.errors.append(self.minuit.errors[name])
-
-        self.create_result_df()
+        self._store_result(
+            [minuit.values[name] for name in parnames],
+            [minuit.errors[name] for name in parnames],
+        )
 
     # Binned fitting
     def fit_Binned(self, pulsar_phases):
+        """Least-squares fit to the phaseogram (background fixed to the OFF level)."""
         self.check_model()
         histogram = pulsar_phases.histogram
 
         # Shift the phases if one of the peak is near the interval edge
-        shift_phases = list(histogram.lc[1][:-1])
-        bin_height = list(histogram.lc[0])
+        left_edges = np.array(histogram.lc[1][:-1], dtype=float)
+        bin_height = np.array(histogram.lc[0])
 
         if self.shift != 0:
-            for i in range(0, len(shift_phases)):
-                if shift_phases[i] < self.shift:
-                    shift_phases[i] = shift_phases[i] + 1
+            left_edges[left_edges < self.shift] += 1
 
-        bin_height = np.array(sort_together([shift_phases, bin_height])[1])
-        shift_phases.sort()
-        shift_phases.append(shift_phases[0] + 1)
-        shift_phases = np.array(shift_phases)
-        bin_centres = (shift_phases[1:] + shift_phases[0:-1]) / 2
+        order = np.argsort(left_edges, kind="stable")
+        bin_height = bin_height[order]
+        edges = np.append(left_edges[order], left_edges[order][0] + 1)
+        bin_centres = (edges[1:] + edges[:-1]) / 2
 
-        if self.model == "dgaussian":
+        # Poissonian uncertainties. Empty bins are given unit uncertainty to
+        # keep the residuals finite.
+        sigma = np.sqrt(bin_height)
+        sigma[sigma == 0] = 1
 
-            def custom_dgaussian(x, mu, sigma, mu_2, sigma_2, B, C):
-                return double_gaussian(x, mu, sigma, mu_2, sigma_2, self.init[-1], B, C)
+        model, bkg_index = self._model_with_fixed_background()
+        params, pcov = curve_fit(
+            model,
+            bin_centres,
+            bin_height,
+            sigma=sigma,
+            p0=self.init[:-1],
+        )
 
-            params, pcov_l = curve_fit(
-                custom_dgaussian,
-                bin_centres,
-                bin_height,
-                sigma=np.sqrt(bin_height),
-                p0=self.init[:-1],
-            )
-            self.parnames = ["mu", "sigma", "mu_2", "sigma_2", "A", "B", "C"]
+        # Store the result of params and errors (the background is not fitted)
+        values = list(params)
+        errors = list(np.sqrt(np.diag(pcov)))
+        values.insert(bkg_index, self.init[-1])
+        errors.insert(bkg_index, 0)
 
-        elif self.model == "asym_dgaussian":
-            assymetric_double_gaussian_vec = np.vectorize(
-                assymetric_double_gaussian, excluded=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            )
-
-            def custom_adgaussian(
-                x, mu, sigma1, sigma2, mu_2, sigma1_2, sigma2_2, B, C
-            ):
-                return assymetric_double_gaussian_vec(
-                    x, mu, sigma1, sigma2, mu_2, sigma1_2, sigma2_2, self.init[-1], B, C
-                )
-
-            params, pcov_l = curve_fit(
-                custom_adgaussian,
-                bin_centres,
-                bin_height,
-                sigma=np.sqrt(bin_height),
-                p0=self.init[:-1],
-            )
-            self.parnames = [
-                "mu",
-                "sigma1",
-                "sigma2",
-                "mu_2",
-                "sigma1_2",
-                "sigma2_2",
-                "A",
-                "B",
-                "C",
-            ]
-
-        elif self.model == "tgaussian":
-
-            def custom_tgaussian(x, mu, sigma, mu_2, sigma_2, mu_3, sigma_3, B, C, D):
-                return triple_gaussian(
-                    x, self.init[-1], mu, sigma, mu_2, sigma_2, mu_3, sigma_3, B, C, D
-                )
-
-            # bounds = ([0,0,0,0,0,0.1,0,0,0],[2,2,2,2,2,2,np.inf,np.inf,np.inf])
-            params, pcov_l = curve_fit(
-                custom_tgaussian,
-                bin_centres,
-                bin_height,
-                sigma=np.sqrt(bin_height),
-                p0=self.init[:-1],
-            )
-            self.parnames = [
-                "A",
-                "mu",
-                "sigma",
-                "mu_2",
-                "sigma_2",
-                "mu_3",
-                "sigma_3",
-                "B",
-                "C",
-                "D",
-            ]
-
-        elif self.model == "double_lorentz":
-
-            def custom_lorentzian(x, mu_1, gamma_1, mu_2, gamma_2, B, C):
-                return double_lorentz(
-                    x, mu_1, gamma_1, mu_2, gamma_2, self.init[-1], B, C
-                )
-
-            params, pcov_l = curve_fit(
-                custom_lorentzian,
-                bin_centres,
-                bin_height,
-                sigma=np.sqrt(bin_height),
-                p0=self.init[:-1],
-            )
-
-            self.parnames = ["mu_1", "gamma_1", "mu_2", "gamma_2", "A", "B", "C"]
-
-        elif self.model == "lorentzian":
-
-            def custom_lorentzian(x, mu_1, gamma_1, B):
-                return lorentzian(x, mu_1, gamma_1, self.init[-1], B)
-
-            params, pcov_l = curve_fit(
-                custom_lorentzian,
-                bin_centres,
-                bin_height,
-                sigma=np.sqrt(bin_height),
-                p0=self.init[:-1],
-            )
-
-            self.parnames = ["mu_1", "gamma_1", "A", "B"]
-
-        elif self.model == "gaussian":
-
-            def custom_gaussian(x, mu, sigma, B):
-                return gaussian(x, mu, sigma, self.init[-1], B)
-
-            params, pcov_l = curve_fit(
-                custom_gaussian,
-                bin_centres,
-                bin_height,
-                sigma=np.sqrt(bin_height),
-                p0=self.init[:-1],
-            )
-            self.parnames = ["mu", "sigma", "A", "B"]
-
-        # Store the result of params and errors
-        self.params = []
-        self.errors = []
-        j = 0
-        for i in range(0, len(self.parnames)):
-            if self.parnames[i] == "A":
-                self.params.append(self.init[-1])
-                self.errors.append(0)
-                j = 1
-            else:
-                self.params.append(params[i - j])
-                self.errors.append(np.sqrt(pcov_l[i - j][i - j]))
-
-        self.create_result_df()
+        self._store_result(values, errors)
 
     ##############################################
     # RESULTS
     #############################################
 
     def check_fit_result(self):
-        try:
-            self.params
-        except AttributeError:
-            return False
-        return True
+        return hasattr(self, "params")
 
     def create_result_df(self):
         d = {"Name": self.parnames, "Value": self.params, "Error": self.errors}
         self.df_result = pd.DataFrame(data=d)
 
     def show_result(self):
-        try:
-            return self.df_result
-        except AttributeError:
+        if not hasattr(self, "df_result"):
             logger.warning("No fit has been done so far")
+            return None
+        return self.df_result

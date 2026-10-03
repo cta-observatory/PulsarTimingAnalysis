@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 
-__all__ = ["PulsarTimeAnalysis", "function_sqrt", "function_lin"]
+__all__ = ["PulsarTimeAnalysis", "function_lin", "function_sqrt"]
 
 
 def function_sqrt(x, A):
@@ -71,14 +71,12 @@ class PulsarTimeAnalysis:
             pass
 
         if "delta_t" in pulsar_phases.info:
-            diff = pulsar_phases.info.delta_t
-            self.t.append(sum(diff[diff < 1]))
+            diff = pulsar_phases.info.delta_t.values
+            self.t.append(np.sum(diff[diff < 1]))
         else:
-            diff = abs(
-                pulsar_phases.info.dragon_time.values[1:]
-                - pulsar_phases.info.dragon_time.values[:-1]
-            )
-            self.t.append(sum(diff[diff < 1]))
+            # Elapsed time, without the gaps between observations
+            diff = np.abs(np.diff(pulsar_phases.info.dragon_time.values))
+            self.t.append(np.sum(diff[diff < self.diff_del]))
 
         pulsar_phases.tobs = self.t[-1] / 3600
 
@@ -90,9 +88,13 @@ class PulsarTimeAnalysis:
 
     def run(self, pulsar_phases):
         dataframe = pulsar_phases.info
+        if len(dataframe) == 0:
+            raise ValueError("No events left to analyse. Check the applied cuts.")
+
         diff = abs(dataframe.dragon_time.values[1:] - dataframe.dragon_time.values[:-1])
         s = 0
         self.t = [0]
+        n_last_update = 0
 
         # Estimate from each telescope the interval of time at which we can ignore the differences of time
         if pulsar_phases.telescope == "fermi":
@@ -101,24 +103,27 @@ class PulsarTimeAnalysis:
             self.diff_del = 3600
 
         # Update the information
-        for i in range(0, len(diff)):
+        last = len(diff) - 1
+        for i in range(len(diff)):
             if diff[i] < self.diff_del:
                 s = s + diff[i]
 
                 # Update information when tobs>=tint
-                if s > self.tint:
+                if s > self.tint and i < last:
                     pulse_df_partial = dataframe[
                         dataframe["dragon_time"] < dataframe.dragon_time.values[i + 1]
                     ]
                     self.update_tinfo(pulsar_phases, pulse_df_partial)
+                    n_last_update = len(pulse_df_partial)
                     s = 0
-
-                # Update last interval
-                elif i == (len(diff) - 1):
-                    self.update_tinfo(pulsar_phases, dataframe)
 
             else:
                 diff[i] = 0
+
+        # The last update always includes all the events, so the final
+        # statistics do not depend on where the last time interval ends
+        if n_last_update != len(dataframe):
+            self.update_tinfo(pulsar_phases, dataframe)
 
     ##############################################
     # RESULTS
@@ -163,12 +168,10 @@ class PulsarTimeAnalysis:
             )
 
         plt.xlabel("Time of observation (h)")
-        plt.ylabel("Significance ($\sigma$)")
+        plt.ylabel(r"Significance ($\sigma$)")
         plt.grid()
         plt.legend()
         plt.tight_layout()
-        plt.show()
-
         return fig
 
     def PsigVsTime(self):
@@ -203,7 +206,8 @@ class PulsarTimeAnalysis:
             ax1.annotate(
                 "Sig=A"
                 + r"$\sqrt{t}$"
-                + f" \n A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
+                + " \n"
+                + rf" A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
                 + r"h$^{-1/2}$",
                 xy=(0.95, 0.35),
                 xytext=(0.95, 0.35),
@@ -262,7 +266,8 @@ class PulsarTimeAnalysis:
             ax2.annotate(
                 "Sig=A"
                 + r"$\sqrt{t}$"
-                + f" \n A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
+                + " \n"
+                + rf" A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
                 + r"h$^{-1/2}$",
                 xy=(0.95, 0.35),
                 xytext=(0.95, 0.35),
@@ -321,7 +326,8 @@ class PulsarTimeAnalysis:
             ax3.annotate(
                 "Sig=A"
                 + r"$\sqrt{t}$"
-                + f" \n A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
+                + " \n"
+                + rf" A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
                 + r"h$^{-1/2}$",
                 xy=(0.95, 0.35),
                 xytext=(0.95, 0.35),
@@ -354,8 +360,6 @@ class PulsarTimeAnalysis:
         ax3.set_title("P1+P2")
 
         plt.tight_layout()
-        plt.show()
-
         return fig
 
     def PexVsTime(self):
@@ -392,7 +396,8 @@ class PulsarTimeAnalysis:
 
             ax1.annotate(
                 "Nex=At"
-                + f" \n A=({ppot[0]:.2f}$\pm$ {np.sqrt(pcov[0][0]):.2f})"
+                + " \n"
+                + rf" A=({ppot[0]:.2f}$\pm$ {np.sqrt(pcov[0][0]):.2f})"
                 + r"h$^{-1}$",
                 xy=(0.95, 0.35),
                 xytext=(0.95, 0.35),
@@ -450,7 +455,8 @@ class PulsarTimeAnalysis:
 
             ax2.annotate(
                 "Nex=At"
-                + f" \n A=({ppot[0]:.2f}$\pm$ {np.sqrt(pcov[0][0]):.2f})"
+                + " \n"
+                + rf" A=({ppot[0]:.2f}$\pm$ {np.sqrt(pcov[0][0]):.2f})"
                 + r"h$^{-1}$",
                 xy=(0.95, 0.35),
                 xytext=(0.95, 0.35),
@@ -509,7 +515,8 @@ class PulsarTimeAnalysis:
 
             ax3.annotate(
                 "Nex=At"
-                + f" \n A=({ppot[0]:.2f}$\pm$ {np.sqrt(pcov[0][0]):.2f})"
+                + " \n"
+                + rf" A=({ppot[0]:.2f}$\pm$ {np.sqrt(pcov[0][0]):.2f})"
                 + r"h$^{-1}$",
                 xy=(0.95, 0.35),
                 xytext=(0.95, 0.35),
@@ -542,8 +549,6 @@ class PulsarTimeAnalysis:
         ax3.set_title("P1+P2")
 
         plt.tight_layout()
-        plt.show()
-
         return fig
 
     def StatsVsTime(self):
@@ -559,8 +564,8 @@ class PulsarTimeAnalysis:
 
         if (
             self.HTime is not None
-            and isinstance(self.HTime[-1], float)
-            and self.HTime[-1] != float("inf")
+            and len(self.HTime) > 1
+            and np.all(np.isfinite(self.HTime))
         ):
             ax1.plot(np.array(self.t) / 3600, self.HTime, "o-", color="tab:pink")
             ax1.grid()
@@ -578,7 +583,8 @@ class PulsarTimeAnalysis:
             ax1.annotate(
                 "Sig=A"
                 + r"$\sqrt{t}$"
-                + f" \n A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
+                + " \n"
+                + rf" A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
                 + r"h$^{-1/2}$",
                 xy=(0.95, 0.35),
                 xytext=(0.95, 0.35),
@@ -617,8 +623,8 @@ class PulsarTimeAnalysis:
 
         if (
             self.ZTime is not None
-            and isinstance(self.ZTime[-1], float)
-            and self.ZTime[-1] != float("inf")
+            and len(self.ZTime) > 1
+            and np.all(np.isfinite(self.ZTime))
         ):
             ax2.plot(np.array(self.t) / 3600, self.ZTime, "o-", color="tab:cyan")
             ax2.grid()
@@ -636,7 +642,8 @@ class PulsarTimeAnalysis:
             ax2.annotate(
                 "Sig=A"
                 + r"$\sqrt{t}$"
-                + f" \n A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
+                + " \n"
+                + rf" A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
                 + r"h$^{-1/2}$",
                 xy=(0.95, 0.35),
                 xytext=(0.95, 0.35),
@@ -675,8 +682,8 @@ class PulsarTimeAnalysis:
 
         if (
             self.ChiTime is not None
-            and isinstance(self.ChiTime[-1], float)
-            and self.ChiTime[-1] != float("inf")
+            and len(self.ChiTime) > 1
+            and np.all(np.isfinite(self.ChiTime))
         ):
             ax3.plot(np.array(self.t) / 3600, self.ChiTime, "o-", color="tab:olive")
             ax3.set_xlabel("Time of observation (h)")
@@ -696,7 +703,8 @@ class PulsarTimeAnalysis:
             ax3.annotate(
                 "Sig=A"
                 + r"$\sqrt{t}$"
-                + f" \n A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
+                + " \n"
+                + rf" A=({ppot[0]:.3f}$\pm$ {np.sqrt(pcov[0][0]):.3f})"
                 + r"h$^{-1/2}$",
                 xy=(0.95, 0.35),
                 xytext=(0.95, 0.35),
@@ -728,6 +736,4 @@ class PulsarTimeAnalysis:
         ax3.set_ylabel("Significance (sigma)")
         ax3.set_title("Chi square test")
         plt.tight_layout()
-        plt.show()
-
         return fig

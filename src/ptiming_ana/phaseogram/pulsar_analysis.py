@@ -1,37 +1,33 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-from astropy import units as u
-from dataclasses import dataclass
-from .ptime_analysis import PulsarTimeAnalysis
-from .phase_regions import PhaseRegions, PulsarPeak
-from .lightcurve import Lightcurve
-from .periodicity_test import PeriodicityTest
-from .pfitting import PeakFitting
-from .models import get_model_list
-from .phasebinning import PhaseBinning
-from .penergy_analysis import PEnergyAnalysis
-from .filter_object import FilterPulsarAna
-from .read_events import ReadDL3File, ReadFermiFile, ReadLSTFile, ReadList
-import pickle
-import yaml
 import logging
 import os
+import pickle
 
-pd.options.mode.chained_assignment = None
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import yaml
+from astropy import units as u
+from matplotlib.backends.backend_pdf import PdfPages
 
-LOG_FORMAT = "%(asctime)2s %(levelname)-6s [%(name)3s] %(message)s"
-logging.basicConfig(level=logging.INFO, format=LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
+from .filter_object import FilterPulsarAna
+from .lightcurve import Lightcurve
+from .models import get_model_list
+from .penergy_analysis import PEnergyAnalysis
+from .periodicity_test import PeriodicityTest
+from .pfitting import PeakFitting
+from .phase_regions import PhaseRegions, PulsarPeak
+from .phasebinning import PhaseBinning
+from .ptime_analysis import PulsarTimeAnalysis
+from .read_events import ReadDL3File, ReadFermiFile, ReadList, ReadLSTFile
 
 logger = logging.getLogger(__name__)
-logging.getLogger("matplotlib.font_manager").disabled = True
-logging.getLogger("gammapy").disabled = True
 
 __all__ = ["PulsarAnalysis"]
 
+#: Name of the PDF file with the results if only a directory is given
+DEFAULT_OUTPUT_NAME = "pulsar_analysis_results.pdf"
 
-@dataclass
+
 class PulsarAnalysis:
     """
     MAIN CLASS FOR THE PULSAR ANALYSIS.
@@ -78,6 +74,15 @@ class PulsarAnalysis:
     def __init__(
         self, filename=None, nbins=50, tint=3600, binned=True, model="dgaussian"
     ):
+        # Default settings (they can be changed with set_config or the setters)
+        self.r = None
+        self.filter_data = True
+        self.get_results = False
+        self.output_file = None
+        self.output_dir = None
+        self.OFF_limits = None
+        self.setPeaklimits()
+
         if filename is not None:
             if "fits" in filename:
                 logger.info("Assuming Fermi-LAT data as an input")
@@ -89,7 +94,9 @@ class PulsarAnalysis:
                 self.setLSTInputFile(filename)
                 self.setTimeInterval(tint=3600)  # Every hour
             else:
-                ValueError("FIle has no valid format")
+                raise ValueError(
+                    f"File {filename} has no valid format (FITS or HDF5 expected)"
+                )
         else:
             self.setTimeInterval(tint=tint)
 
@@ -110,15 +117,22 @@ class PulsarAnalysis:
         if "fits" in filename:
             self.r = ReadFermiFile(filename)
             self.telescope = "fermi"
-            self.energy_units = "GeV"
+            # The reader converts the energies from MeV to TeV
+            self.energy_units = "TeV"
 
         else:
             raise ValueError("No FITS file given for Fermi-LAT data")
 
     def setListsInput(
-        self, plist, tlist=None, elist=None, tel="MAGIC", energy_units="GeV"
+        self,
+        plist,
+        tlist=None,
+        elist=None,
+        tel="MAGIC",
+        energy_units="GeV",
+        tobs=None,
     ):
-        self.r = ReadList(plist, tlist, elist, tel)
+        self.r = ReadList(plist, tlist, elist, tel, tobs=tobs)
         self.telescope = tel
         self.energy_units = energy_units
 
@@ -127,7 +141,7 @@ class PulsarAnalysis:
         dirname=None,
         target_radec=None,
         max_rad=0.2,
-        zd_cuts=[0, 60],
+        zd_cuts=(0, 60),
         energy_dependent_theta=True,
     ):
         self.r = ReadDL3File(
@@ -249,7 +263,7 @@ class PulsarAnalysis:
                     else:
                         self.setParamCuts(
                             gammaness_cut=conf["cuts"]["extra_cuts"]["gammaness"],
-                            theta_cut=np.power(conf["cuts"]["extra_cuts"]["theta"], 2),
+                            theta2_cut=np.power(conf["cuts"]["extra_cuts"]["theta"], 2),
                             zd_cut=conf["cuts"]["zd_range"],
                             int_cut=conf["cuts"]["extra_cuts"]["intensity"],
                             energy_binning_cut=conf["cuts"]["extra_cuts"][
@@ -268,7 +282,7 @@ class PulsarAnalysis:
                     else:
                         self.setParamCuts(
                             gammaness_cut=conf["cuts"]["extra_cuts"]["gammaness"],
-                            theta_cut=np.power(conf["cuts"]["extra_cuts"]["theta"], 2),
+                            theta2_cut=np.power(conf["cuts"]["extra_cuts"]["theta"], 2),
                             zd_cut=conf["cuts"]["zd_range"],
                             int_cut=conf["cuts"]["extra_cuts"]["intensity"],
                             energy_cut=conf["cuts"]["extra_cuts"]["energy"],
@@ -351,30 +365,47 @@ class PulsarAnalysis:
         # Set output file for results
         self.get_results = conf["results"]["save_results"]
         if self.get_results:
-            try:
-                self.output_file = conf["results"]["output_directory"]
-            except AttributeError:
-                self.output_file = conf["results"]["output_file"]
+            output = conf["results"].get("output_file")
+            if output is None:
+                output = conf["results"].get("output_directory")
+            if output is None:
+                raise ValueError(
+                    "Set results: output_file (or output_directory) in the "
+                    "configuration file to save the results"
+                )
 
-            self.output_dir = os.path.dirname(self.output_file)
+            self._set_output(output)
             if not os.path.exists(self.output_dir):
                 logger.info("Creating directory: " + self.output_dir)
                 os.makedirs(self.output_dir)
         else:
             self.output_file = None
 
+    def _set_output(self, output):
+        """Set the PDF file (and its directory) where the results are saved."""
+        output = str(output)
+        if output.lower().endswith(".pdf"):
+            self.output_file = output
+        else:
+            # A directory was given: use the default name for the PDF file
+            self.output_file = os.path.join(output, DEFAULT_OUTPUT_NAME)
+
+        self.output_dir = os.path.dirname(self.output_file) or "."
+
     ##############################################
     # EXECUTION
     #############################################
 
     def shift_phases(self, xmin):
-        for i in range(0, len(self.phases)):
-            if self.phases[i] < xmin:
-                self.phases[i] += 1
-
-        self.info["pulsar_phase"] = self.phases
+        self.phases = np.where(self.phases < xmin, self.phases + 1, self.phases)
+        self.info = self.info.assign(pulsar_phase=self.phases)
 
     def init_regions(self):
+        if self.OFF_limits is None:
+            raise ValueError(
+                "No background region defined. Use setBackgroundLimits or set_config"
+            )
+
         OFFob = PulsarPeak(peak_limits=self.OFF_limits, peaktype="background")
 
         if self.P1_limits is not None:
@@ -394,6 +425,8 @@ class PulsarAnalysis:
 
         if len(self.P1P2_limits) > 0:
             p1p2ob = PulsarPeak(peak_limits=self.P1P2_limits, peaktype="signal")
+        else:
+            p1p2ob = None
 
         self.regions = PhaseRegions(
             OFF_object=OFFob,
@@ -420,15 +453,19 @@ class PulsarAnalysis:
         self.stats = PeriodicityTest(self)
 
     def initialize(self):
+        if self.r is None:
+            raise ValueError(
+                "No input data defined. Use set_config or one of the input setters"
+            )
+
         # Read the data and filter
-        try:
-            self.r.run(self)
-        except TypeError:
-            self.r.run()
+        self.r.run(self)
 
         # Extract each attribute
         self.phases = np.array(self.r.info["pulsar_phase"].to_list())
         self.info = self.r.info
+        if len(self.phases) == 0:
+            raise ValueError("No events left to analyse. Check the applied cuts.")
 
         # Shift phases if necessary
         self.shift_phases(xmin=self.binning.xmin)
@@ -443,8 +480,12 @@ class PulsarAnalysis:
         # COmpute P1/P2 ratio
         self.regions.calculate_P1P2()
 
-        # Set the final effective time of observation
+        # Set the final effective time of observation and update the
+        # significance per unit of time of each region accordingly
         self.tobs = tobs
+        for region in self.regions.dic.values():
+            if region is not None:
+                region.sign_ratio = region.sign / np.sqrt(self.tobs)
 
         # Fit the histogram using PeakFitting class. If binned is False, an Unbinned Likelihood method is used for the fitting
         if self.do_fit:
@@ -468,13 +509,9 @@ class PulsarAnalysis:
         self.execute_stats(self.r.tobs)
 
         # Execute stats in energy bins
-        try:
+        if self.check_energyana():
             logger.info("Performing energy-dependent analysis...")
             self.EnergyAna.run(self)
-        except AttributeError:
-            logger.warning(
-                "No Energy Analysis was performed. Check that you set the right energy params"
-            )
 
         logger.info("FINISHED. Producing general results...")
 
@@ -486,10 +523,8 @@ class PulsarAnalysis:
     #############################################
 
     def check_energyana(self):
-        try:
-            self.EnergyAna
-        except AttributeError:
-            logger.info("No energy-dependent analysis has been done")
+        if not hasattr(self, "EnergyAna"):
+            logger.info("No energy-dependent analysis has been set")
             return False
         return True
 
@@ -585,7 +620,7 @@ class PulsarAnalysis:
     def show_FWHMVsEnergy(self, integral=None):
         if self.check_energyana():
             fig = plt.figure()
-            self.EnergyAna.FWHMVsEnergy()
+            self.EnergyAna.FWHMVsEnergy(integral)
             return fig
 
     def show_SigVsEnergy(self, integral=None):
@@ -622,12 +657,20 @@ class PulsarAnalysis:
             )
 
         elif file_format == "csv":
-            self.info.to_csv(index=False)
+            self.info.to_csv(output_file, index=False)
+
+        else:
+            raise ValueError("File format not valid. Use 'h5' or 'csv'")
 
     def save_results(self, output_file=None):
         if output_file is not None:
-            self.output_file = output_file
-            self.output_dir = os.path.dirname(self.output_file)
+            self._set_output(output_file)
+
+        if self.output_file is None:
+            raise ValueError("No output file given to save the results")
+
+        os.makedirs(self.output_dir, exist_ok=True)
+        open_figures = set(plt.get_fignums())
 
         with PdfPages(self.output_file) as pdf:
             pdf.savefig(
@@ -669,27 +712,31 @@ class PulsarAnalysis:
                 )
 
                 fitting = self.fitting.show_result()
-                fitting.to_hdf(self.output_dir + "/overall_fitting.h5", key="results")
-
-            try:
-                pdf.savefig(self.show_EnergyAna(), bbox_inches="tight", pad_inches=1)
-                for i in range(0, len(self.EnergyAna.show_Energy_lightcurve())):
-                    pdf.savefig(
-                        self.EnergyAna.show_Energy_lightcurve()[i],
-                        bbox_inches="tight",
-                        pad_inches=1,
+                if fitting is not None:
+                    fitting.to_hdf(
+                        os.path.join(self.output_dir, "overall_fitting.h5"),
+                        key="results",
                     )
+
+            if self.check_energyana():
+                pdf.savefig(self.show_EnergyAna(), bbox_inches="tight", pad_inches=1)
+                for fig in self.EnergyAna.show_Energy_lightcurve():
+                    pdf.savefig(fig, bbox_inches="tight", pad_inches=1)
+
                 if self.do_fit:
-                    for i in range(0, len(self.show_EnergyFitresults())):
-                        df = self.show_EnergyFitresults()[i]
-                        df.to_hdf(
-                            self.output_dir + "/fitting_energy_bin" + str(i) + ".h5",
-                            key="results",
-                        )
-            except AttributeError:
-                pass
+                    for i, df in enumerate(self.show_EnergyFitresults()):
+                        if isinstance(df, pd.DataFrame):
+                            df.to_hdf(
+                                os.path.join(
+                                    self.output_dir, f"fitting_energy_bin{i}.h5"
+                                ),
+                                key="results",
+                            )
+
+        # Close the figures created to produce the PDF file
+        for num in set(plt.get_fignums()) - open_figures:
+            plt.close(num)
 
     def save_object(self, output_file):
         with open(output_file, "wb") as file:
             pickle.dump(self, file)
-            file.close()
