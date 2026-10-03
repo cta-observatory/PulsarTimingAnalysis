@@ -1,29 +1,27 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
+import inspect
 import logging
-from .gammapy_utils import (
-    read_DL3_files,
-    set_geometry,
-    set_makers,
-    execute_makers,
-    set_model_to_fit,
-    do_fitting,
-    compute_spectral_points,
-    read_DL4_files,
-)
-from .config_reading import SpectralConfigSetting
-from .plot_utils import get_kwargs_points, get_kwargs_line, get_kwargs_region
-from IPython.display import display
-
-from gammapy.modeling import Fit
+import os
 from itertools import combinations
 
-LOG_FORMAT = "%(asctime)2s %(levelname)-6s [%(name)3s] %(message)s"
-logging.basicConfig(level=logging.INFO, format=LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
+import matplotlib.pyplot as plt
+import numpy as np
+from gammapy.modeling import Fit
+from matplotlib.gridspec import GridSpec
+
+from .config_reading import SpectralConfigSetting
+from .gammapy_utils import (
+    compute_spectral_points,
+    do_fitting,
+    execute_makers,
+    read_DL3_files,
+    read_DL4_files,
+    set_geometry,
+    set_makers,
+    set_model_to_fit,
+)
+from .plot_utils import get_kwargs_line, get_kwargs_points, get_kwargs_region
 
 logger = logging.getLogger(__name__)
-logging.getLogger("matplotlib.font_manager").disabled = True
 
 __all__ = ["SpectralPulsarAnalysis"]
 
@@ -31,10 +29,10 @@ __all__ = ["SpectralPulsarAnalysis"]
 class SpectralPulsarAnalysis:
     def __init__(self, config=None, ref_model=None):
         self.ref_model = ref_model
+        self.config_params = None
 
         if config is not None:
-            if ".yaml" in config:
-                self.init_settings(config)
+            self.init_settings(config)
 
         if ref_model is not None:
             self.spectral_model = ref_model
@@ -228,11 +226,18 @@ class SpectralPulsarAnalysis:
         logger.info("FINISHED. Showing results and final plots")
         self.show_fitting_results()
         self.get_flux_points()
-        self.plot_SED_residuals()
-        # self.plot_excess_counts()
-        self.plot_fp_likelihood()
-        self.create_contour_lines_params()
-        self.get_covariance_matrix()
+        # A failure producing one of the diagnostic plots (e.g. the likelihood
+        # profiles of a source that is not detected) must not stop the analysis
+        for plot in (
+            self.plot_SED_residuals,
+            self.plot_fp_likelihood,
+            self.create_contour_lines_params,
+            self.get_covariance_matrix,
+        ):
+            try:
+                plot()
+            except (ValueError, AttributeError) as error:
+                logger.warning("%s could not be produced: %s", plot.__name__, error)
 
         ############# RESULTS ######################
 
@@ -284,7 +289,7 @@ class SpectralPulsarAnalysis:
         )
         self.plot_residuals(ax=fig_gs2)
 
-        fig_sed.savefig(self.config_params.output_dir + "SED.png")
+        fig_sed.savefig(os.path.join(self.config_params.output_dir, "SED.png"))
 
     def plot_residuals(self, ax=None, kwargs=None):
         if ax is None:
@@ -347,10 +352,12 @@ class SpectralPulsarAnalysis:
                     label="Statistical uncertainty",
                 )
 
-            self.model_best.spectral_model.plot(ax=ax, **kwargs_best)
+            self._plot_model(self.model_best.spectral_model, ax, kwargs_best)
 
             if include_statistical:
-                self.model_best.spectral_model.plot_error(ax=ax, **kwargs_best_error)
+                self._plot_model(
+                    self.model_best.spectral_model, ax, kwargs_best_error, error=True
+                )
 
         ax.legend()
         ax.grid(which="both")
@@ -391,11 +398,35 @@ class SpectralPulsarAnalysis:
                 label=ref_label,
             )
 
-        ref_spec_model.plot(ax=ax, **kwargs_ref)
+        self._plot_model(ref_spec_model, ax, kwargs_ref)
+
+    @staticmethod
+    def _plot_model(spectral_model, ax, kwargs, error=False):
+        """
+        Plot a spectral model (or its uncertainty band) setting the units of
+        the y axis. The units are not forwarded to matplotlib, since recent
+        versions do not accept them as an argument of ``fill_between``.
+        """
+        kwargs = dict(kwargs)
+        yunits = kwargs.pop("yunits", None)
+        if yunits is not None and ax is not None:
+            ax.yaxis.set_units(yunits)
+
+        if error:
+            return spectral_model.plot_error(ax=ax, **kwargs)
+        return spectral_model.plot(ax=ax, **kwargs)
 
     def show_fitting_results(self):
         logger.info("RESULTS of the fitting:\n%s", self.fitting_result)
-        display(self.fitting_result.models.to_parameters_table())
+        table = self.fitting_result.models.to_parameters_table()
+        try:
+            # Rich display of the table when running in a notebook
+            from IPython.display import display
+
+            display(table)
+        except ImportError:
+            logger.info("\n%s", table)
+        return table
 
     def plot_excess_counts(self, index=0):
         fig, ax = plt.subplots(figsize=(8, 5))
@@ -408,7 +439,7 @@ class SpectralPulsarAnalysis:
         ax.set_xticks(orig_xticks, labels=new_xticks)
         ax.set_xlabel("E (GeV)")
 
-        fig.savefig(self.config_params.output_dir + "excess_counts.png")
+        fig.savefig(os.path.join(self.config_params.output_dir, "excess_counts.png"))
 
     def plot_fp_likelihood(self, kwargs_fp=None, color_fp="orange"):
         fig, ax = plt.subplots()
@@ -425,7 +456,9 @@ class SpectralPulsarAnalysis:
         ax.set_xlabel("E (GeV)")
         ax.set_xlim([self.config_params.e_min_points, self.config_params.e_max_points])
 
-        fig.savefig(self.config_params.output_dir + "likelihood_profile.png")
+        fig.savefig(
+            os.path.join(self.config_params.output_dir, "likelihood_profile.png")
+        )
 
     def fit_statistic_profile_params(self):
         total_stat = self.fitting_result.total_stat
@@ -447,13 +480,22 @@ class SpectralPulsarAnalysis:
             ax.set_title(f"{name}:\n {par.value:.1e} +- {par.error:.1e}")
 
     def get_covariance_matrix(self):
-        logger.info("Covariance matrix data:\n%s", self.fitting_result.models.covariance)
+        logger.info(
+            "Covariance matrix data:\n%s", self.fitting_result.models.covariance
+        )
 
         logger.info("Total Correlation matrix:")
-        fig, ax = plt.subplots(figsize=(6, 6))
-        self.fitting_result.models.covariance.plot_correlation(ax)
+        covariance = self.fitting_result.models.covariance
 
-        fig.savefig(self.config_params.output_dir + "correlation.png")
+        # The correlation plot creates its own figure in recent versions of gammapy
+        if "ax" in inspect.signature(covariance.plot_correlation).parameters:
+            fig, ax = plt.subplots(figsize=(6, 6))
+            covariance.plot_correlation(ax)
+        else:
+            ax = covariance.plot_correlation(figsize=(6, 6))
+            fig = ax.figure
+
+        fig.savefig(os.path.join(self.config_params.output_dir, "correlation.png"))
 
     def extract_parameters(self):
         name_list = []
@@ -468,7 +510,6 @@ class SpectralPulsarAnalysis:
         names, index = self.extract_parameters()
         # panels = []
         # cts_sigma = []
-        contours = dict()
         for par_1, par_2 in combinations(names, r=2):
             par1 = self.datasets.models.parameters[par_1]
             par2 = self.datasets.models.parameters[par_2]
@@ -497,8 +538,10 @@ class SpectralPulsarAnalysis:
             contours = ax.contour(
                 x_values, y_values, stat_surface, levels=levels, colors="white"
             )
-            ax.clabel(contours, fmt="%.0f$\,\sigma$", inline=3, fontsize=15)
+            ax.clabel(contours, fmt=r"%.0f$\,\sigma$", inline=3, fontsize=15)
 
             fig.savefig(
-                self.config_params.output_dir + f"contour_line_{par_1}_{par_2}.png"
+                os.path.join(
+                    self.config_params.output_dir, f"contour_line_{par_1}_{par_2}.png"
+                )
             )
