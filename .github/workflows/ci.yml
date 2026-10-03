@@ -24,6 +24,16 @@ env:
   PYTEST_ADDOPTS: --color=yes
 
 jobs:
+  lint:
+    name: Lint and format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: pre-commit/action@v3.0.1
+
   tests:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
@@ -136,3 +146,26 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: docs/build/html
+
+  build:
+    name: Build and check the package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build sdist and wheel
+        run: |
+          pip install build twine
+          python -m build
+          twine check --strict dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
