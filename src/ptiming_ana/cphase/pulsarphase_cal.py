@@ -220,6 +220,33 @@ def DL3_calphase_gammapy(
             os.remove(str(os.getcwd()) + "/" + parname)
 
 
+def check_mjd_in_ephem_range(timelist, ephem):
+    """
+    Checks that the MJD times of the run fall within the START-FINISH range
+    of the ephemeris .par file. Raises ValueError if not.
+    """
+    if not ephem.endswith(".par"):
+        return
+
+    m = get_model(ephem)
+
+    start = m["START"].value  # MJD
+    finish = m["FINISH"].value  # MJD
+
+    t_min = min(timelist)
+    t_max = max(timelist)
+
+    logger.info(f"Ephemeris valid range: START={start:.6f}, FINISH={finish:.6f} MJD")
+    logger.info(f"Run time range: {t_min:.6f} - {t_max:.6f} MJD")
+
+    if t_min < start or t_max > finish:
+        raise ValueError(
+            f"Run MJD range [{t_min:.6f}, {t_max:.6f}] is outside the ephemeris "
+            f"validity range [START={start:.6f}, FINISH={finish:.6f}]. "
+            f"Check your .par file."
+        )
+    logger.info("Run MJD range is within the ephemeris validity range. OK!")
+
 def DL3_calphase(
     file,
     ephem,
@@ -281,6 +308,8 @@ def DL3_calphase(
     time = time_orig + lst_epoch.to_value(format="unix")
     times = Time(time, format="unix").to_value("mjd", "long")
     timelist = list(times)
+
+    check_mjd_in_ephem_range(timelist, ephem)
 
     if create_tim_file:
         timname = str(os.path.basename(file).replace(".fits", "")) + ".tim"

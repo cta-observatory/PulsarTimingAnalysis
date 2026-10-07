@@ -20,6 +20,7 @@ import glob
 from regions import PointSkyRegion
 from gammapy.irf import RadMax2D
 import h5py
+import re
 logger = logging.getLogger(__name__)
 
 logging.getLogger("gammapy").disabled = True
@@ -359,8 +360,9 @@ class ReadLSTFile:
                 srcindep_df = pd.read_hdf(
                     fname, key=dl2_params_lstcam_key, float_precision=20
                 )
-                logger.info("Adding delta key")
-                srcindep_df = add_delta_t_key(srcindep_df)
+                # logger.info("Adding delta key")
+                srcindep_df.rename(columns={"phase": "pulsar_phase"}, inplace=True)
+                # srcindep_df = add_delta_t_key(srcindep_df)
                 on_df_srcdep = get_srcdep_params(fname, "on")
 
                 if "pulsar_phase" not in srcindep_df:
@@ -415,7 +417,7 @@ class ReadLSTFile:
                         [
                             "event_id",
                             "intensity",
-                            "mjd_time",
+                            # "mjd_time",
                             "event_type",
                             "pulsar_phase",
                             "dragon_time",
@@ -501,14 +503,28 @@ class ReadLSTFile:
                     info_file = self.read_LSTfile(name, df_type, filter_data)
                     self.info = info_file
                     total_obs += self.tobs
-                    run_number = int(name.split(".h5")[0][-5:])
+                    match = re.search(r"Run(\d+)", name)
+                    if match:
+                        run_number = int(match.group(1))
+                    else:
+                        raise ValueError(f"No se pudo extraer el run number de {name}")
+                    
                     if filter_data:
                         pulsarana.cuts.apply_fixed_cut(self, run_number)
                         if pulsarana.cuts.energy_binning_cut is not None:
                             if even_odd_cuts is True:
                                 pulsarana.cuts.apply_energydep_cuts_on_even_odd(self)
                             else:
-                                pulsarana.cuts.apply_energydep_cuts(self)
+                                if pulsarana.irf_cuts_dir is not None:
+                                    fname = os.path.join(pulsarana.irf_cuts_dir, f"dl3_LST-1.Run{run_number:05d}.fits")
+                                    hdul = fits.open(fname)
+                                    gh_cuts = hdul['GH_CUTS'].data.cut
+                                    alpha_cut = hdul['AL_CUTS'].data.cut
+                                    energy_bins = hdul['GH_CUTS'].data.low
+                                    energy_bins = np.append(energy_bins, hdul['GH_CUTS'].data.high[-1])
+                                    pulsarana.cuts.apply_energydep_cuts(self, gh_cuts=gh_cuts, alpha_cut=alpha_cut, energy_bins=energy_bins)
+                                else:
+                                    pulsarana.cuts.apply_energydep_cuts(self)
 
                     self.save_memory()
                     info_list.append(self.info)

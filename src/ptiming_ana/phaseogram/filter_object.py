@@ -61,7 +61,7 @@ class FilterPulsarAna:
         if self.int_cut is not None:
             if isinstance(self.int_cut, float):
                 if run_number is not None and run_number < 6045:
-                    int_cut = 80.0
+                    int_cut = 50.0
                     logger.info(f"Run {run_number} < 6045, using modified intensity cut: {int_cut}")
                 else:
                     int_cut = self.int_cut
@@ -128,25 +128,30 @@ class FilterPulsarAna:
                 return False
         return True
 
-    def apply_energydep_cuts(self, events):
+    def apply_energydep_cuts(self, events, gh_cuts= None, alpha_cut=None, energy_bins=None):
         dataframe_energy = []
         dataframe = events.info
-
-        for i in range(0, len(self.energy_binning_cut) - 1):
+        if gh_cuts is None:
+            gh_cuts = self.gammaness_cut
+        if alpha_cut is None:
+            alpha_cut = self.alpha_cut
+        if energy_bins is None:
+            energy_bins = self.energy_binning_cut
+        for i in range(0, len(energy_bins) - 1):
             if isinstance(self.gammaness_cut, list):
                 mask_gammaness = (
-                    (dataframe["gammaness"] > self.gammaness_cut[i])
-                    & (dataframe["energy"] > self.energy_binning_cut[i])
-                    & (dataframe["energy"] < self.energy_binning_cut[i + 1])
+                    (dataframe["gammaness"] > gh_cuts[i])
+                    & (dataframe["energy"] > energy_bins[i])
+                    & (dataframe["energy"] < energy_bins[i + 1])
                 )
 
                 global_mask = mask_gammaness
 
             if isinstance(self.alpha_cut, list):
                 mask_alpha = (
-                    (dataframe.alpha < self.alpha_cut[i])
-                    & (dataframe["energy"] > self.energy_binning_cut[i])
-                    & (dataframe["energy"] < self.energy_binning_cut[i + 1])
+                    (dataframe.alpha < alpha_cut[i])
+                    & (dataframe["energy"] > energy_bins[i])
+                    & (dataframe["energy"] < energy_bins[i + 1])
                 )
 
                 global_mask = global_mask & mask_alpha
@@ -154,8 +159,8 @@ class FilterPulsarAna:
             if isinstance(self.theta2_cut, list):
                 mask_theta2 = (
                     (dataframe.theta2 < self.theta2_cut[i])
-                    & (dataframe["energy"] > self.energy_binning_cut[i])
-                    & (dataframe["energy"] < self.energy_binning_cut[i + 1])
+                    & (dataframe["energy"] > energy_bins[i])
+                    & (dataframe["energy"] < energy_bins[i + 1])
                 )
 
                 global_mask = global_mask & mask_theta2
