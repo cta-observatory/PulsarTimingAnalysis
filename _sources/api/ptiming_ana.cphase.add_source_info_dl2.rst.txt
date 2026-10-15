@@ -1,0 +1,6 @@
+add_source_info_dl2
+===================
+
+.. currentmodule:: ptiming_ana.cphase
+
+.. autofunction:: add_source_info_dl2

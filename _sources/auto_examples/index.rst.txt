@@ -19,7 +19,7 @@ Examples on how to use Pulsar Timing Analysis.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Basic pulsar analysis using Fermi-LAT data">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to produce the phaseogram of the Crab pulsar, compute the statistics of its peaks, search for pulsations, fit the pulse profile and study the evolution of the signal with time and energy.">
 
 .. only:: html
 

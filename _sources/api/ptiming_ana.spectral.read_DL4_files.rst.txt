@@ -1,0 +1,6 @@
+read_DL4_files
+==============
+
+.. currentmodule:: ptiming_ana.spectral
+
+.. autofunction:: read_DL4_files

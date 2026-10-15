@@ -1,0 +1,6 @@
+get_model_list
+==============
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autofunction:: get_model_list

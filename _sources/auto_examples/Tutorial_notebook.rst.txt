@@ -21,16 +21,25 @@
 Basic pulsar analysis using Fermi-LAT data
 ==========================================
 
-.. GENERATED FROM PYTHON SOURCE LINES 6-14
+This example shows how to produce the phaseogram of the Crab pulsar, compute
+the statistics of its peaks, search for pulsations, fit the pulse profile and
+study the evolution of the signal with time and energy.
+
+It uses about 10 years of public *Fermi*-LAT observations of the Crab pulsar
+(100 MeV - 1 GeV), for which the pulsar phases were already computed.
+
+.. GENERATED FROM PYTHON SOURCE LINES 12-22
 
 .. code-block:: Python
-   :lineno-start: 7
+   :lineno-start: 13
 
 
-    from ptiming_ana.phaseogram import PulsarAnalysis
-    from astropy.io import fits
-    import numpy as np
     import matplotlib.pyplot as plt
+    import numpy as np
+    from astropy.io import fits
+
+    import ptiming_ana
+    from ptiming_ana.phaseogram import PulsarAnalysis
 
     # sphinx_gallery_multi_image = "single"
 
@@ -41,19 +50,48 @@ Basic pulsar analysis using Fermi-LAT data
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-17
+.. GENERATED FROM PYTHON SOURCE LINES 23-25
+
+``ptiming_ana`` reports the progress and the results of the analysis through
+the Python logging system. This shows the messages in the terminal/notebook:
+
+.. GENERATED FROM PYTHON SOURCE LINES 25-29
+
+.. code-block:: Python
+   :lineno-start: 26
+
+
+    ptiming_ana.setup_logging()
+
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <Logger ptiming_ana (INFO)>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 30-34
 
 Create the PulsarAnalysis object and settings
 ---------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-21
+All the settings of the analysis can be read from a configuration file:
+
+.. GENERATED FROM PYTHON SOURCE LINES 34-38
 
 .. code-block:: Python
-   :lineno-start: 18
+   :lineno-start: 35
 
 
     h = PulsarAnalysis()
-    h.set_config('./example_data/config_tutorial.yaml')
+    h.set_config("./example_data/config_tutorial.yaml")
 
 
 
@@ -62,31 +100,32 @@ Create the PulsarAnalysis object and settings
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-24
+.. GENERATED FROM PYTHON SOURCE LINES 39-46
 
 Alternatively we can set the parameters directly
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-42
+The phase regions used to compute the statistics of the peaks (P1 and P2)
+and to estimate the background, the binning of the phaseogram, the time
+interval used to follow the evolution of the signal, the model used to fit
+the pulse profile and the energy binning:
+
+.. GENERATED FROM PYTHON SOURCE LINES 46-60
 
 .. code-block:: Python
-   :lineno-start: 25
+   :lineno-start: 47
 
 
     h = PulsarAnalysis()
-    h.setBackgroundLimits([0.52,0.87])
+    h.setBackgroundLimits([0.52, 0.87])
     h.setPeaklimits(
-        P1_limits=[0,0.026, 0.983, 1],
-        P2_limits=[0.377, 0.422],
-        P3_limits=None
+        P1_limits=[0, 0.026, 0.983, 1], P2_limits=[0.377, 0.422], P3_limits=None
     )
     h.setBinning(50, xmin=0, xmax=1)
-    h.setTimeInterval(tint=3600*24)
-    h.setFittingParams(model='dgaussian', binned=True)
+    h.setTimeInterval(tint=3600 * 24)
+    h.setFittingParams(model="dgaussian", binned=True)
     h.setEnergybinning(
-        np.geomspace(0.1/1e3, 1/1e3, 3),
-        do_diff=True,
-        do_integral=False
+        np.geomspace(0.1 / 1e3, 1 / 1e3, 3), do_diff=True, do_integral=False
     )  # in TeV
 
 
@@ -97,50 +136,47 @@ Alternatively we can set the parameters directly
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-47
+.. GENERATED FROM PYTHON SOURCE LINES 61-65
 
 Extracting phases, times and energies from file and give them to the object
 ---------------------------------------------------------------------------
 
 For Fermi data there is a class to read these lists and use them in the main object.
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-51
+.. GENERATED FROM PYTHON SOURCE LINES 65-69
 
 .. code-block:: Python
-   :lineno-start: 48
+   :lineno-start: 66
 
 
-    h.setFermiInputFile('./example_data/merged2_pulsar.fits')
-
-
-
+    h.setFermiInputFile("./example_data/merged2_pulsar.fits")
 
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-54
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 70-72
 
 But in general we can read our file (FITS, DL2, DL3…) and extract
 phases, times and energies as lists and read them as follows:
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-67
+.. GENERATED FROM PYTHON SOURCE LINES 72-82
 
 .. code-block:: Python
-   :lineno-start: 55
+   :lineno-start: 73
 
 
-    f=fits.open('./example_data/merged2_pulsar.fits')
-    fits_table=f[1].data
+    with fits.open("./example_data/merged2_pulsar.fits") as f:
+        fits_table = f[1].data
+        times = np.array(fits_table["BARYCENTRIC_TIME"], dtype=float)
+        phases = np.array(fits_table["PULSE_PHASE"], dtype=float)
+        energies = np.array(fits_table["ENERGY"], dtype=float)  # in MeV
 
-    times=np.sort(fits_table['BARYCENTRIC_TIME'].byteswap().newbyteorder())
-    phases=fits_table['PULSE_PHASE'].byteswap().newbyteorder()
-    energies=fits_table['ENERGY'].byteswap().newbyteorder()
-
-    h.setListsInput(phases, times, energies/1e6, tel='fermi', energy_units='TeV')
-
-    h.get_results = False
+    h.setListsInput(phases, times, energies / 1e6, tel="fermi", energy_units="TeV")
 
 
 
@@ -150,15 +186,15 @@ phases, times and energies as lists and read them as follows:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-70
+.. GENERATED FROM PYTHON SOURCE LINES 83-85
 
 Run the code
 ------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-74
+.. GENERATED FROM PYTHON SOURCE LINES 85-89
 
 .. code-block:: Python
-   :lineno-start: 71
+   :lineno-start: 86
 
 
     h.run()
@@ -172,13 +208,29 @@ Run the code
 
  .. code-block:: none
 
-    /home/runner/work/PulsarTimingAnalysis/PulsarTimingAnalysis/src/ptiming_ana/phaseogram/phase_regions.py:229: RuntimeWarning: divide by zero encountered in scalar divide
-      self.sign_ratio = self.sign / np.sqrt(tobs)
+    2026-10-15 10:34:03 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Initializing...
+    2026-10-15 10:34:03 INFO   [ptiming_ana.phaseogram.read_events] Finishing reading. Total time is 8342.590926586941 h
+    2026-10-15 10:34:03 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Calculating statistics every 1440.0 minutes...
+    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
+    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
+    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
+    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Performing energy-dependent analysis...
+    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
+    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
+    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
+    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
+    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
+    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
+    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
+    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
+    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
+    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
+    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FINISHED. Producing general results...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-80
+.. GENERATED FROM PYTHON SOURCE LINES 90-95
 
 Show the results
 ----------------
@@ -186,16 +238,13 @@ Show the results
 Overall results
 ^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-87
+.. GENERATED FROM PYTHON SOURCE LINES 95-99
 
 .. code-block:: Python
-   :lineno-start: 81
+   :lineno-start: 96
 
 
-    phaseogram=h.draw_phaseogram(
-        phase_limits=[0, 2],
-        colorhist='xkcd:baby blue'
-    )
+    phaseogram = h.draw_phaseogram(phase_limits=[0, 2], colorhist="xkcd:baby blue")
     plt.tight_layout()
 
 
@@ -210,33 +259,18 @@ Overall results
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-92
+.. GENERATED FROM PYTHON SOURCE LINES 100-102
+
+Statistics of the peaks (Li&Ma significance, number of excess events...) and
+results of the periodicity tests (:math:`\chi^2`, :math:`Z^2_{10}` and H tests):
+
+.. GENERATED FROM PYTHON SOURCE LINES 102-105
 
 .. code-block:: Python
-   :lineno-start: 89
+   :lineno-start: 103
 
 
-    results=h.show_Presults()
-
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 93-95
-
-Result of the fitting
-^^^^^^^^^^^^^^^^^^^^^
-
-.. GENERATED FROM PYTHON SOURCE LINES 97-99
-
-.. code-block:: Python
-   :lineno-start: 97
-
-    h.fit_model
+    peak_statistics, periodicity_statistics = h.show_Presults()
 
 
 
@@ -246,34 +280,313 @@ Result of the fitting
 
  .. code-block:: none
 
+    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
+                           P1           P2         P1+P2
+    Significance   108.591359    58.006568    110.165719
+    Nex           5959.237143  2677.271429   8636.508571
+    Nex_error       84.220286    62.208240    105.936656
+    Number        6969.000000  3734.000000  10703.000000
+    noff          1009.762857  1056.728571   2066.491429
+    sign_t_ratio     1.188899     0.635077      1.206135
+    s/n ratio      187.534413    82.358927    189.985915
+    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.23 +/- 0.06
+    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
+                        Chi_square_test       Zn_test        H_test
+    Statistic              26977.433752  25612.347810  27915.973962
+    p-value                    0.000000      0.000000      0.000000
+    Number of $\sigma$       163.171174    159.548517    149.027746
 
-    'dgaussian'
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-102
+.. GENERATED FROM PYTHON SOURCE LINES 106-108
 
 .. code-block:: Python
-   :lineno-start: 100
+   :lineno-start: 106
+
+    peak_statistics
+
+
+
+
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>P1</th>
+          <th>P2</th>
+          <th>P1+P2</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Significance</th>
+          <td>108.591359</td>
+          <td>58.006568</td>
+          <td>110.165719</td>
+        </tr>
+        <tr>
+          <th>Nex</th>
+          <td>5959.237143</td>
+          <td>2677.271429</td>
+          <td>8636.508571</td>
+        </tr>
+        <tr>
+          <th>Nex_error</th>
+          <td>84.220286</td>
+          <td>62.208240</td>
+          <td>105.936656</td>
+        </tr>
+        <tr>
+          <th>Number</th>
+          <td>6969.000000</td>
+          <td>3734.000000</td>
+          <td>10703.000000</td>
+        </tr>
+        <tr>
+          <th>noff</th>
+          <td>1009.762857</td>
+          <td>1056.728571</td>
+          <td>2066.491429</td>
+        </tr>
+        <tr>
+          <th>sign_t_ratio</th>
+          <td>1.188899</td>
+          <td>0.635077</td>
+          <td>1.206135</td>
+        </tr>
+        <tr>
+          <th>s/n ratio</th>
+          <td>187.534413</td>
+          <td>82.358927</td>
+          <td>189.985915</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
+    <br />
+    <br />
+
+.. GENERATED FROM PYTHON SOURCE LINES 109-112
+
+.. code-block:: Python
+   :lineno-start: 109
+
+    periodicity_statistics
+
+
+
+
+
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>Chi_square_test</th>
+          <th>Zn_test</th>
+          <th>H_test</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Statistic</th>
+          <td>26977.433752</td>
+          <td>25612.347810</td>
+          <td>27915.973962</td>
+        </tr>
+        <tr>
+          <th>p-value</th>
+          <td>0.000000</td>
+          <td>0.000000</td>
+          <td>0.000000</td>
+        </tr>
+        <tr>
+          <th>Number of $\sigma$</th>
+          <td>163.171174</td>
+          <td>159.548517</td>
+          <td>149.027746</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
+    <br />
+    <br />
+
+.. GENERATED FROM PYTHON SOURCE LINES 113-115
+
+Result of the fitting
+^^^^^^^^^^^^^^^^^^^^^
+
+.. GENERATED FROM PYTHON SOURCE LINES 117-119
+
+.. code-block:: Python
+   :lineno-start: 117
+
+    print(h.fit_model)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    dgaussian
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 120-123
+
+.. code-block:: Python
+   :lineno-start: 120
 
     fit_result = h.show_fit_results()
+    fit_result
 
 
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
+          Name       Value      Error
+    0       mu    0.992423   0.001566
+    1    sigma    0.026305   0.001470
+    2     mu_2    1.376341   0.004402
+    3  sigma_2    0.050986   0.004192
+    4        A  466.437500   0.000000
+    5        B  200.237289  10.903034
+    6        C  145.133366  11.041673
 
 
+.. raw:: html
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-111
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>Name</th>
+          <th>Value</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>mu</td>
+          <td>0.992423</td>
+          <td>0.001566</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>sigma</td>
+          <td>0.026305</td>
+          <td>0.001470</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>mu_2</td>
+          <td>1.376341</td>
+          <td>0.004402</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>sigma_2</td>
+          <td>0.050986</td>
+          <td>0.004192</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>A</td>
+          <td>466.437500</td>
+          <td>0.000000</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>B</td>
+          <td>200.237289</td>
+          <td>10.903034</td>
+        </tr>
+        <tr>
+          <th>6</th>
+          <td>C</td>
+          <td>145.133366</td>
+          <td>11.041673</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
+    <br />
+    <br />
+
+.. GENERATED FROM PYTHON SOURCE LINES 124-130
 
 .. code-block:: Python
-   :lineno-start: 103
+   :lineno-start: 124
 
     phaseogram = h.draw_phaseogram(
-        phase_limits=[0, 2],
-        colorhist='xkcd:baby blue',
-        fit=True
+        phase_limits=[0, 2], colorhist="xkcd:baby blue", fit=True
     )
     plt.tight_layout()
 
@@ -290,15 +603,15 @@ Result of the fitting
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-114
+.. GENERATED FROM PYTHON SOURCE LINES 131-133
 
 Results vs Time
 ^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-118
+.. GENERATED FROM PYTHON SOURCE LINES 133-137
 
 .. code-block:: Python
-   :lineno-start: 115
+   :lineno-start: 134
 
 
     TimeEv = h.show_timeEvolution()
@@ -342,23 +655,18 @@ Results vs Time
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-121
-
-The periodicity tests are not available since the signal is too strong
-(p_value too low to extrapolate a significance).
-
-.. GENERATED FROM PYTHON SOURCE LINES 124-126
+.. GENERATED FROM PYTHON SOURCE LINES 138-140
 
 Results vs Energy
 ^^^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-129
+.. GENERATED FROM PYTHON SOURCE LINES 140-143
 
 .. code-block:: Python
-   :lineno-start: 127
+   :lineno-start: 141
 
 
-    h.show_lcVsEnergy()
+    energy_lightcurves = h.show_lcVsEnergy()
 
 
 
@@ -381,21 +689,15 @@ Results vs Energy
          :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-
-    [<Figure size 1200x500 with 1 Axes>, <Figure size 1200x500 with 1 Axes>]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-132
+.. GENERATED FROM PYTHON SOURCE LINES 144-146
 
 .. code-block:: Python
-   :lineno-start: 130
+   :lineno-start: 144
 
-    energy_lc=h.show_all_lc(ylimits=None)
+    energy_lc = h.show_all_lc(ylimits=None)
 
 
 
@@ -409,26 +711,63 @@ Results vs Energy
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-135
+.. GENERATED FROM PYTHON SOURCE LINES 147-149
 
 .. code-block:: Python
-   :lineno-start: 133
+   :lineno-start: 147
 
-    energy_results=h.show_EnergyPresults()
-
-
+    energy_results = h.show_EnergyPresults()
 
 
 
 
 
+.. rst-class:: sphx-glr-script-out
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-139
+ .. code-block:: none
+
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
+                           P1           P2        P1+P2
+    Significance    64.283110    32.326941    64.254439
+    Nex           2329.814286   994.642857  3324.457143
+    Nex_error       53.751332    39.787330    67.825823
+    Number        2828.000000  1516.000000  4344.000000
+    noff           498.185714   521.357143  1019.542857
+    sign_t_ratio     0.703795     0.353927     0.703481
+    s/n ratio      104.382013    43.561167   104.116125
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.34 +/- 0.11
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
+                        Chi_square_test      Zn_test        H_test
+    Statistic               9894.812087  9398.711056  10117.135680
+    p-value                    0.000000     0.000000      0.000000
+    Number of $\sigma$        97.930413    96.234848     89.679481
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
+                           P1           P2        P1+P2
+    Significance    72.157101    39.603539    73.624074
+    Nex           2428.965714  1109.057143  3538.022857
+    Nex_error       53.037924    38.897574    66.437898
+    Number        2771.000000  1467.000000  4238.000000
+    noff           342.034286   357.942857   699.977143
+    sign_t_ratio     0.790003     0.433594     0.806064
+    s/n ratio      131.336840    58.620170   133.726878
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.19 +/- 0.09
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
+                        Chi_square_test       Zn_test        H_test
+    Statistic              12360.395436  11771.055229  12826.853971
+    p-value                    0.000000      0.000000      0.000000
+    Number of $\sigma$       109.750929    107.838824    100.990631
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 150-153
 
 .. code-block:: Python
-   :lineno-start: 136
+   :lineno-start: 150
 
-    energy_plots=h.show_EnergyAna()
+    energy_plots = h.show_EnergyAna()
 
 
 
@@ -443,20 +782,19 @@ Results vs Energy
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-142
+.. GENERATED FROM PYTHON SOURCE LINES 154-156
 
 Fit vs Energy
 ^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-146
+.. GENERATED FROM PYTHON SOURCE LINES 156-159
 
 .. code-block:: Python
-   :lineno-start: 143
+   :lineno-start: 157
 
 
-    mean_energy_plot=h.show_meanVsEnergy()
+    mean_energy_plot = h.show_meanVsEnergy()
 
-    h.show_EnergyFitresults()
 
 
 
@@ -466,33 +804,51 @@ Fit vs Energy
    :class: sphx-glr-single-img
 
 
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 160-161
+
+.. code-block:: Python
+   :lineno-start: 160
+
+    energy_fit_results = h.show_EnergyFitresults()
+
+
+
+
 .. rst-class:: sphx-glr-script-out
 
  .. code-block:: none
 
-
-    [      Name       Value     Error
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
+          Name       Value     Error
     0       mu    0.990064  0.001285
     1    sigma    0.025658  0.001199
     2     mu_2    1.384944  0.003914
     3  sigma_2    0.048394  0.003781
     4        A  231.375000  0.000000
     5        B   80.804887  3.667207
-    6        C   51.361385  3.643919,       Name       Value     Error
+    6        C   51.361385  3.643919
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
+    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
+          Name       Value     Error
     0       mu    0.991737  0.001711
     1    sigma    0.026729  0.001598
     2     mu_2    1.376496  0.004604
     3  sigma_2    0.050032  0.004348
     4        A  156.375000  0.000000
     5        B   83.366327  4.920670
-    6        C   58.966419  4.808841]
+    6        C   58.966419  4.808841
+
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 14.994 seconds)
+   **Total running time of the script:** (0 minutes 12.422 seconds)
 
 
 .. _sphx_glr_download_auto_examples_Tutorial_notebook.py:

@@ -1,0 +1,25 @@
+ReadDL3File
+===========
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: ReadDL3File
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ReadDL3File.calculate_tobs
+      ~ReadDL3File.create_dataframe
+      ~ReadDL3File.read_DL3file
+      ~ReadDL3File.read_all_DL3file
+      ~ReadDL3File.run
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: calculate_tobs
+   .. automethod:: create_dataframe
+   .. automethod:: read_DL3file
+   .. automethod:: read_all_DL3file
+   .. automethod:: run

@@ -1,0 +1,25 @@
+ReadtxtFile
+===========
+
+.. currentmodule:: ptiming_ana.phaseogram
+
+.. autoclass:: ReadtxtFile
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ReadtxtFile.calculate_tobs
+      ~ReadtxtFile.check_format
+      ~ReadtxtFile.create_df_from_info
+      ~ReadtxtFile.read_file
+      ~ReadtxtFile.run
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: calculate_tobs
+   .. automethod:: check_format
+   .. automethod:: create_df_from_info
+   .. automethod:: read_file
+   .. automethod:: run

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -26,33 +25,34 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=c83e6b79" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="_static/documentation_options.js?v=d05173db"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/documentation_options.js?v=504caf1d"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/sg-tags.js?v=d80f6fa4"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.6.dev80+g0a7c6739e" />
+  <meta name="docsearch:version" content="0.6.dev87+gfe28e30e0" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -100,7 +100,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -165,7 +165,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -184,18 +184,24 @@
           
           
           
-          <a href="https://github.com/cta-observatory/PulsarTimingAnalysis" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/cta-observatory/PulsarTimingAnalysis" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
         </li>
 </ul></div>
       
         <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
       
     </div>
     
@@ -204,7 +210,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -282,18 +288,24 @@
           
           
           
-          <a href="https://github.com/cta-observatory/PulsarTimingAnalysis" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/cta-observatory/PulsarTimingAnalysis" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
         </li>
 </ul></div>
         
           <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
         
       </div>
     
@@ -355,10 +367,12 @@
 </li>
       <li><a href="api/ptiming_ana.phaseogram.ReadLSTFile.html#ptiming_ana.phaseogram.ReadLSTFile.add_phases">add_phases() (ptiming_ana.phaseogram.ReadLSTFile method)</a>
 </li>
-      <li><a href="api/ptiming_ana.phaseogram.PeriodicityTest.html#ptiming_ana.phaseogram.PeriodicityTest.apply_all_tests">apply_all_tests() (ptiming_ana.phaseogram.PeriodicityTest method)</a>
+      <li><a href="api/ptiming_ana.cphase.add_source_info_dl2.html#ptiming_ana.cphase.add_source_info_dl2">add_source_info_dl2() (in module ptiming_ana.cphase)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/ptiming_ana.phaseogram.PeriodicityTest.html#ptiming_ana.phaseogram.PeriodicityTest.apply_all_tests">apply_all_tests() (ptiming_ana.phaseogram.PeriodicityTest method)</a>
+</li>
       <li><a href="api/ptiming_ana.phaseogram.FilterPulsarAna.html#ptiming_ana.phaseogram.FilterPulsarAna.apply_energydep_cuts">apply_energydep_cuts() (ptiming_ana.phaseogram.FilterPulsarAna method)</a>
 </li>
       <li><a href="api/ptiming_ana.phaseogram.FilterPulsarAna.html#ptiming_ana.phaseogram.FilterPulsarAna.apply_fixed_cut">apply_fixed_cut() (ptiming_ana.phaseogram.FilterPulsarAna method)</a>
@@ -373,12 +387,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/ptiming_ana.phaseogram.PhaseRegions.html#ptiming_ana.phaseogram.PhaseRegions.calculate_P1P2">calculate_P1P2() (ptiming_ana.phaseogram.PhaseRegions method)</a>
 </li>
-      <li><a href="api/ptiming_ana.phaseogram.ReadFermiFile.html#ptiming_ana.phaseogram.ReadFermiFile.calculate_tobs">calculate_tobs() (ptiming_ana.phaseogram.ReadFermiFile method)</a>
+      <li><a href="api/ptiming_ana.phaseogram.ReadDL3File.html#ptiming_ana.phaseogram.ReadDL3File.calculate_tobs">calculate_tobs() (ptiming_ana.phaseogram.ReadDL3File method)</a>
 
       <ul>
+        <li><a href="api/ptiming_ana.phaseogram.ReadFermiFile.html#ptiming_ana.phaseogram.ReadFermiFile.calculate_tobs">(ptiming_ana.phaseogram.ReadFermiFile method)</a>
+</li>
         <li><a href="api/ptiming_ana.phaseogram.ReadList.html#ptiming_ana.phaseogram.ReadList.calculate_tobs">(ptiming_ana.phaseogram.ReadList method)</a>
 </li>
         <li><a href="api/ptiming_ana.phaseogram.ReadLSTFile.html#ptiming_ana.phaseogram.ReadLSTFile.calculate_tobs">(ptiming_ana.phaseogram.ReadLSTFile method)</a>
+</li>
+        <li><a href="api/ptiming_ana.phaseogram.ReadtxtFile.html#ptiming_ana.phaseogram.ReadtxtFile.calculate_tobs">(ptiming_ana.phaseogram.ReadtxtFile method)</a>
 </li>
       </ul></li>
       <li><a href="api/ptiming_ana.phaseogram.FilterPulsarAna.html#ptiming_ana.phaseogram.FilterPulsarAna.check_cuts">check_cuts() (ptiming_ana.phaseogram.FilterPulsarAna method)</a>
@@ -386,6 +404,8 @@
       <li><a href="api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.check_energyana">check_energyana() (ptiming_ana.phaseogram.PulsarAnalysis method)</a>
 </li>
       <li><a href="api/ptiming_ana.phaseogram.PeakFitting.html#ptiming_ana.phaseogram.PeakFitting.check_fit_result">check_fit_result() (ptiming_ana.phaseogram.PeakFitting method)</a>
+</li>
+      <li><a href="api/ptiming_ana.phaseogram.ReadtxtFile.html#ptiming_ana.phaseogram.ReadtxtFile.check_format">check_format() (ptiming_ana.phaseogram.ReadtxtFile method)</a>
 </li>
       <li><a href="api/ptiming_ana.phaseogram.PeakFitting.html#ptiming_ana.phaseogram.PeakFitting.check_model">check_model() (ptiming_ana.phaseogram.PeakFitting method)</a>
 </li>
@@ -399,10 +419,14 @@
 </li>
       <li><a href="api/ptiming_ana.spectral.SpectralPulsarAnalysis.html#ptiming_ana.spectral.SpectralPulsarAnalysis.create_contour_lines_params">create_contour_lines_params() (ptiming_ana.spectral.SpectralPulsarAnalysis method)</a>
 </li>
+      <li><a href="api/ptiming_ana.phaseogram.ReadDL3File.html#ptiming_ana.phaseogram.ReadDL3File.create_dataframe">create_dataframe() (ptiming_ana.phaseogram.ReadDL3File method)</a>
+</li>
       <li><a href="api/ptiming_ana.phaseogram.ReadFermiFile.html#ptiming_ana.phaseogram.ReadFermiFile.create_df_from_info">create_df_from_info() (ptiming_ana.phaseogram.ReadFermiFile method)</a>
 
       <ul>
         <li><a href="api/ptiming_ana.phaseogram.ReadList.html#ptiming_ana.phaseogram.ReadList.create_df_from_info">(ptiming_ana.phaseogram.ReadList method)</a>
+</li>
+        <li><a href="api/ptiming_ana.phaseogram.ReadtxtFile.html#ptiming_ana.phaseogram.ReadtxtFile.create_df_from_info">(ptiming_ana.phaseogram.ReadtxtFile method)</a>
 </li>
       </ul></li>
       <li><a href="api/ptiming_ana.phaseogram.PhaseRegions.html#ptiming_ana.phaseogram.PhaseRegions.create_dic">create_dic() (ptiming_ana.phaseogram.PhaseRegions method)</a>
@@ -422,6 +446,8 @@
       <li><a href="api/ptiming_ana.cphase.dl2time_totim.html#ptiming_ana.cphase.dl2time_totim">dl2time_totim() (in module ptiming_ana.cphase)</a>
 </li>
       <li><a href="api/ptiming_ana.cphase.DL3_calphase.html#ptiming_ana.cphase.DL3_calphase">DL3_calphase() (in module ptiming_ana.cphase)</a>
+</li>
+      <li><a href="api/ptiming_ana.cphase.DL3_calphase_gammapy.html#ptiming_ana.cphase.DL3_calphase_gammapy">DL3_calphase_gammapy() (in module ptiming_ana.cphase)</a>
 </li>
       <li><a href="api/ptiming_ana.spectral.do_fitting.html#ptiming_ana.spectral.do_fitting">do_fitting() (in module ptiming_ana.spectral)</a>
 </li>
@@ -501,11 +527,13 @@
 </li>
       <li><a href="api/ptiming_ana.spectral.get_kwargs_line.html#ptiming_ana.spectral.get_kwargs_line">get_kwargs_line() (in module ptiming_ana.spectral)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/ptiming_ana.spectral.get_kwargs_points.html#ptiming_ana.spectral.get_kwargs_points">get_kwargs_points() (in module ptiming_ana.spectral)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/ptiming_ana.spectral.get_kwargs_region.html#ptiming_ana.spectral.get_kwargs_region">get_kwargs_region() (in module ptiming_ana.spectral)</a>
+</li>
+      <li><a href="api/ptiming_ana.phaseogram.get_model_list.html#ptiming_ana.phaseogram.get_model_list">get_model_list() (in module ptiming_ana.phaseogram)</a>
 </li>
       <li><a href="api/ptiming_ana.spectral.SpectralPulsarAnalysis.html#ptiming_ana.spectral.SpectralPulsarAnalysis.get_predefined_model">get_predefined_model() (ptiming_ana.spectral.SpectralPulsarAnalysis method)</a>
 </li>
@@ -651,24 +679,40 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/ptiming_ana.phaseogram.ReadDL3File.html#ptiming_ana.phaseogram.ReadDL3File.read_all_DL3file">read_all_DL3file() (ptiming_ana.phaseogram.ReadDL3File method)</a>
+</li>
       <li><a href="api/ptiming_ana.spectral.SpectralConfigSetting.html#ptiming_ana.spectral.SpectralConfigSetting.read_configuration">read_configuration() (ptiming_ana.spectral.SpectralConfigSetting method)</a>
 </li>
       <li><a href="api/ptiming_ana.spectral.read_DL3_files.html#ptiming_ana.spectral.read_DL3_files">read_DL3_files() (in module ptiming_ana.spectral)</a>
 </li>
-      <li><a href="api/ptiming_ana.phaseogram.ReadFermiFile.html#ptiming_ana.phaseogram.ReadFermiFile.read_file">read_file() (ptiming_ana.phaseogram.ReadFermiFile method)</a>
+      <li><a href="api/ptiming_ana.phaseogram.ReadDL3File.html#ptiming_ana.phaseogram.ReadDL3File.read_DL3file">read_DL3file() (ptiming_ana.phaseogram.ReadDL3File method)</a>
 </li>
+      <li><a href="api/ptiming_ana.spectral.read_DL4_files.html#ptiming_ana.spectral.read_DL4_files">read_DL4_files() (in module ptiming_ana.spectral)</a>
+</li>
+      <li><a href="api/ptiming_ana.cphase.read_ephemfile.html#ptiming_ana.cphase.read_ephemfile">read_ephemfile() (in module ptiming_ana.cphase)</a>
+</li>
+      <li><a href="api/ptiming_ana.phaseogram.ReadFermiFile.html#ptiming_ana.phaseogram.ReadFermiFile.read_file">read_file() (ptiming_ana.phaseogram.ReadFermiFile method)</a>
+
+      <ul>
+        <li><a href="api/ptiming_ana.phaseogram.ReadtxtFile.html#ptiming_ana.phaseogram.ReadtxtFile.read_file">(ptiming_ana.phaseogram.ReadtxtFile method)</a>
+</li>
+      </ul></li>
       <li><a href="api/ptiming_ana.phaseogram.ReadLSTFile.html#ptiming_ana.phaseogram.ReadLSTFile.read_LSTfile">read_LSTfile() (ptiming_ana.phaseogram.ReadLSTFile method)</a>
+</li>
+      <li><a href="api/ptiming_ana.phaseogram.ReadDL3File.html#ptiming_ana.phaseogram.ReadDL3File">ReadDL3File (class in ptiming_ana.phaseogram)</a>
 </li>
       <li><a href="api/ptiming_ana.phaseogram.ReadFermiFile.html#ptiming_ana.phaseogram.ReadFermiFile">ReadFermiFile (class in ptiming_ana.phaseogram)</a>
 </li>
       <li><a href="api/ptiming_ana.phaseogram.ReadList.html#ptiming_ana.phaseogram.ReadList">ReadList (class in ptiming_ana.phaseogram)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/ptiming_ana.phaseogram.ReadLSTFile.html#ptiming_ana.phaseogram.ReadLSTFile">ReadLSTFile (class in ptiming_ana.phaseogram)</a>
+</li>
+      <li><a href="api/ptiming_ana.phaseogram.ReadtxtFile.html#ptiming_ana.phaseogram.ReadtxtFile">ReadtxtFile (class in ptiming_ana.phaseogram)</a>
 </li>
       <li><a href="api/ptiming_ana.phaseogram.PhaseRegions.html#ptiming_ana.phaseogram.PhaseRegions.remove_peak">remove_peak() (ptiming_ana.phaseogram.PhaseRegions method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/ptiming_ana.phaseogram.PeakFitting.html#ptiming_ana.phaseogram.PeakFitting.run">run() (ptiming_ana.phaseogram.PeakFitting method)</a>
 
       <ul>
@@ -678,11 +722,15 @@
 </li>
         <li><a href="api/ptiming_ana.phaseogram.PulsarTimeAnalysis.html#ptiming_ana.phaseogram.PulsarTimeAnalysis.run">(ptiming_ana.phaseogram.PulsarTimeAnalysis method)</a>
 </li>
+        <li><a href="api/ptiming_ana.phaseogram.ReadDL3File.html#ptiming_ana.phaseogram.ReadDL3File.run">(ptiming_ana.phaseogram.ReadDL3File method)</a>
+</li>
         <li><a href="api/ptiming_ana.phaseogram.ReadFermiFile.html#ptiming_ana.phaseogram.ReadFermiFile.run">(ptiming_ana.phaseogram.ReadFermiFile method)</a>
 </li>
         <li><a href="api/ptiming_ana.phaseogram.ReadList.html#ptiming_ana.phaseogram.ReadList.run">(ptiming_ana.phaseogram.ReadList method)</a>
 </li>
         <li><a href="api/ptiming_ana.phaseogram.ReadLSTFile.html#ptiming_ana.phaseogram.ReadLSTFile.run">(ptiming_ana.phaseogram.ReadLSTFile method)</a>
+</li>
+        <li><a href="api/ptiming_ana.phaseogram.ReadtxtFile.html#ptiming_ana.phaseogram.ReadtxtFile.run">(ptiming_ana.phaseogram.ReadtxtFile method)</a>
 </li>
         <li><a href="api/ptiming_ana.spectral.SpectralPulsarAnalysis.html#ptiming_ana.spectral.SpectralPulsarAnalysis.run">(ptiming_ana.spectral.SpectralPulsarAnalysis method)</a>
 </li>
@@ -859,8 +907,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -871,7 +919,7 @@
 
   <p class="copyright">
     
-      © Copyright Álvaro Mas Aguilar, Cristian Pozo González, Daniel Morcuende.  Last updated 24 Sep 2026 15:02.
+      © Copyright Álvaro Mas Aguilar, Cristian Pozo González, Daniel Morcuende.  Last updated 15 Oct 2026 10:34.
       <br/>
     
   </p>
@@ -880,8 +928,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
   </p>
 </div>
       
@@ -894,7 +941,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
 </p></div>
       
     </div>

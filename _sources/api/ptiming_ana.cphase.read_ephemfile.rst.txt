@@ -1,0 +1,6 @@
+read_ephemfile
+==============
+
+.. currentmodule:: ptiming_ana.cphase
+
+.. autofunction:: read_ephemfile
