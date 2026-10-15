@@ -1,8 +1,8 @@
 .. _spectral:
 
-==============================
-Spectral analysis (`spectral`)
-==============================
+================================
+Spectral analysis (``spectral``)
+================================
 
 .. currentmodule:: ptiming_ana.spectral
 

@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite the version you used from Zenodo.
+  The methods are described in the publication listed under "references".
+title: "PulsarTimingAnalysis: periodicity analysis of gamma-ray emission from pulsars"
+type: software
+authors:
+  - family-names: "Mas Aguilar"
+    given-names: "Álvaro"
+    email: alvmas@ucm.es
+  - family-names: "Pozo González"
+    given-names: "Cristian"
+    email: cpozo@iaa.es
+  - family-names: "Morcuende"
+    given-names: "Daniel"
+    email: dmorcuende@iaa.es
+repository-code: "https://github.com/cta-observatory/PulsarTimingAnalysis"
+url: "https://cta-observatory.github.io/PulsarTimingAnalysis/"
+license: BSD-3-Clause
+doi: 10.5281/zenodo.13385378
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.13385378
+    description: "Zenodo concept DOI, it always resolves to the latest release"
+keywords:
+  - astronomy
+  - gamma-ray astronomy
+  - pulsars
+  - timing analysis
+  - CTAO
+  - LST-1
+  - Fermi-LAT
+references:
+  - type: article
+    title: "A detailed study of the very-high-energy Crab pulsar emission with the LST-1"
+    authors:
+      - name: "CTA-LST Project"
+    journal: "Astronomy & Astrophysics"
+    volume: 690
+    start: A167
+    year: 2024
+    doi: 10.1051/0004-6361/202450059
