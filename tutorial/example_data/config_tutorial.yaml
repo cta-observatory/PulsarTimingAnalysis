@@ -6,7 +6,7 @@
 ##################### CPHASE PARAMS ###########################
 ###############################################################
 cphase_setting:
-   tel: lst 
+   tel: lst
    use_interpolation: True
 
 
@@ -34,8 +34,8 @@ phase_regions:
   P2: [0.377,0.422]
   P1+P2: [0,0.026,0.377,0.422, 0.983,1]
   P3: [0.08,0.24]
-  
-  
+
+
 
 ###############################################################
 ##################### PHASEOGRAM TOOLS ########################
@@ -126,7 +126,7 @@ energy_geometry:
     emax: 10
     units: 'TeV'
     nbinning: 40
-    
+
 analysis_extra_settings:
   stacked: True
   use_safe_mask: False
@@ -137,7 +137,7 @@ spectral_fitting:
   emax: 700
   units: 'GeV'
   model: 'PowerLaw'
-    
+
 
 spectral_points:
   emin: 20
@@ -146,6 +146,3 @@ spectral_points:
   number_points: 7  #If bins_per_decade is not False, this parameter has no effect.
   bins_per_decade: False #Set to False if only want to set the total number_points
   min_ts: 1.5
-  
-
-  

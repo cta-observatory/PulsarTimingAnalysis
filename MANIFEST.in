@@ -1,2 +1,4 @@
 prune src/ptiming_ana/_dev_version
 prune .github
+prune tests/data
+include CITATION.cff CHANGELOG.md CONTRIBUTING.md CODE_OF_CONDUCT.md
