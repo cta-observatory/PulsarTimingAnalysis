@@ -1,57 +1,78 @@
 [build-system]
-requires = ["setuptools>=65", "setuptools_scm[toml]>=8"]
+requires = ["setuptools>=77", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ptiming_ana"
 description = "Periodicity analysis of gamma-ray emission from pulsars"
 readme = "README.md"
-license = {text = "BSD-3-Clause"}
+license = "BSD-3-Clause"
+license-files = ["LICENSE.md"]
 authors = [
     {name = "Álvaro Mas Aguilar", email = "alvmas@ucm.es"},
     {name = "Cristian Pozo González", email = "cpozo@iaa.es"},
     {name = "Daniel Morcuende", email = "dmorcuende@iaa.es"},
 ]
+maintainers = [
+    {name = "Cristian Pozo González", email = "cpozo@iaa.es"},
+]
+keywords = [
+    "astronomy",
+    "gamma-ray astronomy",
+    "pulsars",
+    "timing",
+    "CTAO",
+    "LST",
+    "Fermi-LAT",
+]
 classifiers = [
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: BSD License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Astronomy",
-    "Development Status :: 3 - Alpha",
+    "Topic :: Scientific/Engineering :: Physics",
 ]
 
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
-    "astropy~=5.0",
-    "lstchain==0.10.6",
-    "gammapy~=1.1",
+    "astropy>=5.3",
+    "gammapy>=1.1",
     "h5py",
-    "matplotlib~=3.7",
+    "iminuit>=2.8",
+    "lstchain>=0.10.6",
+    "matplotlib>=3.7",
     "numba",
-    "numpy<2.0",
-    "pandas",
-    "scipy",
+    "numpy>=1.23",
+    "pandas>=1.5",
+    "pint-pulsar>=1.0",
+    "pyyaml",
+    "regions",
+    "scipy>=1.9",
     "tables",
-    "pint-pulsar<=0.9.7",
-    "more-itertools==10.4.0",
 ]
 
 # Dynamic versioning through setuptools_scm
 dynamic = ["version"]
 
 [project.urls]
-repository = "https://github.com/cta-observatory/PulsarTimingAnalysis"
-documentation = "https://github.com/cta-observatory/PulsarTimingAnalysis"
+Homepage = "https://github.com/cta-observatory/PulsarTimingAnalysis"
+Documentation = "https://cta-observatory.github.io/PulsarTimingAnalysis/"
+Repository = "https://github.com/cta-observatory/PulsarTimingAnalysis"
+Issues = "https://github.com/cta-observatory/PulsarTimingAnalysis/issues"
+Changelog = "https://github.com/cta-observatory/PulsarTimingAnalysis/blob/main/CHANGELOG.md"
 
 # Command-line scripts mapping the name of the tool to the import and function to execute
 [project.scripts]
 merge_pulsar_files = "ptiming_ana.cphase.merge_pulsar_files:main"
 add_DL3_phase_table = "ptiming_ana.cphase.add_DL3_phase_table:main"
 add_DL2_phase_table = "ptiming_ana.cphase.add_DL2_phase_table:main"
-
+add_fermi_phase_table = "ptiming_ana.cphase.add_fermipulsarphase:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -59,7 +80,7 @@ exclude = ["ptiming_ana._dev_version"]
 
 [project.optional-dependencies]
 test = [
-  "pytest",
+  "pytest>=7",
   "pytest-cov",
 ]
 doc = [
@@ -69,8 +90,11 @@ doc = [
   "sphinx_changelog",
   "sphinx-automodapi",
   "sphinx-gallery",
+  "tomli; python_version < '3.11'",
 ]
 dev = [
+  "pre-commit",
+  "ruff",
   "setuptools_scm",
 ]
 
@@ -80,18 +104,48 @@ all = [
 ]
 
 [tool.setuptools_scm]
-write_to = "src/ptiming_ana/_version.py"
+version_file = "src/ptiming_ana/_version.py"
+
+[tool.pytest.ini_options]
+minversion = "7"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+markers = [
+    "network: tests that need to download data (clock corrections, ephemerides). Run them with --run-network",
+]
+filterwarnings = [
+    "error::SyntaxWarning",
+]
 
 [tool.coverage.run]
-include = ["src/*"]
+source_pkgs = ["ptiming_ana"]
 relative_files = true
-omit = ["src/ptiming_ana/_version.py"]
+omit = [
+    "*/ptiming_ana/_version.py",
+    "*/ptiming_ana/_dev_version/*",
+]
+
+[tool.coverage.paths]
+source = [
+    "src/ptiming_ana",
+    "*/site-packages/ptiming_ana",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "if __name__ == .__main__.:",
+]
 
 [tool.ruff]
 exclude = ["docs", "dev"]
 # Like black
 line-length = 88
 indent-width = 4
+target-version = "py310"
+
+[tool.ruff.lint]
+# pycodestyle errors, pyflakes, invalid escape sequences
+select = ["E4", "E7", "E9", "F", "W605"]
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.

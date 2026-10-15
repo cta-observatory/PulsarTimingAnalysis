@@ -1,14 +1,37 @@
+import logging
+
 import numpy as np
 import pandas as pd
 from gammapy.stats import WStatCountsStatistic
-import logging
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["calculate_CountStats", "PhaseRegions", "PulsarPeak"]
+__all__ = ["PhaseRegions", "PulsarPeak", "calculate_CountStats"]
+
+_PEAK_ATTRIBUTES = {"P1": "P1", "P2": "P2", "P1+P2": "P1P2", "P3": "P3"}
 
 
 def calculate_CountStats(on_file, off_file=None, factor=None):
+    """
+    Li&Ma statistics of a signal region given the background (OFF) region.
+
+    Parameters
+    ----------
+    on_file : array-like
+        Phases of the events in the signal region.
+    off_file : array-like
+        Phases of the events in the background region.
+    factor : float
+        Ratio between the phase extension of the signal and background regions.
+
+    Returns
+    -------
+    stat : `~gammapy.stats.WStatCountsStatistic`
+    yerr : float
+        Uncertainty in the number of excess events.
+    noff : float
+        Number of background events expected in the signal region.
+    """
     if off_file is None:
         raise ValueError("No off data given for the pulsar analysis")
 
@@ -21,6 +44,10 @@ def calculate_CountStats(on_file, off_file=None, factor=None):
 
 
 class PhaseRegions:
+    """
+    Container of the background (OFF) and signal (P1, P2, P1+P2, P3) regions.
+    """
+
     def __init__(
         self,
         OFF_object=None,
@@ -30,10 +57,12 @@ class PhaseRegions:
         P3_object=None,
     ):
         # Define background and null regions for both peaks and
+        self.OFF = OFF_object
         if OFF_object is None:
             logger.debug("No peak statistics available since no background is provided")
-        else:
-            self.OFF = OFF_object
+
+        self.P1P2_ratio = None
+        self.P1P2_ratio_error = None
 
         # Create the peaks in the previosly defined null regions
         self.create_dic(P1_object, P2_object, P1P2_object, P3_object)
@@ -45,33 +74,17 @@ class PhaseRegions:
     def create_dic(
         self, P1_object=None, P2_object=None, P1P2_object=None, P3_object=None
     ):
-        if P1_object is not None:
-            self.P1 = P1_object
-            npeaks = 1
-        else:
-            npeaks = 0
-            self.P1 = None
-            logger.debug("No P1 limits. Cant create P1 object")
+        self.P1 = P1_object
+        self.P2 = P2_object
+        self.P1P2 = P1P2_object
+        self.P3 = P3_object
 
-        if P2_object is not None:
-            self.P2 = P2_object
-            npeaks = npeaks + 1
-        else:
-            self.P2 = None
+        if P1_object is None:
+            logger.debug("No P1 limits. Cant create P1 object")
+        if P2_object is None:
             logger.debug("No P2 limits. Cant create P2 object")
 
-        if P1P2_object is not None:
-            self.P1P2 = P1P2_object
-        else:
-            self.P1P2 = None
-
-        if P3_object is not None:
-            self.P3 = P3_object
-            npeaks = npeaks + 1
-        else:
-            self.P3 = None
-
-        self.npeaks = npeaks
+        self.npeaks = sum(peak is not None for peak in (self.P1, self.P2, self.P3))
 
         self.dic = {
             "P1": P1_object,
@@ -80,17 +93,27 @@ class PhaseRegions:
             "P3": P3_object,
         }
 
+    def _check_name(self, name):
+        if name not in _PEAK_ATTRIBUTES:
+            raise ValueError(
+                f"Unknown region '{name}'. Valid regions: {list(_PEAK_ATTRIBUTES)}"
+            )
+
     def remove_peak(self, name):
-        del self.dic[name]
-        self.npeaks = self.npeaks - 1
+        self._check_name(name)
+        if self.dic[name] is not None and name != "P1+P2":
+            self.npeaks = self.npeaks - 1
+
+        self.dic[name] = None
+        setattr(self, _PEAK_ATTRIBUTES[name], None)
 
     def create_peak(self, peak_object, name):
-        if self.dic[name]:
-            self.dic[name] = peak_object
-
-        else:
-            self.dic[name] = peak_object
+        self._check_name(name)
+        if self.dic[name] is None and name != "P1+P2":
             self.npeaks = self.npeaks + 1
+
+        self.dic[name] = peak_object
+        setattr(self, _PEAK_ATTRIBUTES[name], peak_object)
 
     def calculate_P1P2(self):
         if self.dic["P1"] is not None and self.dic["P2"] is not None:
@@ -143,13 +166,11 @@ class PulsarPeak:
 
     Parameters
     ----------
-    lc_data : PulsarPhases class object
-        PulsarPhases object from which we extract the pulsar phases and the OFF region statistics
     peak_limits : list
         list of phase edges used to define the region.
         To define a non continuos region (for instance, the sum of two independent peaks), a list of four edges can be provided.
-    peak_type : str, optional
-        'Background' or 'Signal' type to calculate especific statistics.
+    peaktype : str, optional
+        'background' or 'signal' type to calculate especific statistics.
 
     Note: To obtain peak statistics an OFF region must be defined in the phase list object first.
 
@@ -185,35 +206,42 @@ class PulsarPeak:
     """
 
     def __init__(self, peak_limits, peaktype="signal"):
+        if peak_limits is None or len(peak_limits) == 0 or len(peak_limits) % 2 != 0:
+            raise ValueError(
+                "Wrong defined regions: an even number of phase edges is needed, "
+                f"got {peak_limits}"
+            )
+        if peaktype not in ("signal", "background"):
+            raise ValueError("The type of region must be 'signal' or 'background'")
+
         # Define the features of the region
         self.limits = peak_limits
         self.type = peaktype
+        self.nregions = len(self.limits) // 2
         self.deltaP = 0
-        if len(self.limits) % 2 == 0:
-            for i in range(1, len(self.limits), 2):
-                self.deltaP = self.deltaP + (self.limits[i] - self.limits[i - 1])
+        for i in range(1, len(self.limits), 2):
+            self.deltaP = self.deltaP + (self.limits[i] - self.limits[i - 1])
+
+        if self.deltaP <= 0:
+            raise ValueError(
+                f"Wrong defined regions: the phase range of {peak_limits} is not positive"
+            )
 
     ##############################################
     # EXECUTION
     #############################################
 
     def fillPeak(self, phases):
-        self.phases = np.array([])
-        if len(self.limits) % 2 == 0:
-            for i in range(1, len(self.limits), 2):
-                self.phases = np.concatenate(
-                    [
-                        self.phases,
-                        phases[
-                            (phases > self.limits[i - 1]) & (phases < self.limits[i])
-                        ],
-                    ]
-                )
+        phases = np.asarray(phases)
 
-            self.number = len(self.phases)
-            self.nregions = len(self.limits) / 2
-        else:
-            raise ValueError("Wrong defined regions")
+        # Keep the events ordered by interval, as they are defined in limits
+        self.phases = np.concatenate(
+            [
+                phases[(phases > self.limits[i - 1]) & (phases < self.limits[i])]
+                for i in range(1, len(self.limits), 2)
+            ]
+        ).astype(float)
+        self.number = len(self.phases)
 
     # Make statistics if the region is signal type only
     def make_stats(self, regions, tobs):

@@ -1,22 +1,31 @@
-import astropy.units as u
-import os
-import yaml
 import logging
+import os
+
+import astropy.units as u
+import yaml
 from gammapy.maps import MapAxis
 
-LOG_FORMAT = "%(asctime)2s %(levelname)-6s [%(name)3s] %(message)s"
-logging.basicConfig(level=logging.INFO, format=LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
-
 logger = logging.getLogger(__name__)
-logging.getLogger("matplotlib.font_manager").disabled = True
 
 __all__ = ["SpectralConfigSetting"]
 
+
 class SpectralConfigSetting:
+    """
+    Settings of the spectral analysis read from a YAML configuration file.
+
+    Parameters
+    ----------
+    config : str or `pathlib.Path`
+        Path to the YAML configuration file.
+    """
+
     def __init__(self, config):
+        self.conf = None
         if config is not None:
-            if ".yaml" in config:
-                self.read_configuration(config)
+            if not str(config).endswith((".yaml", ".yml")):
+                raise ValueError(f"The configuration file {config} is not a YAML file")
+            self.read_configuration(config)
 
     def read_configuration(self, configuration_file):
         with open(configuration_file, "rb") as cfile:
@@ -34,13 +43,13 @@ class SpectralConfigSetting:
         self.dl4_dir = configuration_dict["DL4_directory"]
         if not os.path.exists(self.dl4_dir):
             logger.info("Creating directory: " + self.dl4_dir)
-            os.makedirs(self.dl4_dir)
+            os.makedirs(self.dl4_dir, exist_ok=True)
 
         # Results Output directory
         self.output_dir = configuration_dict["results_output_directory"]
         if not os.path.exists(self.output_dir):
             logger.info("Creating directory: " + self.output_dir)
-            os.makedirs(self.output_dir)
+            os.makedirs(self.output_dir, exist_ok=True)
 
         # Energy dependent theta
         self.reader_info = configuration_dict["reader"]

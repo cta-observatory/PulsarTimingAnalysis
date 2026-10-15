@@ -1,32 +1,78 @@
-import pandas as pd
+import logging
+import os
+
 import numpy as np
-from astropy.time import Time
+import pandas as pd
 from astropy import units as u
+from astropy.coordinates import SkyCoord
 from astropy.io import fits
-from lstchain.reco.utils import get_effective_time, add_delta_t_key
+from astropy.time import Time
+from gammapy.data import DataStore
+from gammapy.utils.regions import CircleSkyRegion
 from lstchain.io.io import (
     dl2_params_lstcam_key,
     get_srcdep_params,
 )
-import os
-from gammapy.data import DataStore
-from gammapy.utils.regions import CircleSkyRegion
-from astropy.coordinates import SkyCoord
-import logging
+from lstchain.reco.utils import add_delta_t_key, get_effective_time
 from regions import PointSkyRegion
 
 logger = logging.getLogger(__name__)
 
-logging.getLogger("gammapy").disabled = True
-
 __all__ = [
-    "compute_theta2",
-    "ReadFermiFile",
     "ReadDL3File",
+    "ReadFermiFile",
     "ReadLSTFile",
+    "ReadList",
     "ReadtxtFile",
-    "ReadList"
+    "compute_theta2",
 ]
+
+#: Reference epoch of the LST-1 event times (used if not found in the DL3 header)
+LST_EPOCH = Time("2018-10-01", scale="utc")
+
+
+def _native_byteorder(array):
+    """Return the array in native byte order (FITS columns are big-endian)."""
+    array = np.asarray(array)
+    return array.astype(array.dtype.newbyteorder("="), copy=False)
+
+
+#: Value of event_type of the cosmic (physics trigger) events in lstchain
+COSMIC_EVENT_TYPE = 32
+
+
+def _effective_time_hours(dataframe):
+    """
+    Effective observation time (hours) from the distribution of time differences
+    between consecutive triggered events (see ``lstchain.reco.utils.get_effective_time``).
+
+    This estimate is only valid for unfiltered event lists (i.e. before the
+    gamma/hadron separation cuts), where the events are consecutive triggers.
+    """
+    if "delta_t" not in dataframe:
+        dataframe = add_delta_t_key(dataframe)
+
+    events = pd.DataFrame(
+        {
+            "dragon_time": np.asarray(dataframe["dragon_time"], dtype=float),
+            "delta_t": np.asarray(dataframe["delta_t"], dtype=float),
+        }
+    )
+    # Recent versions of lstchain only count the events tagged as physics triggers
+    if "event_type" in dataframe:
+        events["event_type"] = np.asarray(dataframe["event_type"])
+    else:
+        events["event_type"] = COSMIC_EVENT_TYPE
+
+    return get_effective_time(events)[1].value / 3600
+
+
+def _tobs_from_gaps(mjd_times, max_gap_hours=None):
+    """Observation time in hours as the sum of the time differences between events."""
+    diff = np.diff(np.asarray(mjd_times, dtype=float))
+    if max_gap_hours is not None:
+        diff[diff > max_gap_hours / 24] = 0
+    return float(np.sum(diff) * 24)
 
 
 def compute_theta2(reco_src_x, reco_src_y, src_x, src_y):
@@ -49,14 +95,14 @@ class ReadFermiFile:
             self.fname = file
 
     def read_file(self):
-        f = fits.open(self.fname)
-        fits_table = f[1].data
+        with fits.open(self.fname) as f:
+            fits_table = f[1].data.copy()
         return fits_table
 
     def create_df_from_info(self, fits_table):
-        time = fits_table["BARYCENTRIC_TIME"].byteswap().newbyteorder()
-        phases = fits_table["PULSE_PHASE"].byteswap().newbyteorder()
-        energies = fits_table["ENERGY"].byteswap().newbyteorder()
+        time = _native_byteorder(fits_table["BARYCENTRIC_TIME"])
+        phases = _native_byteorder(fits_table["PULSE_PHASE"])
+        energies = _native_byteorder(fits_table["ENERGY"])
         dataframe = pd.DataFrame(
             {
                 "mjd_time": time,
@@ -70,13 +116,9 @@ class ReadFermiFile:
         return self.info
 
     def calculate_tobs(self):
-        diff = np.array(self.info["mjd_time"].to_list()[1:]) - np.array(
-            self.info["mjd_time"].to_list()[0:-1]
-        )
-        diff[diff > 5 / 24] = 0
-        return sum(diff) * 24
+        return _tobs_from_gaps(self.info["mjd_time"], max_gap_hours=5)
 
-    def run(self):
+    def run(self, pulsarana=None):
         logger.info("Reading Fermi-LAT data file")
         ftable = self.read_file()
         self.create_df_from_info(ftable)
@@ -90,12 +132,16 @@ class ReadDL3File:
         directory=None,
         target_radec=None,
         max_rad=0.1,
-        zd_cuts=[0, 60],
+        zd_cuts=(0, 60),
         energy_dependent_theta=True,
     ):
-        if directory is not None:
-            self.direc = directory
-            self.datastore = DataStore.from_dir(self.direc)
+        if directory is None:
+            raise ValueError("No directory with the DL3 files provided")
+        if target_radec is None:
+            raise ValueError("No target coordinates (RA, Dec in deg) provided")
+
+        self.direc = directory
+        self.datastore = DataStore.from_dir(self.direc)
 
         self.target_radec = target_radec
         self.energydep_radmax = energy_dependent_theta
@@ -155,13 +201,32 @@ class ReadDL3File:
         return self.datastore.obs_table[mask]["LIVETIME"].data.sum() / 3600
 
     def create_dataframe(self):
+        missing = [
+            col for col in ("PHASE", "BARYCENT_TIME") if col not in self.events.colnames
+        ]
+        if missing:
+            raise ValueError(
+                f"Columns {missing} not found in the DL3 file. The pulsar phases have "
+                "to be computed first (see add_DL3_phase_table)."
+            )
+
         df = self.events.to_pandas()
         df = df.sort_values("TIME")
 
-        lst = Time("2018-10-01", scale="utc")
+        # Reference epoch of the event times, taken from the header if available
+        meta = self.events.meta
+        if "MJDREFI" in meta and "MJDREFF" in meta:
+            epoch = Time(
+                meta["MJDREFI"],
+                meta["MJDREFF"],
+                format="mjd",
+                scale=str(meta.get("TIMESYS", "utc")).lower(),
+            )
+        else:
+            epoch = LST_EPOCH
         time_orig = df["TIME"]
 
-        time = time_orig + lst.to_value(format="unix")
+        time = time_orig + epoch.to_value(format="unix")
         # timelist = list(Time(time, format="unix").to_value("mjd"))
 
         info = pd.DataFrame(
@@ -179,16 +244,21 @@ class ReadDL3File:
 
         return info
 
-    def run(self, pulsarana):
+    def run(self, pulsarana=None):
         logger.info("Reading DL3 data files")
+        if len(self.ids) == 0:
+            raise ValueError(
+                f"No observations found in {self.direc} within the zenith range"
+            )
+
         info_list = []
         for obs_id in self.ids:
             logger.info("Reading run number " + str(obs_id))
             try:
                 info_file = self.read_DL3file(obs_id)
                 info_list.append(info_file)
-            except AttributeError:
-                raise ValueError("Failing when reading:" + str(obs_id))
+            except AttributeError as err:
+                raise ValueError("Failing when reading:" + str(obs_id)) from err
 
         self.info = pd.concat(info_list)
         self.tobs = self.calculate_tobs()
@@ -233,22 +303,27 @@ class ReadLSTFile:
                     df_or["mjd_time"] = df_pulsar["mjd_barycenter_time"]
 
                 if "event_type" in df_or.columns:
-                    df = df_or[df_or["event_type"] == 32]
+                    df = df_or[df_or["event_type"] == 32].copy()
 
                     if "theta2" not in df.columns:
                         try:
                             df_pos = pd.read_hdf(fname, "source_position")
-                            df_pos = df_pos[df_or["event_type"] == 32]
-                            if "theta2" in df_pos.columns:
-                                logger.info(
-                                    "Including theta2 column from source position table"
-                                )
-                                df["theta2"] = df_pos["theta2"]
+                        except KeyError:
+                            df_pos = None
+                            logger.info("No theta2 computed")
+
+                        if df_pos is not None:
+                            df_pos = df_pos[(df_or["event_type"] == 32).values]
                             if "theta2_on" in df_pos.columns:
                                 logger.info(
                                     "Including theta2 column from source position table"
                                 )
-                                df["theta2"] = df_pos["theta2_on"]
+                                df["theta2"] = df_pos["theta2_on"].values
+                            elif "theta2" in df_pos.columns:
+                                logger.info(
+                                    "Including theta2 column from source position table"
+                                )
+                                df["theta2"] = df_pos["theta2"].values
                             else:
                                 df["theta2"] = compute_theta2(
                                     np.array(df["reco_src_x"]),
@@ -256,15 +331,11 @@ class ReadLSTFile:
                                     np.array(df_pos["src_x"]),
                                     np.array(df_pos["src_y"]),
                                 )
-                        except AttributeError:
-                            logger.info("No theta2 computed")
                 else:
                     df = df_or
 
             elif self.src_dependent:
-                srcindep_df = pd.read_hdf(
-                    fname, key=dl2_params_lstcam_key, float_precision=20
-                )
+                srcindep_df = pd.read_hdf(fname, key=dl2_params_lstcam_key)
                 on_df_srcdep = get_srcdep_params(fname, "on")
 
                 if "pulsar_phase" not in srcindep_df:
@@ -272,76 +343,39 @@ class ReadLSTFile:
                     srcindep_df["pulsar_phase"] = df_pulsar["pulsar_phase"]
                     srcindep_df["mjd_time"] = df_pulsar["mjd_barycenter_time"]
 
-                if "reco_energy" in srcindep_df.keys():
-                    srcindep_df.drop(["reco_energy"])
-
-                if "gammaness" in srcindep_df.keys():
-                    srcindep_df.drop(["gammaness"])
+                # The source-dependent reconstruction replaces these columns
+                srcindep_df = srcindep_df.drop(
+                    columns=[
+                        col
+                        for col in on_df_srcdep.columns
+                        if col in srcindep_df.columns
+                    ]
+                )
 
                 df = pd.concat([srcindep_df, on_df_srcdep], axis=1)
-                df = df[df.event_type == 32]
+                df = df[df.event_type == 32].copy()
 
             if df_type == "short":
-                if "alpha" in df and "theta2" in df:
-                    df_filtered = df[
-                        [
-                            "event_id",
-                            "intensity",
-                            "mjd_time",
-                            "pulsar_phase",
-                            "dragon_time",
-                            "gammaness",
-                            "alpha",
-                            "theta2",
-                            "alt_tel",
-                        ]
-                    ]
-                elif "alpha" in df and "theta2" not in df:
-                    df_filtered = df[
-                        [
-                            "event_id",
-                            "intensity",
-                            "mjd_time",
-                            "pulsar_phase",
-                            "dragon_time",
-                            "gammaness",
-                            "alpha",
-                            "alt_tel",
-                        ]
-                    ]
-                elif "theta2" in df and "alpha" not in df:
-                    df_filtered = df[
-                        [
-                            "event_id",
-                            "intensity",
-                            "mjd_time",
-                            "pulsar_phase",
-                            "dragon_time",
-                            "gammaness",
-                            "theta2",
-                            "alt_tel",
-                        ]
-                    ]
-                else:
-                    df_filtered = df[
-                        [
-                            "event_id",
-                            "intensity",
-                            "mjd_time",
-                            "pulsar_phase",
-                            "dragon_time",
-                            "gammaness",
-                            "alt_tel",
-                        ]
-                    ]
-
-                try:
-                    df_filtered["energy"] = df["reco_energy"]
-                except AttributeError:
-                    df_filtered["energy"] = df["energy"]
+                columns = [
+                    "event_id",
+                    "intensity",
+                    "mjd_time",
+                    "pulsar_phase",
+                    "dragon_time",
+                    "gammaness",
+                ]
+                columns += [col for col in ("alpha", "theta2") if col in df]
+                columns.append("alt_tel")
+                if "event_type" in df:
+                    columns.append("event_type")
+                df_filtered = df[columns].copy()
             else:
                 df_filtered = df
+
+            if "reco_energy" in df:
                 df_filtered["energy"] = df["reco_energy"]
+            else:
+                df_filtered["energy"] = df["energy"]
 
             df_filtered = add_delta_t_key(df_filtered)
 
@@ -350,8 +384,7 @@ class ReadLSTFile:
         return df_filtered
 
     def calculate_tobs(self):
-        dataframe = add_delta_t_key(self.info)
-        return get_effective_time(dataframe)[1].value / 3600
+        return _effective_time_hours(self.info)
 
     def save_memory(self):
         for column in self.info.columns:
@@ -368,16 +401,21 @@ class ReadLSTFile:
             self.info[column] = self.info[column].astype("float32")
 
     def run(self, pulsarana, df_type="short"):
-        filter_data = pulsarana.filter_data
+        filter_data = getattr(pulsarana, "filter_data", True)
         logger.info("Reading LST-1 data file")
         if isinstance(self.fname, list):
+            if len(self.fname) == 0:
+                raise ValueError(f"No HDF5 files found in {self.direc}")
+
             info_list = []
+            tobs = 0
             for name in self.fname:
                 logger.info("Reading file: " + name)
                 try:
                     info_file = self.read_LSTfile(name, df_type, filter_data)
                     self.info = info_file
-                    self.tobs = self.calculate_tobs()
+                    # The effective time has to be computed before the cuts
+                    tobs += self.calculate_tobs()
 
                     if filter_data:
                         pulsarana.cuts.apply_fixed_cut(self)
@@ -386,8 +424,8 @@ class ReadLSTFile:
 
                     self.save_memory()
                     info_list.append(self.info)
-                except AttributeError:
-                    raise ValueError("Failing when reading:" + str(name))
+                except AttributeError as err:
+                    raise ValueError("Failing when reading:" + str(name)) from err
 
             self.info = pd.DataFrame()
             while len(info_list) > 0:
@@ -399,7 +437,7 @@ class ReadLSTFile:
                     info_list = []
 
                 self.info = pd.concat([self.info, chunk_df])
-            self.tobs = self.calculate_tobs()
+            self.tobs = tobs
 
         else:
             self.info = self.read_LSTfile(self.fname, df_type, filter_data)
@@ -415,91 +453,128 @@ class ReadLSTFile:
 
 
 class ReadtxtFile:
+    """
+    Reader of events stored in a text file with space-separated columns.
+
+    Parameters
+    ----------
+    file : str
+        Path to the text file (no header).
+    format_txt : str or list of str
+        Content of each column: ``t`` (MJD time), ``p`` (phase), ``e`` (energy),
+        ``g`` (gammaness), ``a`` (alpha), ``t2`` (theta2) and ``at`` (telescope
+        altitude). It can be given as a list (``["t", "p", "e"]``), as a
+        space- or comma-separated string (``"t p e t2"``) or, if only
+        single-character codes are used, as a plain string (``"tpe"``).
+        Times and phases are mandatory.
+    """
+
+    _columns = {
+        "t": "mjd_time",
+        "p": "pulsar_phase",
+        "e": "energy",
+        "g": "gammaness",
+        "a": "alpha",
+        "t2": "theta2",
+        "at": "alt_tel",
+    }
+
     def __init__(self, file, format_txt):
         self.fname = file
-        self.format = format_txt
+        if isinstance(format_txt, str):
+            if "," in format_txt or " " in format_txt:
+                format_txt = format_txt.replace(",", " ").split()
+            else:
+                format_txt = list(format_txt)
+        self.format = list(format_txt)
 
     def read_file(self):
-        data = pd.read_csv(self.fname, sep=" ", header=None)
+        data = pd.read_csv(self.fname, sep=r"\s+", header=None)
         return data
 
     def check_format(self):
         for name in ["t", "p"]:
             if name not in self.format:
-                raise ValueError("   No valid format")
+                raise ValueError("No valid format: times (t) and phases (p) are needed")
+
+        unknown = [name for name in self.format if name not in self._columns]
+        if unknown:
+            raise ValueError(
+                f"No valid format: unknown columns {unknown}. "
+                f"Valid codes are {list(self._columns)}"
+            )
 
     def create_df_from_info(self, df):
-        for i in range(0, len(self.format)):
-            if self.format[i] == "t":
-                times = df.iloc[:, i]
-            elif self.format[i] == "e":
-                energies = df.iloc[:, i]
-            elif self.format[i] == "p":
-                phases = df.iloc[:, i]
-            elif self.format[i] == "g":
-                gammaness = df.iloc[:, i]
-            elif self.format[i] == "a":
-                alpha = df.iloc[:, i]
-            elif self.format[i] == "t2":
-                theta2 = df.iloc[:, i]
-            elif self.format[i] == "at":
-                alt_tel = df.iloc[:, i]
+        if df.shape[1] < len(self.format):
+            raise ValueError(
+                f"The file has {df.shape[1]} columns but the format "
+                f"describes {len(self.format)}"
+            )
 
         dataframe = pd.DataFrame(
             {
-                "mjd_time": times,
-                "pulsar_phase": phases,
-                "dragon_time": times * 3600 * 24,
-                "energy": energies,
+                self._columns[code]: df.iloc[:, i].to_numpy()
+                for i, code in enumerate(self.format)
             }
         )
-
-        try:
-            dataframe["gammaness"] = gammaness
-        except AttributeError:
-            pass
-
-        try:
-            dataframe["alpha"] = alpha
-        except AttributeError:
-            pass
-
-        try:
-            dataframe["theta2"] = theta2
-        except AttributeError:
-            pass
-
-        try:
-            dataframe["alt_tel"] = alt_tel
-        except AttributeError:
-            pass
+        dataframe["dragon_time"] = dataframe["mjd_time"] * 3600 * 24
+        if "energy" not in dataframe:
+            dataframe["energy"] = np.nan
 
         dataframe = dataframe.sort_values(by=["mjd_time"])
         self.info = dataframe
 
     def calculate_tobs(self):
-        diff = np.array(self.info["mjd_time"].to_list()[1:]) - np.array(
-            self.info["mjd_time"].to_list()[0:-1]
-        )
-        return sum(diff) * 24
+        return _tobs_from_gaps(self.info["mjd_time"])
 
-    def run(self):
+    def run(self, pulsarana=None):
         data = self.read_file()
         self.check_format()
         self.create_df_from_info(data)
         self.tobs = self.calculate_tobs()
 
-        logger.info(
-            "    Finishing reading. Total time is " + str(self.tobs) + " s" + "\n"
-        )
+        logger.info("Finishing reading. Total time is " + str(self.tobs) + " h")
 
 
 class ReadList:
-    def __init__(self, phases_list, time_list=None, energy_list=None, tel="LST"):
-        self.plist = phases_list
-        self.tlist = time_list
-        self.elist = energy_list
+    """
+    Reader of events given as lists of phases, times (MJD) and energies.
+
+    Parameters
+    ----------
+    phases_list : array-like
+        Pulsar phases.
+    time_list : array-like
+        Arrival times in MJD.
+    energy_list : array-like, optional
+        Energies of the events.
+    tel : str
+        Name of the telescope.
+    tobs : float, optional
+        Observation time in hours. If not given, it is estimated from the
+        arrival times: for "fermi" as the elapsed time without the gaps longer
+        than 5 hours; for any other telescope with
+        ``lstchain.reco.utils.get_effective_time``, which is only valid if the
+        list contains all the triggered events (i.e. no cuts were applied).
+    """
+
+    def __init__(
+        self, phases_list, time_list=None, energy_list=None, tel="LST", tobs=None
+    ):
+        self.tobs_input = tobs
+        if time_list is None:
+            raise ValueError("The list of arrival times (MJD) is needed")
+
+        self.plist = np.asarray(phases_list, dtype=float)
+        self.tlist = np.asarray(time_list, dtype=float)
+        if energy_list is None:
+            self.elist = np.full(len(self.plist), np.nan)
+        else:
+            self.elist = np.asarray(energy_list, dtype=float)
         self.tel = tel
+
+        if not (len(self.plist) == len(self.tlist) == len(self.elist)):
+            raise ValueError("Phases, times and energies must have the same length")
 
     def create_df_from_info(self):
         dataframe = pd.DataFrame(
@@ -514,20 +589,24 @@ class ReadList:
         self.info = dataframe
 
     def calculate_tobs(self):
-        if self.tel == "LST" or self.tel == "MAGIC":
-            dataframe = add_delta_t_key(self.info)
-            return get_effective_time(dataframe)[1].value / 3600
+        if self.tobs_input is not None:
+            return float(self.tobs_input)
 
-        elif self.tel == "fermi":
-            diff = np.array(self.info["mjd_time"].to_list()[1:]) - np.array(
-                self.info["mjd_time"].to_list()[0:-1]
+        if str(self.tel).lower() == "fermi":
+            return _tobs_from_gaps(self.info["mjd_time"], max_gap_hours=5)
+
+        self.info = add_delta_t_key(self.info)
+        try:
+            return _effective_time_hours(self.info)
+        except ValueError:
+            logger.warning(
+                "The effective time cannot be estimated from the time differences "
+                "between events. Using the elapsed time (gaps longer than 1 hour "
+                "excluded): provide tobs to set the observation time."
             )
-            diff[diff > 5 / 24] = 0
-            return sum(diff) * 24
+            return _tobs_from_gaps(self.info["mjd_time"], max_gap_hours=1)
 
-    def run(self):
+    def run(self, pulsarana=None):
         self.create_df_from_info()
         self.tobs = self.calculate_tobs()
-        logger.info(
-            "    Finishing reading. Total time is " + str(self.tobs) + " s" + "\n"
-        )
+        logger.info("Finishing reading. Total time is " + str(self.tobs) + " h")

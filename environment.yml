@@ -1,27 +1,34 @@
+# Conda environment to use and develop ptiming_ana
+#
+#   mamba env create -f environment.yml
+#   mamba activate pulsar-lst1
+#   pip install -e .
+#
 name: pulsar-lst1
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
+  - python>=3.10,<3.13
   - pip
-  - astropy
-  - ctapipe~=0.19.2
-  - gammapy~=1.1
+  # lstchain brings ctapipe, gammapy, astropy, numpy, pandas, scipy, iminuit...
+  # and protozfits, which is not available in PyPI for macOS
+  - lstchain>=0.12
+  - gammapy>=1.1
   - h5py
-  - iminuit>=2
-  - ipython
-  - joblib
-  - jupyter
-  - matplotlib~=3.7
+  - iminuit>=2.8
+  - matplotlib>=3.7
   - numba
-  - numpy
-  - pandas
+  - pytables
   - pyyaml
-  - scipy
-  - vitables
-  - jplephem
-  - zstandard
-  - lstchain==0.10.6
-  - more-itertools==10.4.0
+  - regions
+  - scipy>=1.9
+  # Interactive use
+  - ipython
+  - jupyter
+  # Development
+  - pre-commit
+  - pytest
+  - pytest-cov
+  - ruff
   - pip:
-    - pint-pulsar  # not available for arm64 on conda-forge
+      - pint-pulsar>=1.0  # not available for arm64 on conda-forge

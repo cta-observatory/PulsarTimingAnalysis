@@ -1,28 +1,25 @@
-import numpy as np
+"""Analytical models used to describe the pulse profile (phaseogram).
+
+All the models return the expected number of counts per phase bin as a
+function of the pulsar phase, i.e. a constant background level plus one or
+more peaks whose integral (in phase) is given by the amplitude parameters.
+"""
+
 import numba as nb
+import numpy as np
 
 __all__ = [
-    "get_model_list",
-    "gaussian",
-    "double_gaussian",
-    "triple_gaussian",
-    "assymetric_gaussian_pdf",
+    "MODELS",
     "assymetric_double_gaussian",
-    "lorentzian",
+    "assymetric_gaussian_pdf",
+    "double_gaussian",
     "double_lorentz",
+    "gaussian",
+    "get_model_list",
     "lorentz_pdf",
+    "lorentzian",
+    "triple_gaussian",
 ]
-
-
-def get_model_list():
-    return [
-        "gaussian",
-        "dgaussian",
-        "double_lorentz",
-        "asym_dgaussian",
-        "tgaussian",
-        "lorentzian",
-    ]
 
 
 kwd = {"parallel": False, "fastmath": True}
@@ -65,20 +62,14 @@ def triple_gaussian(x, Bkg, mu, sigma, mu_2, sigma_2, mu_3, sigma_3, A, B, C):
 
 @nb.njit(**kwd)
 def assymetric_gaussian_pdf(x, mu, sigma1, sigma2):
-    if x <= mu:
-        return (
-            2
-            / np.sqrt(2 * np.pi)
-            / (abs(sigma1) + abs(sigma2))
-            * np.exp(-((x - mu) ** 2) / 2.0 / sigma1**2)
-        )
-    else:
-        return (
-            2
-            / np.sqrt(2 * np.pi)
-            / (abs(sigma1) + abs(sigma2))
-            * np.exp(-((x - mu) ** 2) / 2.0 / sigma2**2)
-        )
+    """Normalised two-sided Gaussian: width sigma1 below mu and sigma2 above."""
+    sigma = np.where(x <= mu, sigma1, sigma2)
+    return (
+        2
+        / np.sqrt(2 * np.pi)
+        / (abs(sigma1) + abs(sigma2))
+        * np.exp(-((x - mu) ** 2) / 2.0 / sigma**2)
+    )
 
 
 @nb.njit(**kwd)
@@ -97,11 +88,80 @@ def lorentz_pdf(x, mu, gamma):
     return 1 / (np.pi * gamma) * (gamma**2) / ((x - mu) ** 2 + gamma**2)
 
 
+@nb.njit(**kwd)
 def lorentzian(x, mu, gamma, A, B):
     return A + B / (np.pi * gamma) * (gamma**2) / ((x - mu) ** 2 + gamma**2)
 
 
 @nb.njit(**kwd)
 def double_lorentz(x, mu_1, gamma_1, mu_2, gamma_2, A, B, C):
-    # lorentz_pdf_vec=np.vectorize(lorentz_pdf)
     return A + B * lorentz_pdf(x, mu_1, gamma_1) + C * lorentz_pdf(x, mu_2, gamma_2)
+
+
+#: Registry of the available models. For each model: the function, the name of
+#: its parameters (in the order of the function signature), the name of the
+#: parameter describing the constant background level and the number of peaks.
+MODELS = {
+    "gaussian": {
+        "function": gaussian,
+        "parnames": ["mu", "sigma", "A", "B"],
+        "background": "A",
+        "npeaks": 1,
+    },
+    "dgaussian": {
+        "function": double_gaussian,
+        "parnames": ["mu", "sigma", "mu_2", "sigma_2", "A", "B", "C"],
+        "background": "A",
+        "npeaks": 2,
+    },
+    "double_lorentz": {
+        "function": double_lorentz,
+        "parnames": ["mu_1", "gamma_1", "mu_2", "gamma_2", "A", "B", "C"],
+        "background": "A",
+        "npeaks": 2,
+    },
+    "asym_dgaussian": {
+        "function": assymetric_double_gaussian,
+        "parnames": [
+            "mu",
+            "sigma1",
+            "sigma2",
+            "mu_2",
+            "sigma1_2",
+            "sigma2_2",
+            "A",
+            "B",
+            "C",
+        ],
+        "background": "A",
+        "npeaks": 2,
+    },
+    "tgaussian": {
+        "function": triple_gaussian,
+        "parnames": [
+            "A",
+            "mu",
+            "sigma",
+            "mu_2",
+            "sigma_2",
+            "mu_3",
+            "sigma_3",
+            "B",
+            "C",
+            "D",
+        ],
+        "background": "A",
+        "npeaks": 3,
+    },
+    "lorentzian": {
+        "function": lorentzian,
+        "parnames": ["mu_1", "gamma_1", "A", "B"],
+        "background": "A",
+        "npeaks": 1,
+    },
+}
+
+
+def get_model_list():
+    """Return the names of the models available to fit the pulse profile."""
+    return list(MODELS)

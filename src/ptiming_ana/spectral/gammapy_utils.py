@@ -1,39 +1,44 @@
-from gammapy.makers import SafeMaskMaker, PhaseBackgroundMaker, SpectrumDatasetMaker
-from gammapy.maps import RegionGeom
+import logging
+from pathlib import Path
+
+import astropy.units as u
+import numpy as np
 from gammapy.datasets import (
     Datasets,
-    SpectrumDataset,
     FluxPointsDataset,
+    SpectrumDataset,
     SpectrumDatasetOnOff,
 )
+from gammapy.estimators import FluxPointsEstimator
+from gammapy.makers import PhaseBackgroundMaker, SafeMaskMaker, SpectrumDatasetMaker
+from gammapy.maps import RegionGeom
+from gammapy.modeling import Fit
 from gammapy.modeling.models import (
     PowerLawSpectralModel,
     SkyModel,
 )
-from gammapy.modeling import Fit
-from gammapy.estimators import FluxPointsEstimator
-
-import astropy.units as u
-import numpy as np
 
 from ptiming_ana.phaseogram.read_events import ReadDL3File
-import logging
-from pathlib import Path
-
-
-LOG_FORMAT = "%(asctime)2s %(levelname)-6s [%(name)3s] %(message)s"
-logging.basicConfig(level=logging.INFO, format=LOG_FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
 
 logger = logging.getLogger(__name__)
-logging.getLogger("matplotlib.font_manager").disabled = True
 
-__all__ = ["read_DL3_files", "set_geometry", "set_makers", "execute_makers"]
+__all__ = [
+    "compute_spectral_points",
+    "do_fitting",
+    "execute_makers",
+    "read_DL3_files",
+    "read_DL4_files",
+    "set_geometry",
+    "set_makers",
+    "set_model_to_fit",
+]
+
 
 def read_DL3_files(
     directory=None,
     target_radec=None,
     max_rad=0.2,
-    zd_cuts=[0, 60],
+    zd_cuts=(0, 60),
     energy_dependent_theta=True,
 ):
     # Read the DL3 files:
@@ -112,7 +117,7 @@ def execute_makers(
     if save_DL4:
         logger.info("Writing DL4 files in " + str(OGIP_dir))
         ogip_path = Path(OGIP_dir)
-        for d in range(0, len(datasets)):
+        for d in range(len(datasets)):
             datasets[d].write(
                 filename=ogip_path / f"obs_{ids[d]}.fits.gz", overwrite=True
             )
@@ -132,7 +137,7 @@ def read_DL4_files(DL4_directory, obs_ids, stacked=False):
     logger.info("Reading DL4 files from " + str(DL4_directory))
     datasets = Datasets()
     for obs in obs_ids:
-        file = DL4_directory + f"/obs_{obs}.fits.gz"
+        file = Path(DL4_directory) / f"obs_{obs}.fits.gz"
         datasets.append(SpectrumDatasetOnOff.read(file))
 
     if stacked:
@@ -159,10 +164,19 @@ def set_model_to_fit(spectral_model=None, predefined_model="PowerLaw", model_nam
 
         model = SkyModel(spectral_model=spectral_model, name=model_name)
 
+    else:
+        raise ValueError(
+            f"Predefined model '{predefined_model}' not available. Use 'PowerLaw' "
+            "or provide a gammapy spectral model"
+        )
+
     return (spectral_model, model)
 
 
 def do_fitting(dataset, model, geom, emin_fit=None, emax_fit=None, stacked=False):
+    # No energy range given: all the energy bins are used in the fit
+    mask_fit = None
+
     if (emin_fit is None) and (emax_fit is not None):
         mask_fit = geom.energy_mask(0.02 * u.GeV, emax_fit)
 

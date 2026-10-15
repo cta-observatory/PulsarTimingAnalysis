@@ -2,66 +2,81 @@
 Basic pulsar analysis using Fermi-LAT data
 ==========================================
 
+This example shows how to produce the phaseogram of the Crab pulsar, compute
+the statistics of its peaks, search for pulsations, fit the pulse profile and
+study the evolution of the signal with time and energy.
+
+It uses about 10 years of public *Fermi*-LAT observations of the Crab pulsar
+(100 MeV - 1 GeV), for which the pulsar phases were already computed.
 """
 
-from ptiming_ana.phaseogram import PulsarAnalysis
-from astropy.io import fits
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+from astropy.io import fits
+
+import ptiming_ana
+from ptiming_ana.phaseogram import PulsarAnalysis
 
 # sphinx_gallery_multi_image = "single"
 
 # %%
+# ``ptiming_ana`` reports the progress and the results of the analysis through
+# the Python logging system. This shows the messages in the terminal/notebook:
+
+ptiming_ana.setup_logging()
+
+
+# %%
 # Create the PulsarAnalysis object and settings
 # ---------------------------------------------
+#
+# All the settings of the analysis can be read from a configuration file:
 
 h = PulsarAnalysis()
-h.set_config('./example_data/config_tutorial.yaml')
+h.set_config("./example_data/config_tutorial.yaml")
 
 # %%
 # Alternatively we can set the parameters directly
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# The phase regions used to compute the statistics of the peaks (P1 and P2)
+# and to estimate the background, the binning of the phaseogram, the time
+# interval used to follow the evolution of the signal, the model used to fit
+# the pulse profile and the energy binning:
 
 h = PulsarAnalysis()
-h.setBackgroundLimits([0.52,0.87])
+h.setBackgroundLimits([0.52, 0.87])
 h.setPeaklimits(
-    P1_limits=[0,0.026, 0.983, 1],
-    P2_limits=[0.377, 0.422],
-    P3_limits=None
+    P1_limits=[0, 0.026, 0.983, 1], P2_limits=[0.377, 0.422], P3_limits=None
 )
 h.setBinning(50, xmin=0, xmax=1)
-h.setTimeInterval(tint=3600*24)
-h.setFittingParams(model='dgaussian', binned=True)
+h.setTimeInterval(tint=3600 * 24)
+h.setFittingParams(model="dgaussian", binned=True)
 h.setEnergybinning(
-    np.geomspace(0.1/1e3, 1/1e3, 3),
-    do_diff=True,
-    do_integral=False
+    np.geomspace(0.1 / 1e3, 1 / 1e3, 3), do_diff=True, do_integral=False
 )  # in TeV
 
 
 # %%
 # Extracting phases, times and energies from file and give them to the object
 # ---------------------------------------------------------------------------
-# 
+#
 # For Fermi data there is a class to read these lists and use them in the main object.
 
-h.setFermiInputFile('./example_data/merged2_pulsar.fits')
+h.setFermiInputFile("./example_data/merged2_pulsar.fits")
 
 
 # %%
 # But in general we can read our file (FITS, DL2, DL3…) and extract
 # phases, times and energies as lists and read them as follows:
 
-f=fits.open('./example_data/merged2_pulsar.fits')
-fits_table=f[1].data
+with fits.open("./example_data/merged2_pulsar.fits") as f:
+    fits_table = f[1].data
+    times = np.array(fits_table["BARYCENTRIC_TIME"], dtype=float)
+    phases = np.array(fits_table["PULSE_PHASE"], dtype=float)
+    energies = np.array(fits_table["ENERGY"], dtype=float)  # in MeV
 
-times=np.sort(fits_table['BARYCENTRIC_TIME'].byteswap().newbyteorder())
-phases=fits_table['PULSE_PHASE'].byteswap().newbyteorder()
-energies=fits_table['ENERGY'].byteswap().newbyteorder()
-
-h.setListsInput(phases, times, energies/1e6, tel='fermi', energy_units='TeV')
-
-h.get_results = False
+h.setListsInput(phases, times, energies / 1e6, tel="fermi", energy_units="TeV")
 
 
 # %%
@@ -78,15 +93,20 @@ h.run()
 # Overall results
 # ^^^^^^^^^^^^^^^
 
-phaseogram=h.draw_phaseogram(
-    phase_limits=[0, 2],
-    colorhist='xkcd:baby blue'
-)
+phaseogram = h.draw_phaseogram(phase_limits=[0, 2], colorhist="xkcd:baby blue")
 plt.tight_layout()
 
 # %%
+# Statistics of the peaks (Li&Ma significance, number of excess events...) and
+# results of the periodicity tests (:math:`\chi^2`, :math:`Z^2_{10}` and H tests):
 
-results=h.show_Presults()
+peak_statistics, periodicity_statistics = h.show_Presults()
+
+# %%
+peak_statistics
+
+# %%
+periodicity_statistics
 
 
 # %%
@@ -94,16 +114,15 @@ results=h.show_Presults()
 # ^^^^^^^^^^^^^^^^^^^^^
 
 # %%
-h.fit_model
+print(h.fit_model)
 
 # %%
 fit_result = h.show_fit_results()
+fit_result
 
 # %%
 phaseogram = h.draw_phaseogram(
-    phase_limits=[0, 2],
-    colorhist='xkcd:baby blue',
-    fit=True
+    phase_limits=[0, 2], colorhist="xkcd:baby blue", fit=True
 )
 plt.tight_layout()
 
@@ -116,30 +135,26 @@ TimeEv = h.show_timeEvolution()
 
 
 # %%
-# The periodicity tests are not available since the signal is too strong
-# (p_value too low to extrapolate a significance).
-
-
-# %%
 # Results vs Energy
 # ^^^^^^^^^^^^^^^^^
 
-h.show_lcVsEnergy()
+energy_lightcurves = h.show_lcVsEnergy()
 
 # %%
-energy_lc=h.show_all_lc(ylimits=None)
+energy_lc = h.show_all_lc(ylimits=None)
 
 # %%
-energy_results=h.show_EnergyPresults()
+energy_results = h.show_EnergyPresults()
 
 # %%
-energy_plots=h.show_EnergyAna()
+energy_plots = h.show_EnergyAna()
 
 
 # %%
 # Fit vs Energy
 # ^^^^^^^^^^^^^
 
-mean_energy_plot=h.show_meanVsEnergy()
+mean_energy_plot = h.show_meanVsEnergy()
 
-h.show_EnergyFitresults()
+# %%
+energy_fit_results = h.show_EnergyFitresults()

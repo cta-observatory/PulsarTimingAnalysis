@@ -1,7 +1,10 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import copy
 import logging
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from .models import MODELS
 
 __all__ = ["PEnergyAnalysis"]
 
@@ -71,7 +74,8 @@ class PEnergyAnalysis:
             if self.do_integral:
                 self.integral = True
             else:
-                logger.info(
+                self.integral = False
+                logger.warning(
                     "No energy analysis will be performed. Please set do_diff or do_integral to True"
                 )
 
@@ -86,7 +90,7 @@ class PEnergyAnalysis:
         if self.do_diff:
             # Create array of PulsarPhases objects binning in energy
             self.Parray = []
-            for i in range(0, len(self.energy_edges) - 1):
+            for i in range(len(self.energy_edges) - 1):
                 dataframe = pulsarana.info
                 di = dataframe[
                     (dataframe["energy"] > self.energy_edges[i])
@@ -97,7 +101,7 @@ class PEnergyAnalysis:
                     "Creating object in "
                     + "energy range ("
                     + self.energy_units
-                    + f"):{self.energy_edges[i]:.2f}-{self.energy_edges[i+1]:.2f}"
+                    + f"):{self.energy_edges[i]:.2f}-{self.energy_edges[i + 1]:.2f}"
                 )
                 self.Parray.append(copy.copy(pulsarana))
                 self.Parray[i].setTimeInterval(self.Parray[i].tint)
@@ -119,7 +123,7 @@ class PEnergyAnalysis:
 
         if self.do_integral:
             self.Parray_integral = []
-            for i in range(0, len(self.energy_edges) - 1):
+            for i in range(len(self.energy_edges) - 1):
                 dataframe = pulsarana.info
                 di = dataframe[(dataframe["energy"] > self.energy_edges[i])]
 
@@ -171,7 +175,7 @@ class PEnergyAnalysis:
             histogram_array = self.Parray
 
         fig_array = []
-        for i in range(0, len(histogram_array)):
+        for i in range(len(histogram_array)):
             # Plot histogram from 0 to 1 and from 1 to 2 (2 periods)
             fig = plt.figure(figsize=(12, 5))
             histogram_array[i].histogram.show_phaseogram(
@@ -186,12 +190,12 @@ class PEnergyAnalysis:
 
             if integral:
                 energy_label = (
-                    "ENERGY RANGE (GeV):" + f" E > {self.energy_edges[i]*1000:.0f}"
+                    "ENERGY RANGE (GeV):" + f" E > {self.energy_edges[i] * 1000:.3g}"
                 )
             else:
                 energy_label = (
                     "ENERGY RANGE (GeV):"
-                    + f"{self.energy_edges[i]*1000:.0f}-{self.energy_edges[i+1]*1000:.0f}"
+                    + f"{self.energy_edges[i] * 1000:.3g}-{self.energy_edges[i + 1] * 1000:.3g}"
                 )
 
             plt.annotate(
@@ -215,7 +219,7 @@ class PEnergyAnalysis:
                         text_towrite = (
                             text_towrite
                             + key
-                            + f": Sig(Li&Ma):{value.sign:.2f}$\sigma$"
+                            + rf": Sig(Li&Ma):{value.sign:.2f}$\sigma$"
                         )
                         count += 1
                     else:
@@ -223,7 +227,7 @@ class PEnergyAnalysis:
                             text_towrite
                             + "\n"
                             + key
-                            + f": Sig(Li&Ma):{value.sign:.2f}$\sigma$"
+                            + rf": Sig(Li&Ma):{value.sign:.2f}$\sigma$"
                         )
             plt.annotate(
                 text_towrite + "\n" + f"Entries={len(histogram_array[i].phases)}",
@@ -240,7 +244,6 @@ class PEnergyAnalysis:
 
             plt.legend(loc=4, bbox_to_anchor=(1.2, 0), fontsize=15)
             fig_array.append(fig)
-            plt.show()
 
         return fig_array
 
@@ -263,7 +266,7 @@ class PEnergyAnalysis:
 
             histogram_array = self.Parray
 
-        for i in range(0, len(histogram_array)):
+        for i in range(len(histogram_array)):
             if histogram_array[i].fitting.check_fit_result():
                 fig = plt.figure(figsize=(17, 8))
                 break
@@ -273,14 +276,14 @@ class PEnergyAnalysis:
             ):
                 logger.warning("No fit available for any energy bin")
                 return
-        for i in range(0, len(histogram_array)):
+        for i in range(len(histogram_array)):
             if histogram_array[i].fitting.check_fit_result():
                 histogram_array[i].histogram.draw_fitting(
                     histogram_array[i],
                     color="C" + str(i),
                     density=True,
                     label="Energies(GeV):"
-                    + f"{self.energy_edges[i]*1000:.2f}-{self.energy_edges[i+1]*1000:.2f}",
+                    + f"{self.energy_edges[i] * 1000:.3g}-{self.energy_edges[i + 1] * 1000:.3g}",
                 )
         plt.xlim(
             2 * histogram_array[0].fitting.shift,
@@ -305,19 +308,19 @@ class PEnergyAnalysis:
     ):
         fig = plt.figure(figsize=(17, 8))
 
-        for i in range(0, len(self.Parray)):
+        for i in range(len(self.Parray)):
             self.Parray[i].histogram.draw_density_hist(
                 [0.7, 1.7],
                 colorhist=colorh[i],
                 label="Energies(GeV):"
-                + f"{self.energy_edges[i]*1000:.0f}-{self.energy_edges[i+1]*1000:.0f}",
+                + f"{self.energy_edges[i] * 1000:.3g}-{self.energy_edges[i + 1] * 1000:.3g}",
                 fill=False,
             )
 
         self.Parray[i].histogram.draw_background(self.Parray[i], "grey", hline=False)
 
         signal = ["P1", "P2", "P3"]
-        for j in range(0, len(signal)):
+        for j in range(len(signal)):
             self.Parray[0].histogram.draw_peakregion(
                 self.Parray[0], signal[j], color=colorP[j]
             )
@@ -351,9 +354,9 @@ class PEnergyAnalysis:
         peak_stat = [0] * (len(self.energy_edges) - 1)
         p_stat = [0] * (len(self.energy_edges) - 1)
 
-        for i in range(0, len(self.energy_edges) - 1):
+        for i in range(len(self.energy_edges) - 1):
             logger.info(
-                "Energies(GeV): %.0f-%.0f",
+                "Energies(GeV): %.3g-%.3g",
                 self.energy_edges[i] * 1000,
                 self.energy_edges[i + 1] * 1000,
             )
@@ -382,9 +385,9 @@ class PEnergyAnalysis:
 
         fit_results = [0] * (len(self.energy_edges) - 1)
 
-        for i in range(0, len(self.energy_edges) - 1):
+        for i in range(len(self.energy_edges) - 1):
             logger.info(
-                "Energies(GeV): %.2f-%.2f",
+                "Energies(GeV): %.3g-%.3g",
                 self.energy_edges[i] * 1000,
                 self.energy_edges[i + 1] * 1000,
             )
@@ -418,7 +421,7 @@ class PEnergyAnalysis:
         P2_s = []
         P1P2_s = []
 
-        for i in range(0, len(self.energy_centres)):
+        for i in range(len(self.energy_centres)):
             if histogram_array[i].regions.dic["P1"] is not None:
                 P1_s.append(histogram_array[i].regions.P1.sign)
             if histogram_array[i].regions.dic["P2"] is not None:
@@ -427,19 +430,21 @@ class PEnergyAnalysis:
                 P1P2_s.append(histogram_array[i].regions.P1P2.sign)
 
         if len(P1P2_s) > 0:
-            plt.plot(self.energy_centres, P1P2_s, "o-", color="tab:red", label="P1+P2")
+            plt.plot(
+                self.energy_centres * 1000, P1P2_s, "o-", color="tab:red", label="P1+P2"
+            )
 
         if len(P1_s) > 0:
-            plt.plot(self.energy_centres, P1_s, "o-", color="tab:orange", label="P1")
+            plt.plot(
+                self.energy_centres * 1000, P1_s, "o-", color="tab:orange", label="P1"
+            )
 
         if len(P2_s) > 0:
-            plt.plot(self.energy_centres, P2_s, "o-", color="tab:green", label="P2")
+            plt.plot(
+                self.energy_centres * 1000, P2_s, "o-", color="tab:green", label="P2"
+            )
 
-        plt.ylabel("Significance($\sigma$)")
-        plt.xticks(
-            [0.02, 0.05, 0.08, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1],
-            labels=[20, 50, 80, 100, 200, 300, 400, 500, 700, 1000],
-        )
+        plt.ylabel(r"Significance($\sigma$)")
         plt.xlabel("E (GeV)")
         plt.legend()
         plt.tight_layout()
@@ -469,11 +474,13 @@ class PEnergyAnalysis:
             histogram_array = self.Parray
 
         if histogram_array[0].regions.P1P2_ratio is not None:
-            for i in range(0, len(self.energy_centres)):
+            for i in range(len(self.energy_centres)):
                 P1P2E.append(histogram_array[i].regions.P1P2_ratio)
                 P1P2E_error.append(histogram_array[i].regions.P1P2_ratio_error)
         else:
-            logger.warning("Cannot calculate P1/P2 since one of the peaks is not defined")
+            logger.warning(
+                "Cannot calculate P1/P2 since one of the peaks is not defined"
+            )
 
         return (P1P2E, P1P2E_error)
 
@@ -486,164 +493,112 @@ class PEnergyAnalysis:
 
         ratio, ratio_error = self.P1P2_ratioVsEnergy(integral=integral)
         plt.fill_between(
-            self.energy_centres,
+            self.energy_centres * 1000,
             np.array(ratio) + np.array(ratio_error),
             np.array(ratio) - np.array(ratio_error),
             alpha=0.3,
         )
-        plt.plot(self.energy_centres, ratio, "o-", label="LST-1")
+        plt.plot(self.energy_centres * 1000, ratio, "o-", label="LST-1")
 
         plt.ylabel("P1/P2")
-        plt.xticks(
-            [0.02, 0.05, 0.08, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1],
-            labels=[20, 50, 80, 100, 200, 300, 400, 500, 700, 1000],
-        )
         plt.xlabel("E (GeV)")
         plt.tight_layout()
         plt.xscale("log")
         plt.title("P1/P2 vs Energy")
         plt.grid(which="both")
 
-    def FWHMVsEnergy(self, integral=None):
+    def _get_histogram_array(self, integral=None):
         if integral is None:
             integral = self.integral
-
-        FP1 = []
-        FP2 = []
-        FP1_err = []
-        FP2_err = []
-        energies_F1 = []
-        energies_F2 = []
 
         if integral:
             if not self.do_integral:
                 raise ValueError(
                     "Energy Integral results not produced. Check if do_integral parameter is set to True"
                 )
+            return self.Parray_integral
 
-            histogram_array = self.Parray_integral
-        else:
-            if not self.do_diff:
-                raise ValueError(
-                    "Energy Differential results not produced. Check if do_diff parameter is set to True"
-                )
+        if not self.do_diff:
+            raise ValueError(
+                "Energy Differential results not produced. Check if do_diff parameter is set to True"
+            )
+        return self.Parray
 
-            histogram_array = self.Parray
+    def _fit_shape_vs_energy(self, integral=None):
+        """
+        Mean and FWHM (with uncertainties) of each fitted peak in each energy bin.
 
-        if histogram_array[0].fitting.model == "asym_dgaussian":
-            prefactor = 2.35482
-            for i in range(0, len(self.energy_centres)):
-                try:
-                    FP1.append(
-                        prefactor * histogram_array[i].fitting.params[1] / 2
-                        + prefactor * histogram_array[i].fitting.params[2] / 2
-                    )
-                    energies_F1.append(self.energy_centres[i])
-                    try:
-                        FP1_err.append(
-                            FP1
-                            * np.sqrt(
-                                (
-                                    histogram_array[i].errors.params[1]
-                                    / histogram_array[i].fitting.params[1]
-                                )
-                                ** 2
-                                + (
-                                    histogram_array[i].fitting.errors[2]
-                                    / histogram_array[i].fitting.params[2]
-                                )
-                                ** 2
-                            )
-                        )
-                    except AttributeError:
-                        FP1_err.append(0)
-                except AttributeError:
-                    pass
+        Returns
+        -------
+        dict
+            For each peak ("P1", "P2", "P3"), a dictionary with the arrays
+            ``energy``, ``mean``, ``mean_err``, ``fwhm`` and ``fwhm_err``.
+            Energy bins without a valid fit are skipped.
+        """
+        histogram_array = self._get_histogram_array(integral)
+        keys = ("energy", "mean", "mean_err", "fwhm", "fwhm_err")
+        results = {}
 
-                try:
-                    FP2.append(
-                        prefactor * histogram_array[i].fitting.params[4] / 2
-                        + prefactor * histogram_array[i].fitting.params[5] / 2
-                    )
-                    energies_F2.append(self.energy_centres[i])
-                    try:
-                        FP2_err.append(
-                            FP2
-                            * np.sqrt(
-                                (
-                                    histogram_array[i].errors.params[4]
-                                    / histogram_array[i].fitting.params[4]
-                                )
-                                ** 2
-                                + (
-                                    histogram_array[i].fitting.errors[5]
-                                    / histogram_array[i].fitting.params[5]
-                                )
-                                ** 2
-                            )
-                        )
-                    except AttributeError:
-                        FP2_err.append(0)
-                except AttributeError:
-                    pass
+        for i in range(len(self.energy_centres)):
+            fitting = histogram_array[i].fitting
+            if not fitting.check_fit_result():
+                continue
 
-        else:
-            if histogram_array[0].fitting.model == "dgaussian":
-                prefactor = 2.35482
-
-            elif histogram_array[0].fitting.model == "lorentzian":
-                prefactor = 2
-
+            spec = MODELS[fitting.model]
+            if spec["npeaks"] == 1:
+                peak_names = [fitting.peak_tofit]
             else:
-                prefactor = 0
+                peak_names = ["P1", "P2", "P3"][: spec["npeaks"]]
 
-            for i in range(0, len(self.energy_centres)):
-                try:
-                    FP1.append(prefactor * histogram_array[i].fitting.params[1])
-                    energies_F1.append(self.energy_centres[i])
-                    try:
-                        FP1_err.append(prefactor * histogram_array[i].fitting.errors[1])
-                    except AttributeError:
-                        FP1_err.append(0)
-                except AttributeError:
-                    pass
+            parnames = spec["parnames"]
+            mu_index = [j for j, name in enumerate(parnames) if name.startswith("mu")]
+            for npeak, peak in enumerate(peak_names):
+                # The width parameters of a peak are those between its mean
+                # and the next parameter that is not a width
+                width_index = []
+                for j in range(mu_index[npeak] + 1, len(parnames)):
+                    if not parnames[j].startswith(("sigma", "gamma")):
+                        break
+                    width_index.append(j)
 
-                try:
-                    FP2.append(prefactor * histogram_array[i].fitting.params[3])
-                    energies_F2.append(self.energy_centres[i])
-                    try:
-                        FP2_err.append(prefactor * histogram_array[i].fitting.errors[3])
-                    except AttributeError:
-                        FP2_err.append(0)
-                except AttributeError:
-                    pass
+                # FWHM = 2 sqrt(2 ln 2) sigma for a Gaussian (the mean of the
+                # two widths if asymmetric) and 2 gamma for a Lorentzian
+                if parnames[width_index[0]].startswith("gamma"):
+                    prefactor = 2
+                else:
+                    prefactor = 2 * np.sqrt(2 * np.log(2))
+                prefactor = prefactor / len(width_index)
 
-        energies_F1 = np.array(energies_F1)
-        energies_F2 = np.array(energies_F2)
-        FP1 = np.array(FP1)
-        FP2 = np.array(FP2)
-        FP1_err = np.array(FP1_err)
-        FP2_err = np.array(FP2_err)
+                widths = np.array([fitting.params[j] for j in width_index])
+                width_errors = np.array([fitting.errors[j] for j in width_index])
 
-        if len(FP1) > 0:
+                result = results.setdefault(peak, {key: [] for key in keys})
+                result["energy"].append(self.energy_centres[i])
+                result["mean"].append(fitting.params[mu_index[npeak]])
+                result["mean_err"].append(fitting.errors[mu_index[npeak]])
+                result["fwhm"].append(prefactor * np.sum(np.abs(widths)))
+                result["fwhm_err"].append(prefactor * np.sqrt(np.sum(width_errors**2)))
+
+        return {
+            peak: {key: np.array(value) for key, value in result.items()}
+            for peak, result in results.items()
+        }
+
+    def FWHMVsEnergy(self, integral=None):
+        results = self._fit_shape_vs_energy(integral)
+        colors = {"P1": "tab:orange", "P2": "tab:green", "P3": "tab:purple"}
+
+        for peak, result in results.items():
             plt.errorbar(
-                energies_F1 * 1000,
-                FP1,
-                yerr=FP1_err,
+                result["energy"] * 1000,
+                result["fwhm"],
+                yerr=result["fwhm_err"],
                 fmt="o-",
-                color="tab:orange",
-                label="P1",
+                color=colors[peak],
+                label=peak,
             )
-        if len(FP2) > 0:
-            plt.errorbar(
-                energies_F2 * 1000,
-                FP2,
-                yerr=FP2_err,
-                fmt="o-",
-                color="tab:green",
-                label="P2",
-            )
-        if len(FP1) <= 0 and len(FP2) <= 0:
+
+        if len(results) == 0:
             plt.annotate(
                 "Plot not available",
                 xy=(0.6, 0.6),
@@ -665,111 +620,26 @@ class PEnergyAnalysis:
             plt.xscale("log")
 
     def MeanVsEnergy(self, integral=None):
-        if integral is None:
-            integral = self.integral
+        results = self._fit_shape_vs_energy(integral)
+        colors = {"P1": "tab:orange", "P2": "tab:green", "P3": "tab:purple"}
 
-        if integral:
-            if not self.do_integral:
-                raise ValueError(
-                    "Energy Integral results not produced. Check if do_integral parameter is set to True"
-                )
-
-            histogram_array = self.Parray_integral
-        else:
-            if not self.do_diff:
-                raise ValueError(
-                    "Energy Differential results not produced. Check if do_diff parameter is set to True"
-                )
-
-            histogram_array = self.Parray
-
-        M1 = []
-        M2 = []
-        M1_err = []
-        M2_err = []
-        energies_M1 = []
-        energies_M2 = []
-
-        if histogram_array[0].fitting.model == "asym_dgaussian":
-            for i in range(0, len(self.energy_centres)):
-                try:
-                    M1.append(histogram_array[i].fitting.params[0])
-                    energies_M1.append(self.energy_centres[i])
-                    try:
-                        M1_err.append(histogram_array[i].fitting.errors[0])
-                    except AttributeError:
-                        M1_err.append(0)
-                except AttributeError:
-                    pass
-
-                try:
-                    M2.append(histogram_array[i].fitting.params[3])
-                    energies_M2.append(self.energy_centres[i])
-                    try:
-                        M1_err.append(histogram_array[i].fitting.errors[3])
-                    except AttributeError:
-                        M1_err.append(0)
-                except AttributeError:
-                    pass
-
-        elif (
-            histogram_array[0].fitting.model == "dgaussian"
-            or histogram_array[0].fitting.model == "lorentzian"
-        ):
-            for i in range(0, len(self.energy_centres)):
-                try:
-                    M1.append(histogram_array[i].fitting.params[0])
-                    energies_M1.append(self.energy_centres[i])
-                    try:
-                        M1_err.append(histogram_array[i].fitting.errors[0])
-                    except AttributeError:
-                        M1_err.append(0)
-                except AttributeError:
-                    pass
-
-                try:
-                    M2.append(histogram_array[i].fitting.params[2])
-                    energies_M2.append(self.energy_centres[i])
-                    try:
-                        M2_err.append(histogram_array[i].fitting.errors[2])
-                    except AttributeError:
-                        M2_err.append(0)
-                except AttributeError:
-                    pass
-
-        if len(M1) == 0 and len(M2) == 0:
+        if len(results) == 0:
             logger.warning("No fit available for plotting")
             return
-        elif len(M1) > 0 and len(M2) > 0:
-            nplots = 2
-        else:
-            nplots = 1
 
         fig = plt.figure(figsize=(10, 5))
-        if len(M1) > 0:
-            plt.subplot(nplots, 1, 1)
-            plt.errorbar(energies_M1, M1, yerr=M1_err, fmt="o-", color="tab:orange")
-            plt.ylabel("Mean phase")
-            plt.xticks(
-                [0.02, 0.05, 0.08, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1],
-                labels=[20, 50, 80, 100, 200, 300, 400, 500, 700, 1000],
+        for nplot, (peak, result) in enumerate(results.items()):
+            plt.subplot(len(results), 1, nplot + 1)
+            plt.errorbar(
+                result["energy"] * 1000,
+                result["mean"],
+                yerr=result["mean_err"],
+                fmt="o-",
+                color=colors[peak],
             )
-            plt.xlabel("E (GeV)")
-            plt.title("P1 mean phase")
-            plt.tight_layout()
-            plt.grid(which="both")
-            plt.xscale("log")
-
-        if len(M2) > 0:
-            plt.subplot(nplots, 1, nplots)
-            plt.errorbar(energies_M2, M2, yerr=M2_err, fmt="o-", color="tab:green")
-            plt.title("P2 mean phase")
             plt.ylabel("Mean phase")
-            plt.xticks(
-                [0.02, 0.05, 0.08, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1],
-                labels=[20, 50, 80, 100, 200, 300, 400, 500, 700, 1000],
-            )
             plt.xlabel("E (GeV)")
+            plt.title(f"{peak} mean phase")
             plt.tight_layout()
             plt.grid(which="both")
             plt.xscale("log")
@@ -789,4 +659,3 @@ class PEnergyAnalysis:
         self.FWHMVsEnergy(integral)
 
         plt.tight_layout()
-        plt.show()

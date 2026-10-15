@@ -1,18 +1,13 @@
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy.stats import chisquare, norm
 import logging
 
-logger = logging.getLogger(__name__)
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import chisquare
 
-from .models import (
-    gaussian,
-    double_gaussian,
-    triple_gaussian,
-    assymetric_double_gaussian,
-    double_lorentz,
-    lorentzian,
-)
+from .models import MODELS
+from .periodicity_test import chi2_log_pvalue, sigma_from_log_pvalue
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["Lightcurve"]
 
@@ -52,7 +47,7 @@ class Lightcurve:
         # Calculate chi_sqr test
         mean_signal = np.mean(self.lc[0])
         chi_sqr, p_value = chisquare(self.lc[0], mean_signal)
-        sigmas = norm.isf(p_value, loc=0, scale=1)
+        sigmas = sigma_from_log_pvalue(chi2_log_pvalue(chi_sqr, len(self.lc[0]) - 1))
 
         return (chi_sqr, p_value, sigmas)
 
@@ -61,28 +56,29 @@ class Lightcurve:
     #############################################
 
     def draw_stats(self, pulsar_phases, phase_limits, stats="short"):
-        text_towrite = ""
-        count = 0
-        for key, value in pulsar_phases.regions.dic.items():
-            if value is not None:
-                if count == 0:
-                    text_towrite = (
-                        text_towrite + key + f": Sig(Li&Ma):{value.sign:.2f}$\sigma$"
-                    )
-                    count += 1
-                else:
-                    text_towrite = (
-                        text_towrite
-                        + "\n"
-                        + key
-                        + f": Sig(Li&Ma):{value.sign:.2f}$\sigma$"
-                    )
+        text_towrite = "\n".join(
+            rf"{key}: Sig(Li&Ma):{value.sign:.2f}$\sigma$"
+            for key, value in pulsar_phases.regions.dic.items()
+            if value is not None
+        )
+
+        chi2_stat, chi2_pvalue, chi2_sigma = pulsar_phases.stats.chisqr_res
+        h_stat, h_pvalue, h_sigma = pulsar_phases.stats.Htest_res
+        zn_stat, zn_pvalue, zn_sigma = pulsar_phases.stats.Zntest_res
 
         if stats == "long":
+            if pulsar_phases.regions.P1P2 is not None:
+                sign_ratio = pulsar_phases.regions.P1P2.sign / np.sqrt(
+                    pulsar_phases.tobs
+                )
+                text_towrite += (
+                    "\n"
+                    + rf" $\sigma$(P1+P2)/sqrt(T) ={sign_ratio:.2f}"
+                    + r"h$^{-1/2}$"
+                )
+
             plt.annotate(
-                text_towrite
-                + f"\n $\sigma$(P1+P2)/sqrt(T) ={pulsar_phases.regions.P1P2.sign/np.sqrt(pulsar_phases.tobs):.2f}"
-                + r"h$^{-1/2}$",
+                text_towrite,
                 xy=(0.29, 1.4),
                 xytext=(0.29, 1.4),
                 fontsize=13,
@@ -95,7 +91,11 @@ class Lightcurve:
             )
 
             plt.annotate(
-                f'$\chi^{2}$-test: $\chi^{2}$={pulsar_phases.stats.chisqr_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.chisqr_res[1])} sign={pulsar_phases.stats.chisqr_res[2]:.2f}$\sigma$ \n H-test: H={pulsar_phases.stats.Htest_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.Htest_res[1])} sign={pulsar_phases.stats.Htest_res[2]:.2f}$\sigma$ \n Z$_{{10}}$-test: Z$_{{10}}$={pulsar_phases.stats.Zntest_res[0]:.2f} p_value={"{:.2e}".format(pulsar_phases.stats.Zntest_res[1])} sign={pulsar_phases.stats.Zntest_res[2]:.2f}$\sigma$ ',
+                rf"$\chi^2$-test: $\chi^2$={chi2_stat:.2f} p_value={chi2_pvalue:.2e} sign={chi2_sigma:.2f}$\sigma$ "
+                + "\n"
+                + rf" H-test: H={h_stat:.2f} p_value={h_pvalue:.2e} sign={h_sigma:.2f}$\sigma$ "
+                + "\n"
+                + rf" Z$_{{10}}$-test: Z$_{{10}}$={zn_stat:.2f} p_value={zn_pvalue:.2e} sign={zn_sigma:.2f}$\sigma$ ",
                 xy=(0.54, 1.3),
                 xytext=(0.54, 1.3),
                 fontsize=15,
@@ -111,7 +111,11 @@ class Lightcurve:
             plt.annotate(
                 text_towrite
                 + "\n"
-                + f"$\chi^{2}$-test={pulsar_phases.stats.chisqr_res[2]:.2f}$\sigma$ \n H-test= {pulsar_phases.stats.Htest_res[2]:.2f}$\sigma$ \n Z$_{{10}}$-test={pulsar_phases.stats.Zntest_res[2]:.2f}$\sigma$ ",
+                + rf"$\chi^2$-test={chi2_sigma:.2f}$\sigma$ "
+                + "\n"
+                + rf" H-test= {h_sigma:.2f}$\sigma$ "
+                + "\n"
+                + rf" Z$_{{10}}$-test={zn_sigma:.2f}$\sigma$ ",
                 xy=(0.72, 1.3),
                 xytext=(0.72, 1.3),
                 fontsize=15,
@@ -124,105 +128,50 @@ class Lightcurve:
             )
 
     def draw_peakregion(self, pulsar_phases, name, color):
-        # Draw first peak region
-        if pulsar_phases.regions.dic[name] is not None:
-            plt.fill_between(
-                np.linspace(
-                    pulsar_phases.regions.dic[name].limits[0],
-                    pulsar_phases.regions.dic[name].limits[1],
-                    150,
-                ),
-                0,
-                1600500,
-                facecolor=color,
-                color=color,
-                alpha=0.2,
-                label=name,
-                zorder=4,
-            )
-            plt.fill_between(
-                np.linspace(
-                    pulsar_phases.regions.dic[name].limits[0] + 1,
-                    pulsar_phases.regions.dic[name].limits[1] + 1,
-                    150,
-                ),
-                0,
-                1600500,
-                facecolor=color,
-                color=color,
-                alpha=0.2,
-                zorder=4,
-            )
+        # Draw the signal region in the two periods shown in the phaseogram
+        region = pulsar_phases.regions.dic.get(name)
+        if region is None:
+            return
 
-            if len(pulsar_phases.regions.dic[name].limits) > 2:
-                plt.fill_between(
-                    np.linspace(
-                        pulsar_phases.regions.dic[name].limits[2],
-                        pulsar_phases.regions.dic[name].limits[3],
-                        150,
-                    ),
-                    0,
-                    1600500,
+        label = name
+        for i in range(0, len(region.limits), 2):
+            for period in (0, 1):
+                plt.axvspan(
+                    region.limits[i] + period,
+                    region.limits[i + 1] + period,
                     facecolor=color,
-                    color=color,
+                    edgecolor=color,
                     alpha=0.2,
+                    label=label,
                     zorder=4,
                 )
-                plt.fill_between(
-                    np.linspace(
-                        pulsar_phases.regions.dic[name].limits[2] + 1,
-                        pulsar_phases.regions.dic[name].limits[3] + 1,
-                        150,
-                    ),
-                    0,
-                    1600500,
-                    facecolor=color,
-                    color=color,
-                    alpha=0.2,
-                    zorder=4,
-                )
+                label = None
 
     def draw_background(self, pulsar_phases, color, hline=True):
-        # Draw the background region
-        plt.fill_between(
-            np.linspace(
-                pulsar_phases.regions.OFF.limits[0],
-                pulsar_phases.regions.OFF.limits[1],
-                150,
-            ),
-            0,
-            1600500,
-            facecolor="white",
-            color=color,
-            alpha=0.2,
-            hatch="/",
-            label="OFF",
-        )
-
-        plt.fill_between(
-            np.linspace(
-                pulsar_phases.regions.OFF.limits[0] + 1,
-                pulsar_phases.regions.OFF.limits[1] + 1,
-                150,
-            ),
-            0,
-            1600500,
-            facecolor="white",
-            color=color,
-            alpha=0.2,
-            hatch="/",
-        )
+        # Draw the background region in the two periods shown in the phaseogram
+        off_limits = pulsar_phases.regions.OFF.limits
+        label = "OFF"
+        for i in range(0, len(off_limits), 2):
+            for period in (0, 1):
+                plt.axvspan(
+                    off_limits[i] + period,
+                    off_limits[i + 1] + period,
+                    facecolor="white",
+                    edgecolor=color,
+                    alpha=0.2,
+                    hatch="/",
+                    label=label,
+                )
+                label = None
 
         # Add hline for background level reference (default True)
         if hline:
             plt.hlines(
                 y=np.mean(
-                    (
-                        self.lc[0][
-                            (self.lc[1][:-1] > (pulsar_phases.regions.OFF.limits[0]))
-                            & (self.lc[1][1:] < (pulsar_phases.regions.OFF.limits[1]))
-                        ]
-                    )
+                    self.lc[0][
+                        (self.lc[1][:-1] > (off_limits[0]))
+                        & (self.lc[1][1:] < (off_limits[1]))
+                    ]
                 ),
                 xmin=0,
                 xmax=2,
@@ -232,35 +181,14 @@ class Lightcurve:
             )
 
     def draw_fitting(self, pulsar_phases, color, density=False, label=None):
-        if pulsar_phases.fitting.shift == 0:
-            x = np.linspace(0, 1, 100000)
-        else:
-            x = np.linspace(
-                pulsar_phases.fitting.shift, 1 + pulsar_phases.fitting.shift, 100000
-            )
+        fitting = pulsar_phases.fitting
+        if not fitting.check_fit_result():
+            raise AttributeError("No fit result available to be drawn")
+
+        x = np.linspace(fitting.shift, 1 + fitting.shift, 100000)
 
         # Calculate distribution y-points using a model and its fitted params
-        # hoff = np.mean(self.lc[0])
-        if pulsar_phases.fitting.model == "dgaussian":
-            y = double_gaussian(x, *pulsar_phases.fitting.params[0:7])
-
-        elif pulsar_phases.fitting.model == "tgaussian":
-            y = triple_gaussian(x, *pulsar_phases.fitting.params)
-
-        elif pulsar_phases.fitting.model == "asym_dgaussian":
-            assymetric_double_gaussian_vec = np.vectorize(
-                assymetric_double_gaussian, excluded=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            )
-            y = assymetric_double_gaussian_vec(x, *pulsar_phases.fitting.params)
-
-        elif pulsar_phases.fitting.model == "double_lorentz":
-            y = double_lorentz(x, *pulsar_phases.fitting.params)
-
-        elif pulsar_phases.fitting.model == "lorentzian":
-            y = lorentzian(x, *pulsar_phases.fitting.params)
-
-        elif pulsar_phases.fitting.model == "gaussian":
-            y = gaussian(x, *pulsar_phases.fitting.params)
+        y = MODELS[fitting.model]["function"](x, *fitting.params)
 
         if density:
             width = 1 / len(self.lc[0])
@@ -406,7 +334,7 @@ class Lightcurve:
         if background:
             self.draw_background(pulsar_phases, colorb, hline)
 
-        for i in range(0, len(signal)):
+        for i in range(len(signal)):
             self.draw_peakregion(pulsar_phases, signal[i], color=colorP[i])
 
         # Plot fitted distribution (default True)
