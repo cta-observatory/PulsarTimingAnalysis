@@ -1,8 +1,8 @@
 .. _phaseogram:
 
-=========================
-Phaseogram (`phaseogram`)
-=========================
+===========================
+Phaseogram (``phaseogram``)
+===========================
 
 .. currentmodule:: ptiming_ana.phaseogram
 

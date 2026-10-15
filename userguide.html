@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>User guide &#8212; Pulsar timing analysis</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=c83e6b79" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
+
+    <script src="_static/documentation_options.js?v=3636b96f"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/sg-tags.js?v=d80f6fa4"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'userguide';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="auto_examples/index.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.6.dev90+gde7e918ce" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Pulsar timing analysis</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api-reference/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/cta-observatory/PulsarTimingAnalysis" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
+    User guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api-reference/index.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Quick Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/cta-observatory/PulsarTimingAnalysis" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">User guide</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="user-guide">
+<span id="userguide"></span><h1>User guide<a class="headerlink" href="#user-guide" title="Link to this heading">#</a></h1>
+<p>A pulsar analysis with <code class="docutils literal notranslate"><span class="pre">ptiming_ana</span></code> has three steps: the computation of the
+pulsar phases, the analysis of the phaseogram and, optionally, the spectral
+analysis of the peaks. The second and third steps are configured with a
+<a class="reference external" href="https://github.com/cta-observatory/PulsarTimingAnalysis/blob/main/config.yaml">configuration file</a>
+in YAML format, or directly with the methods of the analysis classes.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ptiming_ana</span></code> reports the progress and the results of the analysis with the
+Python logging system. To see the messages in a script or notebook:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ptiming_ana</span>
+
+<span class="n">ptiming_ana</span><span class="o">.</span><span class="n">setup_logging</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="computing-the-pulsar-phases">
+<h2>Computing the pulsar phases<a class="headerlink" href="#computing-the-pulsar-phases" title="Link to this heading">#</a></h2>
+<p>The rotational phase of each event is computed with PINT from the arrival time
+of the event and the ephemeris of the pulsar. The ephemeris can be given as:</p>
+<ul class="simple">
+<li><p>a timing model in <code class="docutils literal notranslate"><span class="pre">.par</span></code> format, or</p></li>
+<li><p>a file with the monthly ephemerides of the Crab pulsar from the Jodrell Bank
+Observatory in <code class="docutils literal notranslate"><span class="pre">.gro</span></code> format, from which the model valid at the time of
+the observation is built.</p></li>
+</ul>
+<p>The command-line tools add the phases and the barycentric times to the data
+files:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>add_DL3_phase_table<span class="w"> </span>--in-file<span class="w"> </span>dl3_LST-1.Run07253.fits<span class="w"> </span>--ephem<span class="w"> </span>model.par<span class="w"> </span>--output<span class="w"> </span>DL3_pulsar/
+<span class="gp">$ </span>add_DL3_phase_table<span class="w"> </span>--dir<span class="w"> </span>DL3/<span class="w"> </span>--ephem<span class="w"> </span>model.par<span class="w"> </span>--output<span class="w"> </span>DL3_pulsar/
+<span class="gp">$ </span>add_DL2_phase_table<span class="w"> </span>--in-file<span class="w"> </span>dl2_LST-1.Run07253.h5<span class="w"> </span>--ephem<span class="w"> </span>model.par
+<span class="gp">$ </span>add_fermi_phase_table<span class="w"> </span>--in-file<span class="w"> </span>ft1.fits<span class="w"> </span>--ft2<span class="w"> </span>ft2.fits<span class="w"> </span>--ephem<span class="w"> </span>model.par<span class="w"> </span>--output<span class="w"> </span>fermi_pulsar/
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">--help</span></code> to see all the options of each tool.</p>
+<ul class="simple">
+<li><p>DL3 files: a new file <code class="docutils literal notranslate"><span class="pre">{name}_pulsar.fits</span></code> is written, with two new columns
+in the events table, <code class="docutils literal notranslate"><span class="pre">PHASE</span></code> and <code class="docutils literal notranslate"><span class="pre">BARYCENT_TIME</span></code> (MJD). To read the new
+files with Gammapy, the index files have to be created
+(<code class="docutils literal notranslate"><span class="pre">lstchain_create_dl3_index_files</span></code>).</p></li>
+<li><p>DL2 files: a new table <code class="docutils literal notranslate"><span class="pre">phase_info</span></code> is added to the file, with the columns
+<code class="docutils literal notranslate"><span class="pre">pulsar_phase</span></code> and <code class="docutils literal notranslate"><span class="pre">mjd_barycenter_time</span></code>.</p></li>
+<li><p><em>Fermi</em>-LAT files: a new file <code class="docutils literal notranslate"><span class="pre">{name}_pulsar.fits</span></code> is written with the
+columns <code class="docutils literal notranslate"><span class="pre">PULSE_PHASE</span></code> and <code class="docutils literal notranslate"><span class="pre">BARYCENTRIC_TIME</span></code>.</p></li>
+</ul>
+<p>The exact calculation is slow for large files. With the <code class="docutils literal notranslate"><span class="pre">--interpolation</span></code>
+option, the phases are only computed for one of every <code class="docutils literal notranslate"><span class="pre">--number-interpolation</span></code>
+events (1000 by default) and interpolated for the rest, which is much faster
+at the cost of a small loss of precision.</p>
+<p>The same functionality is available from Python, see <a class="reference internal" href="api-reference/cphase.html#module-ptiming_ana.cphase" title="ptiming_ana.cphase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ptiming_ana.cphase</span></code></a>.</p>
+</section>
+<section id="phaseogram-analysis">
+<h2>Phaseogram analysis<a class="headerlink" href="#phaseogram-analysis" title="Link to this heading">#</a></h2>
+<p>The main class is <a class="reference internal" href="api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis" title="ptiming_ana.phaseogram.PulsarAnalysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ptiming_ana.phaseogram.PulsarAnalysis</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ptiming_ana.phaseogram</span><span class="w"> </span><span class="kn">import</span> <span class="n">PulsarAnalysis</span>
+
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">PulsarAnalysis</span><span class="p">()</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="s2">"config.yaml"</span><span class="p">)</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="n">peak_statistics</span><span class="p">,</span> <span class="n">periodicity_tests</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">show_Presults</span><span class="p">()</span>
+<span class="n">analysis</span><span class="o">.</span><span class="n">draw_phaseogram</span><span class="p">(</span><span class="n">phase_limits</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<section id="input-data">
+<h3>Input data<a class="headerlink" href="#input-data" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Input</p></th>
+<th class="head"><p>Configuration / method</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>LST-1 DL3 files (with phases)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flags:</span> <span class="pre">DL2_format:</span> <span class="pre">False,</span> <span class="pre">fits_format:</span> <span class="pre">False</span></code> / <code class="docutils literal notranslate"><span class="pre">setDL3InputFile</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>LST-1 DL2 files (with phases)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flags:</span> <span class="pre">DL2_format:</span> <span class="pre">True</span></code> / <code class="docutils literal notranslate"><span class="pre">setLSTInputFile</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><em>Fermi</em>-LAT file (with phases)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flags:</span> <span class="pre">fits_format:</span> <span class="pre">True</span></code> / <code class="docutils literal notranslate"><span class="pre">setFermiInputFile</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Lists of phases, times, energies</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">setListsInput</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The energies are expected in TeV. For lists of events selected with cuts, the
+observation time (in hours) should be given with the <code class="docutils literal notranslate"><span class="pre">tobs</span></code> argument of
+<code class="docutils literal notranslate"><span class="pre">setListsInput</span></code>.</p>
+</section>
+<section id="phase-regions">
+<h3>Phase regions<a class="headerlink" href="#phase-regions" title="Link to this heading">#</a></h3>
+<p>The signal regions (<code class="docutils literal notranslate"><span class="pre">P1</span></code>, <code class="docutils literal notranslate"><span class="pre">P2</span></code> and <code class="docutils literal notranslate"><span class="pre">P3</span></code>) and the background region
+(<code class="docutils literal notranslate"><span class="pre">Bkg</span></code>) are defined by their phase edges. A region crossing phase 0 is
+defined with two intervals, for instance <code class="docutils literal notranslate"><span class="pre">P1:</span> <span class="pre">[0,</span> <span class="pre">0.026,</span> <span class="pre">0.983,</span> <span class="pre">1]</span></code>. The
+number of excess events and the significance of each peak
+(<a class="reference external" href="https://doi.org/10.1086/161295">Li &amp; Ma 1983</a>, Eq. 17) are computed using
+the background region as the OFF region.</p>
+</section>
+<section id="periodicity-tests">
+<h3>Periodicity tests<a class="headerlink" href="#periodicity-tests" title="Link to this heading">#</a></h3>
+<p>Three tests of the uniformity of the phases are applied:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\chi^2\)</span> test of the phaseogram.</p></li>
+<li><p><span class="math notranslate nohighlight">\(Z^2_{n}\)</span> test (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/1983A&amp;A...128..245B">Buccheri et al. 1983</a>) with
+<span class="math notranslate nohighlight">\(n=10\)</span> harmonics.</p></li>
+<li><p>H test (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/1989A&amp;A...221..180D">de Jager et al. 1989</a>), with the
+p-value from <a class="reference external" href="https://doi.org/10.1051/0004-6361/201014362">de Jager &amp; Büsching 2010</a>.</p></li>
+</ul>
+<p>For each test the statistic, the p-value and the equivalent one-sided Gaussian
+significance are reported.</p>
+</section>
+<section id="fit-of-the-pulse-profile">
+<h3>Fit of the pulse profile<a class="headerlink" href="#fit-of-the-pulse-profile" title="Link to this heading">#</a></h3>
+<p>The peaks can be fitted with the models listed by
+<a class="reference internal" href="api/ptiming_ana.phaseogram.get_model_list.html#ptiming_ana.phaseogram.get_model_list" title="ptiming_ana.phaseogram.get_model_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ptiming_ana.phaseogram.get_model_list</span></code></a>: one (<code class="docutils literal notranslate"><span class="pre">gaussian</span></code>), two
+(<code class="docutils literal notranslate"><span class="pre">dgaussian</span></code>) or three (<code class="docutils literal notranslate"><span class="pre">tgaussian</span></code>) Gaussians, two asymmetric Gaussians
+(<code class="docutils literal notranslate"><span class="pre">asym_dgaussian</span></code>) and one (<code class="docutils literal notranslate"><span class="pre">lorentzian</span></code>) or two (<code class="docutils literal notranslate"><span class="pre">double_lorentz</span></code>)
+Lorentzians. The fit is either a least-squares fit to the phaseogram
+(<code class="docutils literal notranslate"><span class="pre">binned:</span> <span class="pre">True</span></code>) or an unbinned extended maximum likelihood fit to the phases.</p>
+</section>
+<section id="evolution-with-time-and-energy">
+<h3>Evolution with time and energy<a class="headerlink" href="#evolution-with-time-and-energy" title="Link to this heading">#</a></h3>
+<p>The statistics are computed in cumulative time intervals (<code class="docutils literal notranslate"><span class="pre">time_binning</span></code>) to
+follow the growth of the signal, and in bins of energy or above energy
+thresholds (<code class="docutils literal notranslate"><span class="pre">energy_binning</span></code>). The results and plots are obtained with the
+<code class="docutils literal notranslate"><span class="pre">show_*</span></code> methods of the analysis object, and saved in a PDF file with
+<code class="docutils literal notranslate"><span class="pre">results:</span> <span class="pre">save_results:</span> <span class="pre">True</span></code>.</p>
+</section>
+</section>
+<section id="spectral-analysis">
+<h2>Spectral analysis<a class="headerlink" href="#spectral-analysis" title="Link to this heading">#</a></h2>
+<p>The spectral energy distribution of a peak is obtained from the DL3 files with
+<a class="reference internal" href="api/ptiming_ana.spectral.SpectralPulsarAnalysis.html#ptiming_ana.spectral.SpectralPulsarAnalysis" title="ptiming_ana.spectral.SpectralPulsarAnalysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ptiming_ana.spectral.SpectralPulsarAnalysis</span></code></a>, using the events in the
+background phase region to estimate the background:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ptiming_ana.spectral</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpectralPulsarAnalysis</span>
+
+<span class="n">spectrum</span> <span class="o">=</span> <span class="n">SpectralPulsarAnalysis</span><span class="p">(</span><span class="s2">"config.yaml"</span><span class="p">)</span>
+<span class="n">spectrum</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">peak</span><span class="o">=</span><span class="s2">"P1"</span><span class="p">)</span>
+
+<span class="n">flux_points</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">get_flux_points</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The energy binning, the energy range of the fit and of the spectral points,
+and the spectral model are set in the configuration file. A Gammapy spectral
+model can be given with the <code class="docutils literal notranslate"><span class="pre">ref_model</span></code> argument to be used as the model to
+fit. The plots are saved in the <code class="docutils literal notranslate"><span class="pre">results_output_directory</span></code> and, optionally,
+the reduced datasets (DL4) in the <code class="docutils literal notranslate"><span class="pre">DL4_directory</span></code>.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="auto_examples/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-pulsar-phases">Computing the pulsar phases</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#phaseogram-analysis">Phaseogram analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-data">Input data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-regions">Phase regions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#periodicity-tests">Periodicity tests</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fit-of-the-pulse-profile">Fit of the pulse profile</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evolution-with-time-and-energy">Evolution with time and energy</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectral-analysis">Spectral analysis</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/userguide.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Álvaro Mas Aguilar, Cristian Pozo González, Daniel Morcuende.  Last updated 15 Oct 2026 10:40.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

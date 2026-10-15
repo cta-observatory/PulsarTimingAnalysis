@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=504caf1d"></script>
+    <script src="../_static/documentation_options.js?v=3636b96f"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -52,11 +52,11 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="API reference" href="../api-reference/index.html" />
-    <link rel="prev" title="Examples" href="../examples/index.html" />
+    <link rel="prev" title="Examples" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.6.dev87+gfe28e30e0" />
+  <meta name="docsearch:version" content="0.6.dev90+gde7e918ce" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -145,8 +145,15 @@
 </li>
 
 
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../userguide.html">
+    User guide
+  </a>
+</li>
+
+
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../examples/index.html">
+  <a class="nav-link nav-internal" href="index.html">
     Examples
   </a>
 </li>
@@ -155,6 +162,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../api-reference/index.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
   </a>
 </li>
 
@@ -260,8 +274,15 @@
 </li>
 
 
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../userguide.html">
+    User guide
+  </a>
+</li>
+
+
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../examples/index.html">
+  <a class="nav-link nav-internal" href="index.html">
     Examples
   </a>
 </li>
@@ -270,6 +291,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../api-reference/index.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
   </a>
 </li>
 
@@ -373,7 +401,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../examples/index.html" class="nav-link">Examples</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Examples</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Basic pulsar analysis using Fermi-LAT data</span></li>
   </ul>
@@ -409,9 +437,7 @@ study the evolution of the signal with time and energy.</p>
 </span><span class="linenos">15</span> <span class="kn">from</span><span class="w"> </span><span class="nn">astropy</span><span class="nn">.</span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">fits</span><span class="w">
 </span><span class="linenos">16</span><span class="w">
 </span><span class="linenos">17</span> <span class="kn">import</span><span class="w"> </span><span class="nn">ptiming_ana</span><span class="w">
-</span><span class="linenos">18</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ptiming_ana</span><span class="nn">.</span><span class="nn">phaseogram</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-class reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis" title="ptiming_ana.phaseogram.PulsarAnalysis"><span class="n">PulsarAnalysis</span></a><span class="w">
-</span><span class="linenos">19</span><span class="w">
-</span><span class="linenos">20</span> <span class="c1"># sphinx_gallery_multi_image = &quot;single&quot;</span><span class="w">
+</span><span class="linenos">18</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ptiming_ana</span><span class="nn">.</span><a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="nn">phaseogram</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-class reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis" title="ptiming_ana.phaseogram.PulsarAnalysis"><span class="n">PulsarAnalysis</span></a><span class="w">
 </span></pre></div></div>
 <p><code class="docutils literal notranslate"><span class="pre">ptiming_ana</span></code> reports the progress and the results of the analysis through
 the Python logging system. This shows the messages in the terminal/notebook:</p>
@@ -441,7 +467,7 @@ the pulse profile and the energy binning:</p>
 </span><span class="linenos">53</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.setTimeInterval" title="ptiming_ana.phaseogram.PulsarAnalysis.setTimeInterval"><span class="n">h</span><span class="o">.</span><span class="n">setTimeInterval</span></a><span class="p">(</span><span class="n">tint</span><span class="o">=</span><span class="mi">3600</span> <span class="o">*</span> <span class="mi">24</span><span class="p">)</span><span class="w">
 </span><span class="linenos">54</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.setFittingParams" title="ptiming_ana.phaseogram.PulsarAnalysis.setFittingParams"><span class="n">h</span><span class="o">.</span><span class="n">setFittingParams</span></a><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">dgaussian</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">binned</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
 </span><span class="linenos">55</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.setEnergybinning" title="ptiming_ana.phaseogram.PulsarAnalysis.setEnergybinning"><span class="n">h</span><span class="o">.</span><span class="n">setEnergybinning</span></a><span class="p">(</span><span class="w">
-</span><span class="linenos">56</span>     <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="p">,</span> <span class="n">do_diff</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_integral</span><span class="o">=</span><span class="kc">False</span><span class="w">
+</span><span class="linenos">56</span>     <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.geomspace.html#numpy.geomspace" title="numpy.geomspace"><span class="n">np</span><span class="o">.</span><span class="n">geomspace</span></a><span class="p">(</span><span class="mf">0.1</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="p">,</span> <span class="n">do_diff</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_integral</span><span class="o">=</span><span class="kc">False</span><span class="w">
 </span><span class="linenos">57</span> <span class="p">)</span>  <span class="c1"># in TeV</span><span class="w">
 </span></pre></div></div>
 </section>
@@ -453,37 +479,37 @@ the pulse profile and the energy binning:</p>
 </span></pre></div></div>
 <p>But in general we can read our file (FITS, DL2, DL3…) and extract
 phases, times and energies as lists and read them as follows:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">73</span> <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">./example_data/merged2_pulsar.fits</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="w">
-</span><span class="linenos">74</span>     <span class="n">fits_table</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="w">
-</span><span class="linenos">75</span>     <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fits_table</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">BARYCENTRIC_TIME</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="w">
-</span><span class="linenos">76</span>     <span class="n">phases</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fits_table</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">PULSE_PHASE</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="w">
-</span><span class="linenos">77</span>     <span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fits_table</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">ENERGY</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># in MeV</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">73</span> <span class="k">with</span> <a class="sphx-glr-backref-module-astropy-io-fits sphx-glr-backref-type-py-function reference external" href="https://docs.astropy.org/en/stable/io/fits/api/files.html#astropy.io.fits.open" title="astropy.io.fits.open"><span class="n">fits</span><span class="o">.</span><span class="n">open</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">./example_data/merged2_pulsar.fits</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">as</span> <a class="sphx-glr-backref-module-astropy-io-fits sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.astropy.org/en/stable/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="astropy.io.fits.HDUList"><span class="n">f</span></a><span class="p">:</span><span class="w">
+</span><span class="linenos">74</span>     <a class="sphx-glr-backref-module-astropy-io-fits sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.astropy.org/en/stable/io/fits/api/tables.html#astropy.io.fits.FITS_rec" title="astropy.io.fits.FITS_rec"><span class="n">fits_table</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-astropy-io-fits sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.astropy.org/en/stable/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="astropy.io.fits.HDUList"><span class="n">f</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="w">
+</span><span class="linenos">75</span>     <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">times</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a class="sphx-glr-backref-module-astropy-io-fits sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.astropy.org/en/stable/io/fits/api/tables.html#astropy.io.fits.FITS_rec" title="astropy.io.fits.FITS_rec"><span class="n">fits_table</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">BARYCENTRIC_TIME</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="w">
+</span><span class="linenos">76</span>     <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">phases</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a class="sphx-glr-backref-module-astropy-io-fits sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.astropy.org/en/stable/io/fits/api/tables.html#astropy.io.fits.FITS_rec" title="astropy.io.fits.FITS_rec"><span class="n">fits_table</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">PULSE_PHASE</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="w">
+</span><span class="linenos">77</span>     <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">energies</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a class="sphx-glr-backref-module-astropy-io-fits sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.astropy.org/en/stable/io/fits/api/tables.html#astropy.io.fits.FITS_rec" title="astropy.io.fits.FITS_rec"><span class="n">fits_table</span></a><span class="p">[</span><span class="s2">&quot;</span><span class="s2">ENERGY</span><span class="s2">&quot;</span><span class="p">]</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># in MeV</span><span class="w">
 </span><span class="linenos">78</span><span class="w">
-</span><span class="linenos">79</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.setListsInput" title="ptiming_ana.phaseogram.PulsarAnalysis.setListsInput"><span class="n">h</span><span class="o">.</span><span class="n">setListsInput</span></a><span class="p">(</span><span class="n">phases</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">energies</span> <span class="o">/</span> <span class="mf">1e6</span><span class="p">,</span> <span class="n">tel</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">fermi</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">energy_units</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">TeV</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="linenos">79</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.setListsInput" title="ptiming_ana.phaseogram.PulsarAnalysis.setListsInput"><span class="n">h</span><span class="o">.</span><span class="n">setListsInput</span></a><span class="p">(</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">phases</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">times</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">energies</span></a> <span class="o">/</span> <span class="mf">1e6</span><span class="p">,</span> <span class="n">tel</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">fermi</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">energy_units</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">TeV</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
 </section>
 <section id="run-the-code">
 <h2>Run the code<a class="headerlink" href="#run-the-code" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">86</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.run" title="ptiming_ana.phaseogram.PulsarAnalysis.run"><span class="n">h</span><span class="o">.</span><span class="n">run</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:34:03 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Initializing...
-2026-10-15 10:34:03 INFO   [ptiming_ana.phaseogram.read_events] Finishing reading. Total time is 8342.590926586941 h
-2026-10-15 10:34:03 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Calculating statistics every 1440.0 minutes...
-2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
-2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
-2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
-2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Performing energy-dependent analysis...
-2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
-2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
-2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
-2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
-2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
-2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
-2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
-2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
-2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
-2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
-2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FINISHED. Producing general results...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:40:25 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Initializing...
+2026-10-15 10:40:25 INFO   [ptiming_ana.phaseogram.read_events] Finishing reading. Total time is 8342.590926586941 h
+2026-10-15 10:40:25 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Calculating statistics every 1440.0 minutes...
+2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
+2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
+2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
+2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Performing energy-dependent analysis...
+2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
+2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
+2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
+2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
+2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
+2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
+2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
+2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
+2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
+2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
+2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FINISHED. Producing general results...
 </pre></div>
 </div>
 </section>
@@ -491,14 +517,14 @@ phases, times and energies as lists and read them as follows:</p>
 <h2>Show the results<a class="headerlink" href="#show-the-results" title="Link to this heading">#</a></h2>
 <section id="overall-results">
 <h3>Overall results<a class="headerlink" href="#overall-results" title="Link to this heading">#</a></h3>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">96</span> <span class="n">phaseogram</span> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram" title="ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram"><span class="n">h</span><span class="o">.</span><span class="n">draw_phaseogram</span></a><span class="p">(</span><span class="n">phase_limits</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="p">,</span> <span class="n">colorhist</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">xkcd:baby blue</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
-</span><span class="linenos">97</span> <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="p">)</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">96</span> <a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="n">phaseogram</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram" title="ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram"><span class="n">h</span><span class="o">.</span><span class="n">draw_phaseogram</span></a><span class="p">(</span><span class="n">phase_limits</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="p">,</span> <span class="n">colorhist</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">xkcd:baby blue</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="linenos">97</span> <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
 <img src="../_images/sphx_glr_Tutorial_notebook_001.png" srcset="../_images/sphx_glr_Tutorial_notebook_001.png" alt="Tutorial notebook" class = "sphx-glr-single-img"/><p>Statistics of the peaks (Li&amp;Ma significance, number of excess events…) and
 results of the periodicity tests (<span class="math notranslate nohighlight">\(\chi^2\)</span>, <span class="math notranslate nohighlight">\(Z^2_{10}\)</span> and H tests):</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">103</span> <span class="n">peak_statistics</span><span class="p">,</span> <span class="n">periodicity_statistics</span> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_Presults" title="ptiming_ana.phaseogram.PulsarAnalysis.show_Presults"><span class="n">h</span><span class="o">.</span><span class="n">show_Presults</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">103</span> <a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">peak_statistics</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">periodicity_statistics</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_Presults" title="ptiming_ana.phaseogram.PulsarAnalysis.show_Presults"><span class="n">h</span><span class="o">.</span><span class="n">show_Presults</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
                        P1           P2         P1+P2
 Significance   108.591359    58.006568    110.165719
 Nex           5959.237143  2677.271429   8636.508571
@@ -507,15 +533,15 @@ Number        6969.000000  3734.000000  10703.000000
 noff          1009.762857  1056.728571   2066.491429
 sign_t_ratio     1.188899     0.635077      1.206135
 s/n ratio      187.534413    82.358927    189.985915
-2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.23 +/- 0.06
-2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
+2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.23 +/- 0.06
+2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
                     Chi_square_test       Zn_test        H_test
 Statistic              26977.433752  25612.347810  27915.973962
 p-value                    0.000000      0.000000      0.000000
 Number of $\sigma$       163.171174    159.548517    149.027746
 </pre></div>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">106</span> <span class="n">peak_statistics</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">106</span> <a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">peak_statistics</span></a><span class="w">
 </span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div>
@@ -589,7 +615,7 @@ Number of $\sigma$       163.171174    159.548517    149.027746
 </div>
 </div>
 <br />
-<br /><div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">109</span> <span class="n">periodicity_statistics</span><span class="w">
+<br /><div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">109</span> <a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">periodicity_statistics</span></a><span class="w">
 </span></pre></div></div>
 <div class="output_subarea output_html rendered_html output_result">
 <div>
@@ -647,10 +673,10 @@ Number of $\sigma$       163.171174    159.548517    149.027746
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>dgaussian
 </pre></div>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">120</span> <span class="n">fit_result</span> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_fit_results" title="ptiming_ana.phaseogram.PulsarAnalysis.show_fit_results"><span class="n">h</span><span class="o">.</span><span class="n">show_fit_results</span></a><span class="p">(</span><span class="p">)</span><span class="w">
-</span><span class="linenos">121</span> <span class="n">fit_result</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">120</span> <a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">fit_result</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_fit_results" title="ptiming_ana.phaseogram.PulsarAnalysis.show_fit_results"><span class="n">h</span><span class="o">.</span><span class="n">show_fit_results</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="linenos">121</span> <a class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame"><span class="n">fit_result</span></a><span class="w">
 </span></pre></div></div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
       Name       Value      Error
 0       mu    0.992423   0.001566
 1    sigma    0.026305   0.001470
@@ -733,10 +759,10 @@ Number of $\sigma$       163.171174    159.548517    149.027746
 </div>
 </div>
 <br />
-<br /><div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">124</span> <span class="n">phaseogram</span> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram" title="ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram"><span class="n">h</span><span class="o">.</span><span class="n">draw_phaseogram</span></a><span class="p">(</span><span class="w">
+<br /><div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">124</span> <a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="n">phaseogram</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram" title="ptiming_ana.phaseogram.PulsarAnalysis.draw_phaseogram"><span class="n">h</span><span class="o">.</span><span class="n">draw_phaseogram</span></a><span class="p">(</span><span class="w">
 </span><span class="linenos">125</span>     <span class="n">phase_limits</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="p">,</span> <span class="n">colorhist</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">xkcd:baby blue</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fit</span><span class="o">=</span><span class="kc">True</span><span class="w">
 </span><span class="linenos">126</span> <span class="p">)</span><span class="w">
-</span><span class="linenos">127</span> <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="linenos">127</span> <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
 <img src="../_images/sphx_glr_Tutorial_notebook_002.png" srcset="../_images/sphx_glr_Tutorial_notebook_002.png" alt="Tutorial notebook" class = "sphx-glr-single-img"/></section>
 <section id="results-vs-time">
@@ -758,12 +784,12 @@ Number of $\sigma$       163.171174    159.548517    149.027746
 <li><img src="../_images/sphx_glr_Tutorial_notebook_007.png" srcset="../_images/sphx_glr_Tutorial_notebook_007.png" alt="Tutorial notebook" class = "sphx-glr-single-img"/></li>
 <li><img src="../_images/sphx_glr_Tutorial_notebook_008.png" srcset="../_images/sphx_glr_Tutorial_notebook_008.png" alt="Tutorial notebook" class = "sphx-glr-single-img"/></li>
 </ul>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">144</span> <span class="n">energy_lc</span> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_all_lc" title="ptiming_ana.phaseogram.PulsarAnalysis.show_all_lc"><span class="n">h</span><span class="o">.</span><span class="n">show_all_lc</span></a><span class="p">(</span><span class="n">ylimits</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">144</span> <a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="n">energy_lc</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_all_lc" title="ptiming_ana.phaseogram.PulsarAnalysis.show_all_lc"><span class="n">h</span><span class="o">.</span><span class="n">show_all_lc</span></a><span class="p">(</span><span class="n">ylimits</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
 <img src="../_images/sphx_glr_Tutorial_notebook_009.png" srcset="../_images/sphx_glr_Tutorial_notebook_009.png" alt="Tutorial notebook" class = "sphx-glr-single-img"/><div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">147</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">energy_results</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyPresults" title="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyPresults"><span class="n">h</span><span class="o">.</span><span class="n">show_EnergyPresults</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
+2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
                        P1           P2        P1+P2
 Significance    64.283110    32.326941    64.254439
 Nex           2329.814286   994.642857  3324.457143
@@ -772,14 +798,14 @@ Number        2828.000000  1516.000000  4344.000000
 noff           498.185714   521.357143  1019.542857
 sign_t_ratio     0.703795     0.353927     0.703481
 s/n ratio      104.382013    43.561167   104.116125
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.34 +/- 0.11
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
+2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.34 +/- 0.11
+2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
                     Chi_square_test      Zn_test        H_test
 Statistic               9894.812087  9398.711056  10117.135680
 p-value                    0.000000     0.000000      0.000000
 Number of $\sigma$        97.930413    96.234848     89.679481
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
+2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
+2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
                        P1           P2        P1+P2
 Significance    72.157101    39.603539    73.624074
 Nex           2428.965714  1109.057143  3538.022857
@@ -788,25 +814,25 @@ Number        2771.000000  1467.000000  4238.000000
 noff           342.034286   357.942857   699.977143
 sign_t_ratio     0.790003     0.433594     0.806064
 s/n ratio      131.336840    58.620170   133.726878
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.19 +/- 0.09
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
+2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.19 +/- 0.09
+2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
                     Chi_square_test       Zn_test        H_test
 Statistic              12360.395436  11771.055229  12826.853971
 p-value                    0.000000      0.000000      0.000000
 Number of $\sigma$       109.750929    107.838824    100.990631
 </pre></div>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">150</span> <span class="n">energy_plots</span> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyAna" title="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyAna"><span class="n">h</span><span class="o">.</span><span class="n">show_EnergyAna</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">150</span> <a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="n">energy_plots</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyAna" title="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyAna"><span class="n">h</span><span class="o">.</span><span class="n">show_EnergyAna</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
 <img src="../_images/sphx_glr_Tutorial_notebook_010.png" srcset="../_images/sphx_glr_Tutorial_notebook_010.png" alt="P1/P2 vs Energy" class = "sphx-glr-single-img"/></section>
 <section id="fit-vs-energy">
 <h3>Fit vs Energy<a class="headerlink" href="#fit-vs-energy" title="Link to this heading">#</a></h3>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">157</span> <span class="n">mean_energy_plot</span> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_meanVsEnergy" title="ptiming_ana.phaseogram.PulsarAnalysis.show_meanVsEnergy"><span class="n">h</span><span class="o">.</span><span class="n">show_meanVsEnergy</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">157</span> <a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="n">mean_energy_plot</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_meanVsEnergy" title="ptiming_ana.phaseogram.PulsarAnalysis.show_meanVsEnergy"><span class="n">h</span><span class="o">.</span><span class="n">show_meanVsEnergy</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
 <img src="../_images/sphx_glr_Tutorial_notebook_011.png" srcset="../_images/sphx_glr_Tutorial_notebook_011.png" alt="P1 mean phase, P2 mean phase" class = "sphx-glr-single-img"/><div class="highlight-Python notranslate"><div class="highlight"><pre><span class="linenos">160</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">energy_fit_results</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-ptiming_ana-phaseogram sphx-glr-backref-type-py-method reference internal" href="../api/ptiming_ana.phaseogram.PulsarAnalysis.html#ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyFitresults" title="ptiming_ana.phaseogram.PulsarAnalysis.show_EnergyFitresults"><span class="n">h</span><span class="o">.</span><span class="n">show_EnergyFitresults</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2026-10-15 10:40:43 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
+2026-10-15 10:40:43 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
       Name       Value     Error
 0       mu    0.990064  0.001285
 1    sigma    0.025658  0.001199
@@ -815,8 +841,8 @@ Number of $\sigma$       109.750929    107.838824    100.990631
 4        A  231.375000  0.000000
 5        B   80.804887  3.667207
 6        C   51.361385  3.643919
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
-2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
+2026-10-15 10:40:43 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
+2026-10-15 10:40:43 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
       Name       Value     Error
 0       mu    0.991737  0.001711
 1    sigma    0.026729  0.001598
@@ -827,7 +853,7 @@ Number of $\sigma$       109.750929    107.838824    100.990631
 6        C   58.966419  4.808841
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 12.422 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 18.444 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-tutorial-notebook-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9dc897b64b82ae92c502938a732d9873/Tutorial_notebook.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">Tutorial_notebook.ipynb</span></code></a></p>
@@ -855,7 +881,7 @@ Number of $\sigma$       109.750929    107.838824    100.990631
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../examples/index.html"
+       href="index.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
@@ -942,7 +968,7 @@ Number of $\sigma$       109.750929    107.838824    100.990631
 
   <p class="copyright">
     
-      © Copyright Álvaro Mas Aguilar, Cristian Pozo González, Daniel Morcuende.  Last updated 15 Oct 2026 10:34.
+      © Copyright Álvaro Mas Aguilar, Cristian Pozo González, Daniel Morcuende.  Last updated 15 Oct 2026 10:40.
       <br/>
     
   </p>

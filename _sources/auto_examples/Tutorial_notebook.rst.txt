@@ -28,7 +28,7 @@ study the evolution of the signal with time and energy.
 It uses about 10 years of public *Fermi*-LAT observations of the Crab pulsar
 (100 MeV - 1 GeV), for which the pulsar phases were already computed.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-22
+.. GENERATED FROM PYTHON SOURCE LINES 12-21
 
 .. code-block:: Python
    :lineno-start: 13
@@ -41,7 +41,6 @@ It uses about 10 years of public *Fermi*-LAT observations of the Crab pulsar
     import ptiming_ana
     from ptiming_ana.phaseogram import PulsarAnalysis
 
-    # sphinx_gallery_multi_image = "single"
 
 
 
@@ -208,24 +207,24 @@ Run the code
 
  .. code-block:: none
 
-    2026-10-15 10:34:03 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Initializing...
-    2026-10-15 10:34:03 INFO   [ptiming_ana.phaseogram.read_events] Finishing reading. Total time is 8342.590926586941 h
-    2026-10-15 10:34:03 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Calculating statistics every 1440.0 minutes...
-    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
-    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
-    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
-    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Performing energy-dependent analysis...
-    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
-    2026-10-15 10:34:09 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
-    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
-    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
-    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
-    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
-    2026-10-15 10:34:11 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
-    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
-    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
-    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
-    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FINISHED. Producing general results...
+    2026-10-15 10:40:25 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Initializing...
+    2026-10-15 10:40:25 INFO   [ptiming_ana.phaseogram.read_events] Finishing reading. Total time is 8342.590926586941 h
+    2026-10-15 10:40:25 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Calculating statistics every 1440.0 minutes...
+    2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
+    2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
+    2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
+    2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Performing energy-dependent analysis...
+    2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
+    2026-10-15 10:40:33 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
+    2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
+    2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
+    2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
+    2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.penergy_analysis] Creating object in energy range (TeV):0.00-0.00
+    2026-10-15 10:40:37 INFO   [ptiming_ana.phaseogram.penergy_analysis] Calculating statistics...
+    2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fitting the data to the given model...
+    2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Fit model: dgaussian
+    2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] Binned fitting: True
+    2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FINISHED. Producing general results...
 
 
 
@@ -280,7 +279,7 @@ results of the periodicity tests (:math:`\chi^2`, :math:`Z^2_{10}` and H tests):
 
  .. code-block:: none
 
-    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
+    2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
                            P1           P2         P1+P2
     Significance   108.591359    58.006568    110.165719
     Nex           5959.237143  2677.271429   8636.508571
@@ -289,8 +288,8 @@ results of the periodicity tests (:math:`\chi^2`, :math:`Z^2_{10}` and H tests):
     noff          1009.762857  1056.728571   2066.491429
     sign_t_ratio     1.188899     0.635077      1.206135
     s/n ratio      187.534413    82.358927    189.985915
-    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.23 +/- 0.06
-    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
+    2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.23 +/- 0.06
+    2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
                         Chi_square_test       Zn_test        H_test
     Statistic              26977.433752  25612.347810  27915.973962
     p-value                    0.000000      0.000000      0.000000
@@ -493,7 +492,7 @@ Result of the fitting
 
  .. code-block:: none
 
-    2026-10-15 10:34:14 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
+    2026-10-15 10:40:40 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
           Name       Value      Error
     0       mu    0.992423   0.001566
     1    sigma    0.026305   0.001470
@@ -726,8 +725,8 @@ Results vs Energy
 
  .. code-block:: none
 
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
+    2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
+    2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
                            P1           P2        P1+P2
     Significance    64.283110    32.326941    64.254439
     Nex           2329.814286   994.642857  3324.457143
@@ -736,14 +735,14 @@ Results vs Energy
     noff           498.185714   521.357143  1019.542857
     sign_t_ratio     0.703795     0.353927     0.703481
     s/n ratio      104.382013    43.561167   104.116125
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.34 +/- 0.11
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
+    2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.34 +/- 0.11
+    2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
                         Chi_square_test      Zn_test        H_test
     Statistic               9894.812087  9398.711056  10117.135680
     p-value                    0.000000     0.000000      0.000000
     Number of $\sigma$        97.930413    96.234848     89.679481
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
+    2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
+    2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PEAK STATISTICS:
                            P1           P2        P1+P2
     Significance    72.157101    39.603539    73.624074
     Nex           2428.965714  1109.057143  3538.022857
@@ -752,8 +751,8 @@ Results vs Energy
     noff           342.034286   357.942857   699.977143
     sign_t_ratio     0.790003     0.433594     0.806064
     s/n ratio      131.336840    58.620170   133.726878
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.19 +/- 0.09
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
+    2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] P1/P2 ratio=2.19 +/- 0.09
+    2026-10-15 10:40:42 INFO   [ptiming_ana.phaseogram.pulsar_analysis] RESULTS FOR THE PERIODICITY SEARCH:
                         Chi_square_test       Zn_test        H_test
     Statistic              12360.395436  11771.055229  12826.853971
     p-value                    0.000000      0.000000      0.000000
@@ -821,8 +820,8 @@ Fit vs Energy
 
  .. code-block:: none
 
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
+    2026-10-15 10:40:43 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.1-0.316
+    2026-10-15 10:40:43 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
           Name       Value     Error
     0       mu    0.990064  0.001285
     1    sigma    0.025658  0.001199
@@ -831,8 +830,8 @@ Fit vs Energy
     4        A  231.375000  0.000000
     5        B   80.804887  3.667207
     6        C   51.361385  3.643919
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
-    2026-10-15 10:34:15 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
+    2026-10-15 10:40:43 INFO   [ptiming_ana.phaseogram.penergy_analysis] Energies(GeV): 0.316-1
+    2026-10-15 10:40:43 INFO   [ptiming_ana.phaseogram.pulsar_analysis] FITTING RESULTS:
           Name       Value     Error
     0       mu    0.991737  0.001711
     1    sigma    0.026729  0.001598
@@ -848,7 +847,7 @@ Fit vs Energy
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 12.422 seconds)
+   **Total running time of the script:** (0 minutes 18.444 seconds)
 
 
 .. _sphx_glr_download_auto_examples_Tutorial_notebook.py:

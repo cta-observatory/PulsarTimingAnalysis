@@ -1,8 +1,8 @@
 .. _cphase:
 
-============================
-Phase calculation (`cphase`)
-============================
+==============================
+Phase calculation (``cphase``)
+==============================
 
 .. currentmodule:: ptiming_ana.cphase
 
