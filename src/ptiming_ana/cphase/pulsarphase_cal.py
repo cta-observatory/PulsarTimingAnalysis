@@ -17,7 +17,6 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy.time import Time
 from gammapy.data import DataStore, EventList
-from lstchain.io.io import dl2_params_lstcam_key
 from pint import models, toa
 from pint.fermi_toas import load_Fermi_TOAs
 from pint.models import get_model
@@ -25,10 +24,11 @@ from pint.observatory.satellite_obs import get_satellite_observatory
 from scipy.interpolate import interp1d
 
 from ptiming_ana.cphase.utils import (
-    add_mjd,
+    check_ephemeris_validity,
     dl2time_totim,
     model_fromephem,
 )
+from ptiming_ana.io import read_dl2_times
 
 __all__ = ["DL2_calphase", "DL3_calphase", "DL3_calphase_gammapy", "fermi_calphase"]
 
@@ -423,7 +423,7 @@ def compute_phases_from_times_model(
     return (barycent_toas, phases)
 
 
-def create_files(timelist, ephem, timname, parname, obs="lst"):
+def create_files(timelist, ephem, timname, parname, obs="lst", check_validity=True):
     """
     Creates the .tim and .par file needed for the use of PINT.
 
@@ -441,7 +441,13 @@ def create_files(timelist, ephem, timname, parname, obs="lst"):
     parname: string
     Name of the output parfile
 
+    check_validity: boolean
+    Raise an error if the ephemeris is not valid for the times (see
+    `ptiming_ana.cphase.utils.check_ephemeris_validity`)
+
     """
+    if check_validity:
+        check_ephemeris_validity(timelist, ephem)
 
     if timname is not None:
         logger.info("Creating .tim file")
@@ -474,7 +480,7 @@ def DL2_calphase(
     Parameters:
     -----------------
     dl2file: string
-    DL2 input file with the arrival times
+    DL2 input file with the arrival times (produced by lstchain or CTLearn)
 
     ephem: string
     Ephemeris to be used (.par or .gro file)
@@ -497,10 +503,9 @@ def DL2_calphase(
 
     """
 
-    # Read the file
+    # Read the file (lstchain or CTLearn DL2)
     logger.info("Input file:" + str(dl2file))
-    df_i = pd.read_hdf(dl2file, key=dl2_params_lstcam_key)
-    add_mjd(df_i)
+    df_i = read_dl2_times(dl2file)
 
     # Create the .tim file
     timelist = df_i.mjd_time.tolist()

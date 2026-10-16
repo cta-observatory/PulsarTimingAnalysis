@@ -11,6 +11,8 @@ MODULES = [
     "ptiming_ana.cphase",
     "ptiming_ana.cphase.pulsarphase_cal",
     "ptiming_ana.cphase.utils",
+    "ptiming_ana.io",
+    "ptiming_ana.io.dl2",
     "ptiming_ana.phaseogram",
     "ptiming_ana.phaseogram.filter_object",
     "ptiming_ana.phaseogram.lightcurve",

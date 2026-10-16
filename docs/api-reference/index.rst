@@ -9,5 +9,6 @@ API reference
     :maxdepth: 2
 
     cphase
+    io
     phaseogram
     spectral

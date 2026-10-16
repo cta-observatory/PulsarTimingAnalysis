@@ -45,12 +45,22 @@ files:
 
 Use ``--help`` to see all the options of each tool.
 
+Before computing the phases, the tools check that the ephemeris is valid for
+the observation: the arrival times must be within the ``START`` - ``FINISH``
+range of a ``.par`` file (only a warning is given if the file does not define
+it) or covered by one of the lines of a ``.gro`` file. Otherwise an error is
+raised.
+
 * DL3 files: a new file ``{name}_pulsar.fits`` is written, with two new columns
   in the events table, ``PHASE`` and ``BARYCENT_TIME`` (MJD). To read the new
   files with Gammapy, the index files have to be created
   (``lstchain_create_dl3_index_files``).
-* DL2 files: a new table ``phase_info`` is added to the file, with the columns
-  ``pulsar_phase`` and ``mjd_barycenter_time``.
+* DL2 files (lstchain or CTLearn, the format is found from each file): a new
+  table ``phase_info`` is added to the file, with the columns ``pulsar_phase``
+  and ``mjd_barycenter_time``. With ``--include-theta`` a table
+  ``source_position`` with the ``theta2`` of each event is also added. The
+  source is given by name (``--source-name``, resolved online) or by its
+  coordinates (``--source-ra``, ``--source-dec``).
 * *Fermi*-LAT files: a new file ``{name}_pulsar.fits`` is written with the
   columns ``PULSE_PHASE`` and ``BARYCENTRIC_TIME``.
 
@@ -86,6 +96,7 @@ Input                               Configuration / method
 ==================================  ==========================================
 LST-1 DL3 files (with phases)       ``flags: DL2_format: False, fits_format: False`` / ``setDL3InputFile``
 LST-1 DL2 files (with phases)       ``flags: DL2_format: True`` / ``setLSTInputFile``
+                                    (lstchain or CTLearn files)
 *Fermi*-LAT file (with phases)      ``flags: fits_format: True`` / ``setFermiInputFile``
 Lists of phases, times, energies    ``setListsInput``
 ==================================  ==========================================

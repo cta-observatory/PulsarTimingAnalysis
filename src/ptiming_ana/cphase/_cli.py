@@ -33,21 +33,28 @@ def add_boolean_argument(parser, *flags, dest, help):
     )
 
 
-def find_files(directory, run=None):
+def find_files(directory, run=None, extensions=None):
     """
     Sorted list of the files in ``directory``. If ``run`` is given, only the
-    files whose name contains the run number are returned.
+    files whose name contains the run number are returned. If ``extensions``
+    is given (e.g. ``(".h5",)``), only the files ending with one of them.
     """
+    if isinstance(extensions, str):
+        extensions = (extensions,)
+
     filelist = [
         os.path.join(directory, name)
         for name in os.listdir(directory)
         if os.path.isfile(os.path.join(directory, name))
         and (run is None or str(run) in name)
+        and (extensions is None or name.endswith(tuple(extensions)))
     ]
     filelist.sort()
 
     if len(filelist) == 0:
         selection = "" if run is None else f" for run number {run}"
+        if extensions is not None:
+            selection += f" with extension {', '.join(extensions)}"
         raise FileNotFoundError(f"No files found in {directory}{selection}")
 
     return filelist
