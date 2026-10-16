@@ -1,5 +1,5 @@
 """
-Script that adds the information of the phases and corrected times for the pulsar analysis to a DL2 file. It includes this information in a new table called 'phase_info' and optionally a new table with the source position and theta2 values (called 'source_position')
+Script that adds the information of the phases and corrected times for the pulsar analysis to a DL2 file (produced by lstchain or CTLearn, the format is found from the file). It includes this information in a new table called 'phase_info' and optionally a new table with the source position and theta2 values (called 'source_position')
 
 Parameters:
 ----------------------
@@ -20,6 +20,10 @@ Parameters:
 
 --source-name: string
   Name of the source used to compute the source position (default: Crab)
+
+--source-ra, --source-dec: float
+  Coordinates (ICRS, deg) of the source. If given, they are used instead of
+  --source-name (which needs internet access to be resolved)
 
 --interpolation: boolean
   Set to True if want to use the interpolation method (faster but loses some precision)
@@ -59,7 +63,9 @@ Original author: Alvaro Mas Aguilar (alvmas)
 
 import argparse
 
+import astropy.units as u
 import pandas as pd
+from astropy.coordinates import SkyCoord
 
 from ptiming_ana import setup_logging
 from ptiming_ana.cphase._cli import add_boolean_argument, find_files
@@ -131,6 +137,22 @@ def get_parser():
         help="Name of the source, used to compute the source position if --include-theta is given",
     )
     parser.add_argument(
+        "--source-ra",
+        action="store",
+        type=float,
+        dest="source_ra",
+        default=None,
+        help="RA (ICRS, deg) of the source. Used instead of --source-name if given",
+    )
+    parser.add_argument(
+        "--source-dec",
+        action="store",
+        type=float,
+        dest="source_dec",
+        default=None,
+        help="Dec (ICRS, deg) of the source. Used instead of --source-name if given",
+    )
+    parser.add_argument(
         "--observatory",
         "-obs",
         action="store",
@@ -168,8 +190,16 @@ def main(args=None):
     if args.directory is not None and args.in_file is not None:
         parser.error("Both directory and file were given, can only use one of them")
 
+    if (args.source_ra is None) != (args.source_dec is None):
+        parser.error("Both --source-ra and --source-dec are needed")
+    source_position = None
+    if args.source_ra is not None:
+        source_position = SkyCoord(
+            ra=args.source_ra * u.deg, dec=args.source_dec * u.deg, frame="icrs"
+        )
+
     if args.directory is not None:
-        filelist = find_files(args.directory, args.run)
+        filelist = find_files(args.directory, args.run, extensions=".h5")
     elif args.in_file is not None:
         filelist = [args.in_file]
     else:
@@ -186,7 +216,7 @@ def main(args=None):
             pickle=args.pickle,
         )
         if args.include_theta:
-            add_source_info_dl2(file, args.source_name)
+            add_source_info_dl2(file, args.source_name, source_position=source_position)
 
 
 if __name__ == "__main__":

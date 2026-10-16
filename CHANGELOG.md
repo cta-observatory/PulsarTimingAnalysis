@@ -39,6 +39,17 @@ the releases are also available in the
 
 ### Added
 
+- Reading of LST-1 DL2 files produced by CTLearn, both to compute the phases
+  (`add_DL2_phase_table`) and in the analysis (`ReadLSTFile`). The format of
+  each file (lstchain or CTLearn) is found automatically, as well as the names
+  of the CTLearn tables (they can also be given with `ctlearn_prefixes`).
+  Files written with ctapipe < 0.27 (`classification` group) and >= 0.27
+  (`particle_type` group) are supported.
+- The validity of the ephemeris is checked before computing the phases: an
+  error is raised if the events are outside the `START` - `FINISH` range of a
+  `.par` file or not covered by a `.gro` file.
+- `--source-ra` and `--source-dec` options of `add_DL2_phase_table`, to give
+  the position of the source without resolving its name online.
 - Support for the current versions of the dependencies (tested with
   `lstchain` 0.12, `pint-pulsar` 1.1, `gammapy` 1.3, NumPy 2.2, pandas 3.0 and
   `matplotlib` 3.10 on Python 3.11). Python 3.12 is added to the CI.
@@ -54,6 +65,15 @@ the releases are also available in the
 
 ### Changed
 
+- `theta2` of DL2 events is computed as the angular distance between the
+  reconstructed direction (transformed from Alt/Az to ICRS) and the source,
+  instead of in the camera frame with a fixed effective focal length. The same
+  definition is used for lstchain and CTLearn files. The `source_position`
+  table now has the columns `obs_id`, `event_id` and `theta2`. The precise
+  position of LST-1 (`ctapipe_io_lst.constants.LST1_LOCATION`) is always used:
+  with old versions of lstchain an approximate position, ~25 m away, was used.
+- The `phase_info` and `source_position` tables of DL2 files are matched to the
+  events by `obs_id` and `event_id` (by position for older files).
 - The minimum supported version of Python is 3.10.
 - Dependencies are not pinned to exact versions anymore; `iminuit`, `pyyaml`
   and `regions` are declared as dependencies and `more-itertools` is not needed.
@@ -74,6 +94,9 @@ the releases are also available in the
 
 ### Fixed
 
+- The time difference with the previous event (`delta_t`), used to compute the
+  effective time of DL2 files, is computed before selecting the cosmic events,
+  as it must be the time since the previous *triggered* event.
 - `from ptiming_ana import *` failed because `spectral` was not imported.
 - `PulsarAnalysis(filename=...)` did not raise an error for unknown file formats.
 - `set_config` failed for source-independent DL2 analyses with extra cuts
@@ -95,4 +118,7 @@ the releases are also available in the
 
 ### Removed
 
+- `ReadLSTFile.add_phases`, which was not used and read the phases from the
+  old location in the DL2 files. The phases are read from the `phase_info`
+  table.
 - `ptiming_ana.cphase.add_pulsarphase` (obsolete duplicate of `add_DL2_phase_table`).

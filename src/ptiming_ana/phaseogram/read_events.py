@@ -16,6 +16,8 @@ from lstchain.io.io import (
 from lstchain.reco.utils import add_delta_t_key, get_effective_time
 from regions import PointSkyRegion
 
+from ptiming_ana.io.dl2 import CTLEARN, EVENT_KEYS, get_dl2_format, read_ctlearn_dl2
+
 logger = logging.getLogger(__name__)
 
 __all__ = [
@@ -73,6 +75,33 @@ def _tobs_from_gaps(mjd_times, max_gap_hours=None):
     if max_gap_hours is not None:
         diff[diff > max_gap_hours / 24] = 0
     return float(np.sum(diff) * 24)
+
+
+def _add_columns(events, table, columns, table_name):
+    """
+    Add to ``events`` the ``columns`` ({new name: name in table}) of ``table``.
+
+    The rows are matched by event (obs_id, event_id) if both tables have them,
+    otherwise both tables must have the same events in the same order.
+    """
+    if set(EVENT_KEYS) <= set(table.columns) and set(EVENT_KEYS) <= set(events.columns):
+        matched = events[EVENT_KEYS].merge(
+            table[EVENT_KEYS + list(columns.values())],
+            on=EVENT_KEYS,
+            how="left",
+            validate="one_to_one",
+        )
+    elif len(table) == len(events):
+        matched = table
+    else:
+        raise ValueError(
+            f"The {table_name} table has {len(table)} rows but there are "
+            f"{len(events)} events"
+        )
+
+    for new_name, name in columns.items():
+        events[new_name] = matched[name].to_numpy()
+    return events
 
 
 def compute_theta2(reco_src_x, reco_src_y, src_x, src_y):
@@ -265,7 +294,29 @@ class ReadDL3File:
 
 
 class ReadLSTFile:
-    def __init__(self, file=None, directory=None, src_dependent=False):
+    """
+    Reader of LST-1 DL2 files with the pulsar phases (see add_DL2_phase_table).
+
+    Both lstchain and CTLearn DL2 files can be read: the format is found from
+    each file.
+
+    Parameters
+    ----------
+    file : str, optional
+        DL2 file.
+    directory : str, optional
+        Directory with DL2 files (all the .h5 files in it are read).
+    src_dependent : bool
+        Read the source-dependent parameters (only lstchain files).
+    ctlearn_prefixes : dict, optional
+        Name of the CTLearn tables for each task (see
+        `ptiming_ana.io.read_ctlearn_dl2`). By default they are found from
+        the files.
+    """
+
+    def __init__(
+        self, file=None, directory=None, src_dependent=False, ctlearn_prefixes=None
+    ):
         if file is None and directory is None:
             raise ValueError("No file provided")
         elif file is not None and directory is not None:
@@ -282,66 +333,91 @@ class ReadLSTFile:
             for x in os.listdir(self.direc):
                 rel_dir = os.path.relpath(self.direc)
                 rel_file = os.path.join(rel_dir, x)
-                if "h5" in rel_file:
+                if x.endswith(".h5"):
                     self.fname.append(rel_file)
-                    self.fname.sort()
+            self.fname.sort()
 
         self.info = None
         self.src_dependent = src_dependent
+        self.ctlearn_prefixes = ctlearn_prefixes
 
-    def add_phases(self, pname):
-        dphase = pd.read_hdf(pname, key=dl2_params_lstcam_key)
-        self.info["pulsar_phase"] = dphase["pulsar_phase"]
+    def _read_srcindep_events(self, fname):
+        """All the events of a DL2 file (lstchain or CTLearn) with lstchain-like columns."""
+        if get_dl2_format(fname) == CTLEARN:
+            events = read_ctlearn_dl2(fname, prefixes=self.ctlearn_prefixes)
+        else:
+            events = pd.read_hdf(fname, key=dl2_params_lstcam_key)
+
+        # Before any selection, so that delta_t is the time since the previous
+        # triggered event (needed to compute the effective time)
+        if "delta_t" not in events:
+            events = add_delta_t_key(events)
+
+        return events.reset_index(drop=True)
+
+    @staticmethod
+    def _add_phases(events, fname):
+        if "pulsar_phase" not in events:
+            phase_info = pd.read_hdf(fname, key="phase_info")
+            events = _add_columns(
+                events,
+                phase_info,
+                {"pulsar_phase": "pulsar_phase", "mjd_time": "mjd_barycenter_time"},
+                "phase_info",
+            )
+        return events
+
+    @staticmethod
+    def _add_theta2(events, fname):
+        if "theta2" in events:
+            return events
+
+        try:
+            source_position = pd.read_hdf(fname, "source_position")
+        except KeyError:
+            logger.info("No theta2 computed")
+            return events
+
+        logger.info("Including theta2 column from source position table")
+        if "theta2_on" in source_position:
+            return _add_columns(
+                events, source_position, {"theta2": "theta2_on"}, "source_position"
+            )
+        if "theta2" in source_position:
+            return _add_columns(
+                events, source_position, {"theta2": "theta2"}, "source_position"
+            )
+
+        # Old files: position of the source in the camera
+        events = _add_columns(
+            events,
+            source_position,
+            {"src_x": "src_x", "src_y": "src_y"},
+            "source_position",
+        )
+        events["theta2"] = compute_theta2(
+            np.array(events["reco_src_x"]),
+            np.array(events["reco_src_y"]),
+            np.array(events["src_x"]),
+            np.array(events["src_y"]),
+        )
+        return events
 
     def read_LSTfile(self, fname, df_type="short", filter_data=True):
         if filter_data:
             if not self.src_dependent:
-                df_or = pd.read_hdf(fname, key=dl2_params_lstcam_key)
-                if "pulsar_phase" not in df_or:
-                    df_pulsar = pd.read_hdf(fname, key="phase_info")
-                    df_or["pulsar_phase"] = df_pulsar["pulsar_phase"]
-                    df_or["mjd_time"] = df_pulsar["mjd_barycenter_time"]
-
-                if "event_type" in df_or.columns:
-                    df = df_or[df_or["event_type"] == 32].copy()
-
-                    if "theta2" not in df.columns:
-                        try:
-                            df_pos = pd.read_hdf(fname, "source_position")
-                        except KeyError:
-                            df_pos = None
-                            logger.info("No theta2 computed")
-
-                        if df_pos is not None:
-                            df_pos = df_pos[(df_or["event_type"] == 32).values]
-                            if "theta2_on" in df_pos.columns:
-                                logger.info(
-                                    "Including theta2 column from source position table"
-                                )
-                                df["theta2"] = df_pos["theta2_on"].values
-                            elif "theta2" in df_pos.columns:
-                                logger.info(
-                                    "Including theta2 column from source position table"
-                                )
-                                df["theta2"] = df_pos["theta2"].values
-                            else:
-                                df["theta2"] = compute_theta2(
-                                    np.array(df["reco_src_x"]),
-                                    np.array(df["reco_src_y"]),
-                                    np.array(df_pos["src_x"]),
-                                    np.array(df_pos["src_y"]),
-                                )
-                else:
-                    df = df_or
+                df = self._read_srcindep_events(fname)
+                df = self._add_phases(df, fname)
+                df = self._add_theta2(df, fname)
 
             elif self.src_dependent:
-                srcindep_df = pd.read_hdf(fname, key=dl2_params_lstcam_key)
-                on_df_srcdep = get_srcdep_params(fname, "on")
-
-                if "pulsar_phase" not in srcindep_df:
-                    df_pulsar = pd.read_hdf(fname, key="phase_info")
-                    srcindep_df["pulsar_phase"] = df_pulsar["pulsar_phase"]
-                    srcindep_df["mjd_time"] = df_pulsar["mjd_barycenter_time"]
+                if get_dl2_format(fname) == CTLEARN:
+                    raise ValueError(
+                        "The source-dependent analysis is not available for CTLearn files"
+                    )
+                srcindep_df = self._read_srcindep_events(fname)
+                on_df_srcdep = get_srcdep_params(fname, "on").reset_index(drop=True)
+                srcindep_df = self._add_phases(srcindep_df, fname)
 
                 # The source-dependent reconstruction replaces these columns
                 srcindep_df = srcindep_df.drop(
@@ -353,7 +429,9 @@ class ReadLSTFile:
                 )
 
                 df = pd.concat([srcindep_df, on_df_srcdep], axis=1)
-                df = df[df.event_type == 32].copy()
+
+            if "event_type" in df:
+                df = df[df["event_type"] == COSMIC_EVENT_TYPE].copy()
 
             if df_type == "short":
                 columns = [
@@ -362,12 +440,14 @@ class ReadLSTFile:
                     "mjd_time",
                     "pulsar_phase",
                     "dragon_time",
+                    "delta_t",
                     "gammaness",
                 ]
                 columns += [col for col in ("alpha", "theta2") if col in df]
                 columns.append("alt_tel")
-                if "event_type" in df:
-                    columns.append("event_type")
+                columns += [
+                    col for col in ("event_type", "ctlearn_is_valid") if col in df
+                ]
                 df_filtered = df[columns].copy()
             else:
                 df_filtered = df
@@ -377,11 +457,19 @@ class ReadLSTFile:
             else:
                 df_filtered["energy"] = df["energy"]
 
-            df_filtered = add_delta_t_key(df_filtered)
-
         else:
             df_filtered = pd.read_hdf(fname, key=dl2_params_lstcam_key)
         return df_filtered
+
+    def _remove_invalid_events(self):
+        """
+        Remove the events without a valid CTLearn prediction. It is done after
+        the computation of the effective time, which needs all the events.
+        """
+        if "ctlearn_is_valid" in self.info:
+            self.info = self.info[self.info["ctlearn_is_valid"]].drop(
+                columns="ctlearn_is_valid"
+            )
 
     def calculate_tobs(self):
         return _effective_time_hours(self.info)
@@ -416,6 +504,7 @@ class ReadLSTFile:
                     self.info = info_file
                     # The effective time has to be computed before the cuts
                     tobs += self.calculate_tobs()
+                    self._remove_invalid_events()
 
                     if filter_data:
                         pulsarana.cuts.apply_fixed_cut(self)
@@ -442,6 +531,7 @@ class ReadLSTFile:
         else:
             self.info = self.read_LSTfile(self.fname, df_type, filter_data)
             self.tobs = self.calculate_tobs()
+            self._remove_invalid_events()
 
             if filter_data:
                 pulsarana.cuts.apply_fixed_cut(self)

@@ -1,5 +1,7 @@
 import argparse
+import logging
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -15,6 +17,7 @@ from ptiming_ana.cphase import (
     add_DL3_phase_table,
     add_fermipulsarphase,
     add_mjd,
+    check_ephemeris_validity,
     dl2time_totim,
     merge_dl2_pulsar,
     merge_pulsar_files,
@@ -28,6 +31,78 @@ from ptiming_ana.cphase.pulsarphase_cal import (
     interpolate_btoas,
     interpolate_phase,
 )
+
+#: Minimal .par ephemeris of the Crab pulsar valid for MJD 60005 - 60036
+PAR_EPHEMERIS = """PSR J0534+2200
+RAJ 05:34:31.973
+DECJ 22:00:52.06
+F0 29.58574931
+F1 -3.6732e-10
+PEPOCH 60020
+START 60005
+FINISH 60036
+UNITS TDB
+"""
+
+
+@pytest.fixture
+def par_file(tmp_path):
+    path = tmp_path / "crab.par"
+    path.write_text(PAR_EPHEMERIS)
+    return str(path)
+
+
+@pytest.mark.parametrize("times", [[60010.5, 60010.6], [60005.0, 60036.0]])
+def test_ephemeris_validity_par(par_file, times):
+    check_ephemeris_validity(times, par_file)
+
+
+@pytest.mark.parametrize(
+    "times", [[60004.9, 60010.0], [60030.0, 60036.1], [60100.0, 60101.0]]
+)
+def test_ephemeris_validity_par_out_of_range(par_file, times):
+    with pytest.raises(ValueError, match="outside the validity range"):
+        check_ephemeris_validity(times, par_file)
+
+
+def test_ephemeris_validity_no_events(par_file):
+    check_ephemeris_validity([], par_file)
+
+
+def test_ephemeris_validity_par_without_range(tmp_path, caplog):
+    """Without START/FINISH the validity cannot be checked: only a warning."""
+    path = tmp_path / "no_range.par"
+    path.write_text(
+        "\n".join(
+            line
+            for line in PAR_EPHEMERIS.splitlines()
+            if not line.startswith(("START", "FINISH"))
+        )
+    )
+    with caplog.at_level(logging.WARNING):
+        check_ephemeris_validity([70000.0], str(path))
+    assert "cannot be checked" in caplog.text
+
+
+@pytest.mark.parametrize("times", [[59980.0, 59981.0], [60000.0, 60010.0]])
+def test_ephemeris_validity_gro(gro_file, times):
+    # The second case covers two lines of the ephemeris file
+    check_ephemeris_validity(times, gro_file)
+
+
+@pytest.mark.parametrize("times", [[59970.0, 59980.0], [60030.0, 60040.0]])
+def test_ephemeris_validity_gro_out_of_range(gro_file, times):
+    with pytest.raises(ValueError, match="outside the validity range"):
+        check_ephemeris_validity(times, gro_file)
+
+
+def test_create_files_checks_the_ephemeris(par_file, tmp_path):
+    times = [60040.0, 60041.0]
+    with pytest.raises(ValueError, match="outside the validity range"):
+        create_files(times, par_file, None, str(tmp_path / "model.par"))
+
+    # The check can be skipped
+    assert create_files(times, par_file, None, "unused", check_validity=False)
 
 
 def test_read_ephemeris_file(gro_file):
@@ -96,7 +171,9 @@ def test_create_files(gro_file, tmp_path):
     times = [60010.5, 60010.6]
 
     # A .par file is used as it is
-    assert create_files(times, "model_test.par", None, par_file) == "model_test.par"
+    model_test = str(tmp_path / "model_test.par")
+    Path(model_test).write_text(PAR_EPHEMERIS)
+    assert create_files(times, model_test, None, par_file) == model_test
     assert not os.path.exists(par_file)
 
     # A .gro file is converted into a .par file
@@ -188,6 +265,12 @@ def test_find_files(tmp_path):
     ]
     with pytest.raises(FileNotFoundError, match="run number 9999"):
         find_files(str(tmp_path), "9999")
+
+    # Selection by extension
+    assert find_files(str(tmp_path), extensions=".txt") == [str(tmp_path / "notes.txt")]
+    assert len(find_files(str(tmp_path), extensions=(".fits", ".txt"))) == 3
+    with pytest.raises(FileNotFoundError, match="with extension .h5"):
+        find_files(str(tmp_path), extensions=".h5")
 
 
 @pytest.mark.parametrize(
