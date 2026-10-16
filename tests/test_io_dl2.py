@@ -5,10 +5,13 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 import pytest
+import tables
+from astropy.table import Table
 import astropy.units as u
 from astropy.coordinates import AltAz, SkyCoord
 from ctapipe_io_lst.constants import LST1_LOCATION
 from astropy.time import Time
+from ctapipe.io import read_table, write_table
 from lstchain.io.io import dl2_params_lstcam_key
 
 from ptiming_ana.cphase import DL2_calphase, add_DL2_phase_table, add_source_info_dl2
@@ -22,6 +25,7 @@ from ptiming_ana.io import (
     read_dl2_times,
 )
 from ptiming_ana.phaseogram import FilterPulsarAna, PulsarAnalysis, ReadLSTFile
+from ptiming_ana.phaseogram.read_events import compute_theta2
 
 # Same position as in the dl2_directions fixture
 CRAB = SkyCoord(83.633, 22.0145, unit="deg", frame="icrs")
@@ -371,3 +375,138 @@ def test_dl2_command_line(
         add_DL2_phase_table.main(
             ["-f", ctlearn_file, "--ephem", gro_file, "-t", "--source-ra", "83.6"]
         )
+
+
+@pytest.mark.parametrize("old_format", ["theta2_on", "theta2", "camera"])
+def test_read_old_source_position(old_format, lstchain_file, dl2_events):
+    """source_position tables written by previous versions (without event keys)."""
+    _write_phases(lstchain_file, dl2_events)
+
+    rng = np.random.default_rng(5)
+    theta2 = rng.uniform(0, 1, len(dl2_events))
+    if old_format == "camera":
+        src_x = rng.normal(0, 0.1, len(dl2_events))
+        src_y = rng.normal(0, 0.1, len(dl2_events))
+        table = pd.DataFrame({"src_x": src_x, "src_y": src_y})
+        theta2 = compute_theta2(
+            dl2_events["reco_src_x"].to_numpy(),
+            dl2_events["reco_src_y"].to_numpy(),
+            src_x,
+            src_y,
+        )
+    else:
+        table = pd.DataFrame(
+            {"dragon_time": dl2_events["dragon_time"].to_numpy(), old_format: theta2}
+        )
+    table.to_hdf(lstchain_file, key="source_position")
+
+    info = ReadLSTFile(file=lstchain_file).read_LSTfile(lstchain_file)
+    cosmic = (dl2_events["event_type"] == 32).to_numpy()
+    np.testing.assert_allclose(info["theta2"], theta2[cosmic])
+
+
+def test_source_position_with_other_events(lstchain_file, dl2_events):
+    _write_phases(lstchain_file, dl2_events)
+    pd.DataFrame({"theta2": np.zeros(10)}).to_hdf(lstchain_file, key="source_position")
+
+    with pytest.raises(ValueError, match="source_position table has 10 rows"):
+        ReadLSTFile(file=lstchain_file).read_LSTfile(lstchain_file)
+
+
+def test_read_file_all_columns(lstchain_file, dl2_events):
+    _write_phases(lstchain_file, dl2_events)
+    info = ReadLSTFile(file=lstchain_file).read_LSTfile(lstchain_file, df_type="long")
+
+    assert {"reco_src_x", "az_tel", "pulsar_phase", "energy"} <= set(info.columns)
+    np.testing.assert_allclose(
+        info["energy"], dl2_events["reco_energy"][dl2_events["event_type"] == 32]
+    )
+
+
+def test_read_ctlearn_dl2_unknown_task(ctlearn_file):
+    with pytest.raises(ValueError, match="Unknown CTLearn tasks"):
+        read_ctlearn_dl2(ctlearn_file, prefixes={"direction": "CTLearn"})
+
+
+def test_read_ctlearn_dl2_without_dl1_tables(ctlearn_file):
+    """Without pointing and DL1 parameters the events can still be read."""
+    with tables.open_file(ctlearn_file, mode="a") as h5file:
+        h5file.remove_node("/dl1/monitoring/telescope/pointing/tel_001")
+        h5file.remove_node("/dl1/event/telescope/parameters/tel_001")
+
+    events = read_ctlearn_dl2(ctlearn_file)
+    assert events["alt_tel"].isna().all()
+    assert events["intensity"].isna().all()
+    assert events["gammaness"].notna().any()
+
+
+def test_read_ctlearn_dl2_pointing_not_per_event(
+    tmp_path, dl2_events, write_ctlearn_dl2
+):
+    path = write_ctlearn_dl2(tmp_path / "dl2.h5", dl2_events[:1000])
+    pointing = Table(
+        {
+            "time": Time([1678400000.0, 1678400010.0], format="unix"),
+            "azimuth": [3.1, 3.1] * u.rad,
+            "altitude": [1.2, 1.2] * u.rad,
+        }
+    )
+    write_table(
+        pointing, path, "/dl1/monitoring/telescope/pointing/tel_001", overwrite=True
+    )
+    with pytest.raises(ValueError, match="the pointing is expected per event"):
+        read_ctlearn_dl2(path)
+
+
+def test_read_ctlearn_dl2_not_sorted(tmp_path, dl2_events, write_ctlearn_dl2, caplog):
+    events = dl2_events[:1000].copy()
+    events["dragon_time"] = events["dragon_time"].to_numpy()[::-1]
+    path = write_ctlearn_dl2(tmp_path / "dl2.h5", events)
+
+    read_ctlearn_dl2(path)
+    assert "not sorted in time" in caplog.text
+
+
+def test_read_source_dependent_file(lstchain_file, dl2_events):
+    """The source-dependent parameters replace the source-independent ones."""
+    from lstchain.io.io import dl2_params_src_dep_lstcam_key, write_dataframe
+
+    _write_phases(lstchain_file, dl2_events)
+    rng = np.random.default_rng(9)
+    srcdep = pd.DataFrame(
+        {
+            ("on", "alpha"): rng.uniform(0, 90, len(dl2_events)),
+            ("on", "gammaness"): rng.uniform(0, 1, len(dl2_events)),
+            ("on", "reco_energy"): 10 ** rng.uniform(-2, 0, len(dl2_events)),
+        }
+    )
+    # As written by lstchain: one column per (source position, parameter)
+    write_dataframe(
+        pd.DataFrame({str(col): values for col, values in srcdep.items()}),
+        lstchain_file,
+        dl2_params_src_dep_lstcam_key,
+    )
+
+    info = ReadLSTFile(file=lstchain_file, src_dependent=True).read_LSTfile(
+        lstchain_file
+    )
+    cosmic = (dl2_events["event_type"] == 32).to_numpy()
+    np.testing.assert_allclose(info["alpha"], srcdep[("on", "alpha")][cosmic])
+    np.testing.assert_allclose(info["gammaness"], srcdep[("on", "gammaness")][cosmic])
+    np.testing.assert_allclose(info["energy"], srcdep[("on", "reco_energy")][cosmic])
+    np.testing.assert_allclose(
+        info["pulsar_phase"], dl2_events["event_id"][cosmic] / len(dl2_events)
+    )
+
+
+def test_read_ctlearn_dl2_parameters_not_aligned(
+    tmp_path, dl2_events, write_ctlearn_dl2
+):
+    path = write_ctlearn_dl2(tmp_path / "dl2.h5", dl2_events[:1000])
+    parameters = read_table(path, "/dl1/event/telescope/parameters/tel_001")
+    parameters["event_id"] = parameters["event_id"][::-1]
+    write_table(
+        parameters, path, "/dl1/event/telescope/parameters/tel_001", overwrite=True
+    )
+    with pytest.raises(ValueError, match="not in the same order"):
+        read_ctlearn_dl2(path)

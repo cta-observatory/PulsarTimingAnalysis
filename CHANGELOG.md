@@ -69,7 +69,9 @@ the releases are also available in the
   reconstructed direction (transformed from Alt/Az to ICRS) and the source,
   instead of in the camera frame with a fixed effective focal length. The same
   definition is used for lstchain and CTLearn files. The `source_position`
-  table now has the columns `obs_id`, `event_id` and `theta2`.
+  table now has the columns `obs_id`, `event_id` and `theta2`. The precise
+  position of LST-1 (`ctapipe_io_lst.constants.LST1_LOCATION`) is always used:
+  with old versions of lstchain an approximate position, ~25 m away, was used.
 - The `phase_info` and `source_position` tables of DL2 files are matched to the
   events by `obs_id` and `event_id` (by position for older files).
 - The minimum supported version of Python is 3.10.

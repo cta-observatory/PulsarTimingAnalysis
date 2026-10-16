@@ -16,6 +16,7 @@ import pandas as pd
 from astropy.coordinates import AltAz, SkyCoord
 from astropy.coordinates.erfa_astrom import ErfaAstromInterpolator, erfa_astrom
 from astropy.time import Time
+from ctapipe_io_lst.constants import LST1_LOCATION
 from lstchain.io import global_metadata, write_metadata
 from lstchain.io.io import (
     dl2_params_lstcam_key,
@@ -34,10 +35,6 @@ from pint.models.timing_model import (
 
 from ptiming_ana.io import read_dl2_directions
 
-try:
-    from lstchain.reco.utils import location
-except ImportError:  # removed in recent versions of lstchain
-    from ctapipe_io_lst.constants import LST1_LOCATION as location
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +129,7 @@ def add_source_info_dl2(file, source_name="Crab", source_position=None):
     reco_direction = SkyCoord(
         alt=events["reco_alt"].to_numpy() * u.rad,
         az=events["reco_az"].to_numpy() * u.rad,
-        frame=AltAz(obstime=times, location=location),
+        frame=AltAz(obstime=times, location=LST1_LOCATION),
     )
 
     logger.info("Computing theta2...")

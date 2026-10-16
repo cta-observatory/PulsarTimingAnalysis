@@ -65,6 +65,10 @@ def test_ephemeris_validity_par_out_of_range(par_file, times):
         check_ephemeris_validity(times, par_file)
 
 
+def test_ephemeris_validity_no_events(par_file):
+    check_ephemeris_validity([], par_file)
+
+
 def test_ephemeris_validity_par_without_range(tmp_path, caplog):
     """Without START/FINISH the validity cannot be checked: only a warning."""
     path = tmp_path / "no_range.par"
