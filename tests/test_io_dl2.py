@@ -5,7 +5,9 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 import pytest
-from astropy.coordinates import SkyCoord
+import astropy.units as u
+from astropy.coordinates import AltAz, SkyCoord
+from ctapipe_io_lst.constants import LST1_LOCATION
 from astropy.time import Time
 from lstchain.io.io import dl2_params_lstcam_key
 
@@ -40,6 +42,32 @@ def lstchain_file(tmp_path, dl2_events):
 
 def _valid(events):
     return np.arange(len(events)) % 7 != 0
+
+
+def _exact_theta2(events):
+    """
+    theta2 (deg2) of the events, transforming their reconstructed direction to
+    ICRS without interpolation. Reference for the computation in
+    add_source_info_dl2 (which interpolates the transformation, as lstchain).
+    """
+    frame = AltAz(
+        obstime=Time(events["dragon_time"].to_numpy(), format="unix", scale="utc"),
+        location=LST1_LOCATION,
+    )
+    reco = SkyCoord(
+        alt=events["reco_alt"].to_numpy() * u.rad,
+        az=events["reco_az"].to_numpy() * u.rad,
+        frame=frame,
+    )
+    return reco.transform_to("icrs").separation(CRAB).to_value(u.deg) ** 2
+
+
+@pytest.fixture
+def exact_theta2(dl2_dataframe, dl2_directions):
+    events = dl2_dataframe.assign(
+        reco_alt=dl2_directions.reco_alt, reco_az=dl2_directions.reco_az
+    )
+    return _exact_theta2(events)
 
 
 def test_dl2_format(ctlearn_file, lstchain_file, tmp_path):
@@ -165,7 +193,7 @@ def test_read_dl2_times(file, dl2_events, request):
 
 
 @pytest.mark.parametrize("file", ["ctlearn_file", "lstchain_file"])
-def test_add_source_info(file, dl2_events, dl2_directions, request):
+def test_add_source_info(file, dl2_events, dl2_directions, exact_theta2, request):
     """theta2 is computed in the same way for lstchain and CTLearn files."""
     path = request.getfixturevalue(file)
     add_source_info_dl2(path, source_position=CRAB)
@@ -175,12 +203,19 @@ def test_add_source_info(file, dl2_events, dl2_directions, request):
     np.testing.assert_array_equal(table["event_id"], dl2_events["event_id"])
 
     valid = _valid(dl2_events) if file == "ctlearn_file" else slice(None)
-    # Precision limited by the interpolation of the coordinate transformation
+    theta = np.sqrt(table["theta2"][valid].to_numpy())
+
+    # Same as the exact transformation, up to its interpolation (< 0.01 arcsec)
+    np.testing.assert_allclose(theta, np.sqrt(exact_theta2[valid]), rtol=0, atol=3e-6)
+
+    # And close to the angular distance at which the directions were simulated.
+    # Not exact: the aberration does not conserve angular distances between
+    # Alt/Az and ICRS (~1 arcsec at 0.5 deg)
     np.testing.assert_allclose(
-        np.sqrt(table["theta2"][valid]),
-        np.sqrt(dl2_directions.theta2[valid]),
-        atol=2e-4,
+        theta, np.sqrt(dl2_directions.theta2[valid]), rtol=0, atol=1e-3
     )
+    if file == "ctlearn_file":
+        assert table["theta2"][~valid].isna().all()
 
     directions = read_dl2_directions(path)
     assert len(directions) == len(dl2_events)
@@ -199,7 +234,7 @@ def _write_phases(path, dl2_events):
     phase_info.to_hdf(path, key="phase_info")
 
 
-def test_read_ctlearn_file(ctlearn_file, dl2_events, dl2_directions):
+def test_read_ctlearn_file(ctlearn_file, dl2_events, exact_theta2):
     _write_phases(ctlearn_file, dl2_events)
     add_source_info_dl2(ctlearn_file, source_position=CRAB)
 
@@ -216,7 +251,7 @@ def test_read_ctlearn_file(ctlearn_file, dl2_events, dl2_directions):
     )
     np.testing.assert_allclose(info["energy"], dl2_events["reco_energy"][selected])
     np.testing.assert_allclose(
-        info["theta2"], dl2_directions.theta2[selected], atol=1e-4
+        np.sqrt(info["theta2"]), np.sqrt(exact_theta2[selected]), rtol=0, atol=3e-6
     )
 
     # The effective time is computed with all the events: 30000 events at 5 kHz
@@ -240,7 +275,10 @@ def test_read_ctlearn_and_lstchain_files(ctlearn_file, lstchain_file, dl2_events
     lstchain = lstchain[np.isin(lstchain["event_id"], ctlearn["event_id"])]
     assert 0 < len(ctlearn) == len(lstchain)
     np.testing.assert_allclose(ctlearn["pulsar_phase"], lstchain["pulsar_phase"])
-    np.testing.assert_allclose(ctlearn["theta2"], lstchain["theta2"], rtol=1e-5)
+    # CTLearn stores the directions in deg: tiny differences from the conversion
+    np.testing.assert_allclose(
+        np.sqrt(ctlearn["theta2"]), np.sqrt(lstchain["theta2"]), rtol=0, atol=1e-8
+    )
     assert readers[0].tobs == pytest.approx(readers[1].tobs)
 
 
