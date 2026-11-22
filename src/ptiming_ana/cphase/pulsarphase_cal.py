@@ -47,8 +47,10 @@ def _pulsar_file_name(file, output_dir, extension=".fits"):
     return os.path.join(str(output_dir), name + "_pulsar" + extension)
 
 
-def update_fermi(timelist, ephem, t):
-    model = create_files(timelist, ephem, None, "model.par")
+def update_fermi(timelist, ephem, t, check_ephemeris=True):
+    model = create_files(
+        timelist, ephem, None, "model.par", check_validity=check_ephemeris
+    )
 
     # Upload TOAs and model
     m = models.get_model(model)
@@ -61,7 +63,9 @@ def update_fermi(timelist, ephem, t):
     return (bt, p)
 
 
-def fermi_calphase(file, ephem, output_dir, pickle=False, ft2_file=None):
+def fermi_calphase(
+    file, ephem, output_dir, pickle=False, ft2_file=None, check_ephemeris=True
+):
     """
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris.
 
@@ -79,6 +83,10 @@ def fermi_calphase(file, ephem, output_dir, pickle=False, ft2_file=None):
 
     pickle: boolean
     True if want to save a pickle file with the loaded TOAs
+
+    check_ephemeris: boolean
+    Raise an error if the ephemeris is not valid for the arrival times. Set to
+    False to compute the phases anyway (e.g. to extrapolate a timing model)
 
 
     """
@@ -100,12 +108,12 @@ def fermi_calphase(file, ephem, output_dir, pickle=False, ft2_file=None):
     phase = []
     k = 0
     for i in range(10000, len(t), 1000):
-        b, p = update_fermi(timelist[k:i], ephem, t[k:i])
+        b, p = update_fermi(timelist[k:i], ephem, t[k:i], check_ephemeris)
         barycent_toas = barycent_toas + list(b.value)
         phase = phase + list(p.frac.value)
         k = i
 
-    b, p = update_fermi(timelist[k:], ephem, t[k:])
+    b, p = update_fermi(timelist[k:], ephem, t[k:], check_ephemeris)
     barycent_toas = barycent_toas + list(b.value)
     phase = phase + list(p.frac.value)
 
@@ -136,6 +144,7 @@ def DL3_calphase_gammapy(
     create_tim_file=False,
     pickle=False,
     overwrite=True,
+    check_ephemeris=True,
 ):
     """
     Function that reads the DL3 files and creates new EventLists with info about the PHASE of the pulsar.
@@ -162,6 +171,10 @@ def DL3_calphase_gammapy(
 
     pickle: boolean
     True if want to save a pickle file with the loaded TOAs
+
+    check_ephemeris: boolean
+    Raise an error if the ephemeris is not valid for the arrival times. Set to
+    False to compute the phases anyway (e.g. to extrapolate a timing model)
 
 
     """
@@ -193,7 +206,14 @@ def DL3_calphase_gammapy(
         parname = "model.par"
 
         # Calculate phases
-        model = create_files(timelist, ephem, timname, parname, obs=obs)
+        model = create_files(
+            timelist,
+            ephem,
+            timname,
+            parname,
+            obs=obs,
+            check_validity=check_ephemeris,
+        )
         if timname is None:
             phases = compute_phases_from_times_model(timelist, model, obs=obs)[1]
         else:
@@ -238,6 +258,7 @@ def DL3_calphase(
     use_interpolation=False,
     n_interp=1000,
     pickle=False,
+    check_ephemeris=True,
 ):
     """
     Function that reads the DL3 files, calculates the phases and create a new DL3 file. The new DL3 file will have two new columns: 'PHASE' and 'BAYCENT_TIME'.
@@ -255,6 +276,10 @@ def DL3_calphase(
 
     pickle: boolean
     True if want to save a pickle file with the loaded TOAs
+
+    check_ephemeris: boolean
+    Raise an error if the ephemeris is not valid for the arrival times. Set to
+    False to compute the phases anyway (e.g. to extrapolate a timing model)
 
     create_tim_file: boolean
     Set to True if want to create and save a .tim file
@@ -305,7 +330,14 @@ def DL3_calphase(
 
     # Calculate phases
     if not use_interpolation:
-        model = create_files(timelist, ephem, timname, parname, obs=obs)
+        model = create_files(
+            timelist,
+            ephem,
+            timname,
+            parname,
+            obs=obs,
+            check_validity=check_ephemeris,
+        )
         if timname is None:
             barycent_toas, phases = compute_phases_from_times_model(
                 times, model, obs=obs
@@ -319,7 +351,14 @@ def DL3_calphase(
     else:
         logger.info("Using interpolation...")
         phase, barycent_toas = compute_phase_interpolation(
-            times, ephem, timname, parname, n_interp, obs, pickle
+            times,
+            ephem,
+            timname,
+            parname,
+            n_interp,
+            obs,
+            pickle,
+            check_ephemeris,
         )
 
     # Shift phases
@@ -448,6 +487,10 @@ def create_files(timelist, ephem, timname, parname, obs="lst", check_validity=Tr
     """
     if check_validity:
         check_ephemeris_validity(timelist, ephem)
+    else:
+        logger.warning(
+            "The validity of the ephemeris %s for the events is not checked", ephem
+        )
 
     if timname is not None:
         logger.info("Creating .tim file")
@@ -472,7 +515,13 @@ def create_files(timelist, ephem, timname, parname, obs="lst", check_validity=Tr
 
 
 def DL2_calphase(
-    dl2file, ephem, obs="lst", use_interpolation=False, n_interp=1000, pickle=False
+    dl2file,
+    ephem,
+    obs="lst",
+    use_interpolation=False,
+    n_interp=1000,
+    pickle=False,
+    check_ephemeris=True,
 ):
     """
     Calculates barycentered times and pulsar phases from the DL2 dile using ephemeris.
@@ -490,6 +539,10 @@ def DL2_calphase(
 
     pickle: boolean
     True if want to save a pickle file with the loaded TOAs
+
+    check_ephemeris: boolean
+    Raise an error if the ephemeris is not valid for the arrival times. Set to
+    False to compute the phases anyway (e.g. to extrapolate a timing model)
 
     use_interpolation: boolean
     Set to True if want to use the interpolation method (faster but loses some precision)
@@ -515,14 +568,28 @@ def DL2_calphase(
     parname = str(os.path.basename(dl2file).replace(".h5", "")) + ".par"
 
     if not use_interpolation:
-        model = create_files(timelist, ephem, timname, parname, obs=obs)
+        model = create_files(
+            timelist,
+            ephem,
+            timname,
+            parname,
+            obs=obs,
+            check_validity=check_ephemeris,
+        )
         barycent_toas, phase = get_phase_list_from_tim(timname, model, pickle)
         phase = np.asarray(phase.frac)
         barycent_toas = np.asarray(barycent_toas)
     else:
         logger.info("Interpolating...")
         phase, barycent_toas = compute_phase_interpolation(
-            timelist, ephem, timname, parname, n_interp, obs, pickle
+            timelist,
+            ephem,
+            timname,
+            parname,
+            n_interp,
+            obs,
+            pickle,
+            check_ephemeris,
         )
 
     # Removing tim file
@@ -546,7 +613,14 @@ def DL2_calphase(
 
 
 def compute_phase_interpolation(
-    timelist, ephem, timname, parname, n_interp=1000, obs="lst", pickle=False
+    timelist,
+    ephem,
+    timname,
+    parname,
+    n_interp=1000,
+    obs="lst",
+    pickle=False,
+    check_ephemeris=True,
 ):
     """
     Calculates barycentered times and pulsar phases using an interpolation method for LST-1
@@ -571,6 +645,10 @@ def compute_phase_interpolation(
     pickle: boolean
     True if want to save a pickle file with the loaded TOAs
 
+    check_ephemeris: boolean
+    Raise an error if the ephemeris is not valid for the arrival times. Set to
+    False to compute the phases anyway (e.g. to extrapolate a timing model)
+
     """
 
     timelist = list(timelist)
@@ -584,7 +662,14 @@ def compute_phase_interpolation(
     # timelist_ns = np.array(timelist_n) * 86400
 
     # Create the files
-    model = create_files(timelist_n, ephem, timname, parname, obs=obs)
+    model = create_files(
+        timelist_n,
+        ephem,
+        timname,
+        parname,
+        obs=obs,
+        check_validity=check_ephemeris,
+    )
 
     # Calculate the barycent times and phases for reference
     if timname is None:

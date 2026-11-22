@@ -458,7 +458,13 @@ class ReadLSTFile:
                 df_filtered["energy"] = df["energy"]
 
         else:
-            df_filtered = pd.read_hdf(fname, key=dl2_params_lstcam_key)
+            # No selection of events, but the phases (and theta2 and the
+            # energy, if available) are needed by the analysis
+            df_filtered = self._read_srcindep_events(fname)
+            df_filtered = self._add_phases(df_filtered, fname)
+            df_filtered = self._add_theta2(df_filtered, fname)
+            if "energy" not in df_filtered and "reco_energy" in df_filtered:
+                df_filtered["energy"] = df_filtered["reco_energy"]
         return df_filtered
 
     def _remove_invalid_events(self):

@@ -1,5 +1,6 @@
 """Tests of the reading of lstchain and CTLearn DL2 files."""
 
+import logging
 from types import SimpleNamespace
 
 import numpy as np
@@ -510,3 +511,58 @@ def test_read_ctlearn_dl2_parameters_not_aligned(
     )
     with pytest.raises(ValueError, match="not in the same order"):
         read_ctlearn_dl2(path)
+
+
+@pytest.mark.parametrize("file", ["ctlearn_file", "lstchain_file"])
+def test_dl2_phases_skip_ephemeris_check(
+    file, dl2_events, tmp_path, monkeypatch, fake_pint, request, caplog
+):
+    """The check of the validity of the ephemeris can be skipped on purpose."""
+    path = request.getfixturevalue(file)
+    monkeypatch.chdir(tmp_path)
+
+    # Ephemeris that does not cover the observation (MJD 60012)
+    par_file = tmp_path / "crab.par"
+    par_file.write_text(
+        "PSR J0534+2200\nRAJ 05:34:31.973\nDECJ 22:00:52.06\nF0 29.6\n"
+        "PEPOCH 60100\nSTART 60100\nFINISH 60130\nUNITS TDB\n"
+    )
+
+    # setup_logging (called by the command-line tools) stops the propagation
+    monkeypatch.setattr(logging.getLogger("ptiming_ana"), "propagate", True)
+    with caplog.at_level("WARNING"):
+        DL2_calphase(path, str(par_file), check_ephemeris=False)
+    assert "is not checked" in caplog.text
+    assert len(pd.read_hdf(path, key="phase_info")) == len(dl2_events)
+
+    # Same with the command-line tool
+    with pytest.raises(ValueError, match="outside the validity range"):
+        add_DL2_phase_table.main(["-f", path, "--ephem", str(par_file)])
+    add_DL2_phase_table.main(
+        ["-f", path, "--ephem", str(par_file), "--skip-ephemeris-check"]
+    )
+
+
+@pytest.mark.parametrize("file", ["ctlearn_file", "lstchain_file"])
+def test_read_dl2_file_without_filtering(file, dl2_events, request):
+    """
+    Regression test: with filter_data False the phases and the energy were not
+    added and CTLearn files could not be read.
+    """
+    path = request.getfixturevalue(file)
+    _write_phases(path, dl2_events)
+
+    analysis = PulsarAnalysis()
+    analysis.filter_data = False
+    reader = ReadLSTFile(file=path)
+    reader.run(analysis)
+
+    # No selection of events, except the ones without a valid CTLearn prediction
+    selected = _valid(dl2_events) if file == "ctlearn_file" else slice(None)
+    info = reader.info
+    np.testing.assert_array_equal(info["event_id"], dl2_events["event_id"][selected])
+    np.testing.assert_allclose(
+        info["pulsar_phase"], dl2_events["event_id"][selected] / len(dl2_events)
+    )
+    np.testing.assert_allclose(info["energy"], dl2_events["reco_energy"][selected])
+    assert reader.tobs == pytest.approx(6 / 3600, rel=0.05)

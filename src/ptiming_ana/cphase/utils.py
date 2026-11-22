@@ -34,6 +34,7 @@ from pint.models.timing_model import (
 )
 
 from ptiming_ana.io import read_dl2_directions
+from ptiming_ana.io.dl2 import CTLEARN, get_dl2_format
 
 
 logger = logging.getLogger(__name__)
@@ -50,11 +51,37 @@ __all__ = [
 ]
 
 
+#: Tables added by ptiming_ana to the DL2 files, merged with the events
+PULSAR_TABLES = ("phase_info", "source_position")
+
+
+def _hdf_keys(file):
+    with pd.HDFStore(file, mode="r") as store:
+        return {key.lstrip("/") for key in store.keys()}
+
+
 def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
+    """
+    Merge the lstchain DL2 files (one per subrun) of a run into a single file.
+
+    The tables added by ``ptiming_ana`` (``phase_info`` and ``source_position``)
+    are merged too, so the phases computed for each subrun are kept.
+
+    Parameters
+    ----------
+    directory : str
+        Directory with the DL2 files.
+    run_number : str
+        Run number: the files whose name contains it are merged.
+    output_dir : str
+        Directory where the merged file is written.
+    src_dep : bool
+        Merge also the source-dependent parameters.
+    """
     # Read the DL2 subrun files for the given run number
     filelist = []
     for x in os.listdir(directory):
-        if str(run_number) in x:
+        if str(run_number) in x and x.endswith(".h5"):
             filelist.append(os.path.join(directory, x))
     filelist.sort()
 
@@ -63,12 +90,42 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
             f"No files found in {directory} for run number {run_number}"
         )
 
+    ctlearn_files = [file for file in filelist if get_dl2_format(file) == CTLEARN]
+    if ctlearn_files:
+        raise ValueError(
+            "Merging CTLearn DL2 files is not supported. Merge them with ctapipe "
+            f"(ctapipe-merge) before computing the phases: {ctlearn_files}"
+        )
+
+    # Tables added by ptiming_ana: they must be in all the files or in none
+    pulsar_tables = []
+    keys = [_hdf_keys(file) for file in filelist]
+    for table in PULSAR_TABLES:
+        n_files = sum(table in file_keys for file_keys in keys)
+        if n_files == len(filelist):
+            pulsar_tables.append(table)
+        elif n_files > 0:
+            raise ValueError(
+                f"The table '{table}' is only in {n_files} of the {len(filelist)} "
+                f"files of run {run_number}"
+            )
+
     # Read the Dl2 events and concatenate the dataframes
     df_list = []
     df_src_list = []
+    tables = {table: [] for table in pulsar_tables}
     for file in filelist:
         df_i = pd.read_hdf(file, key=dl2_params_lstcam_key)
         df_list.append(df_i)
+
+        for table in pulsar_tables:
+            table_i = pd.read_hdf(file, key=table)
+            if len(table_i) != len(df_i):
+                raise ValueError(
+                    f"The table '{table}' of {file} has {len(table_i)} rows but "
+                    f"there are {len(df_i)} events"
+                )
+            tables[table].append(table_i)
 
         # Include source dependent information if it is the case
         if src_dep:
@@ -97,6 +154,11 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
         write_dataframe(
             df_src, output_file, dl2_params_src_dep_lstcam_key, meta=metadata
         )
+
+    for table, table_list in tables.items():
+        pd.concat(table_list, ignore_index=True).to_hdf(output_file, key=table)
+
+    return output_file
 
 
 def add_source_info_dl2(file, source_name="Crab", source_position=None):

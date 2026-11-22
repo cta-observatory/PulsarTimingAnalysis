@@ -47,7 +47,9 @@ the releases are also available in the
   (`particle_type` group) are supported.
 - The validity of the ephemeris is checked before computing the phases: an
   error is raised if the events are outside the `START` - `FINISH` range of a
-  `.par` file or not covered by a `.gro` file.
+  `.par` file or not covered by a `.gro` file. The check can be skipped with
+  the `--skip-ephemeris-check` option of the command-line tools (or
+  `check_ephemeris=False`), e.g. to extrapolate a timing model on purpose.
 - `--source-ra` and `--source-dec` options of `add_DL2_phase_table`, to give
   the position of the source without resolving its name online.
 - Support for the current versions of the dependencies (tested with
@@ -69,7 +71,8 @@ the releases are also available in the
   reconstructed direction (transformed from Alt/Az to ICRS) and the source,
   instead of in the camera frame with a fixed effective focal length. The same
   definition is used for lstchain and CTLearn files. The `source_position`
-  table now has the columns `obs_id`, `event_id` and `theta2`. The precise
+  table now has the columns `obs_id`, `event_id` and `theta2`: the columns
+  `src_x`, `src_y` and `theta2_off` are not written anymore. The precise
   position of LST-1 (`ctapipe_io_lst.constants.LST1_LOCATION`) is always used:
   with old versions of lstchain an approximate position, ~25 m away, was used.
 - The `phase_info` and `source_position` tables of DL2 files are matched to the
@@ -94,6 +97,12 @@ the releases are also available in the
 
 ### Fixed
 
+- `merge_dl2_pulsar` (`merge_pulsar_files`) did not copy the `phase_info` and
+  `source_position` tables, so the phases were lost when the subruns of a run
+  were merged. It now raises a clear error for CTLearn files (they have to be
+  merged with ctapipe before computing the phases).
+- With `filter_data: False`, `ReadLSTFile` did not add the phases nor the
+  energy of the events, and it did not support CTLearn files.
 - The time difference with the previous event (`delta_t`), used to compute the
   effective time of DL2 files, is computed before selecting the cosmic events,
   as it must be the time since the previous *triggered* event.

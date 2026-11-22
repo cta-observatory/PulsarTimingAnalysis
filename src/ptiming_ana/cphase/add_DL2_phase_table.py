@@ -177,6 +177,12 @@ def get_parser():
         default=1000,
         help="Number of events between two interpolation points",
     )
+    parser.add_argument(
+        "--skip-ephemeris-check",
+        action="store_true",
+        dest="skip_ephemeris_check",
+        help="Compute the phases even if the events are outside the validity range of the ephemeris",
+    )
     return parser
 
 
@@ -214,6 +220,7 @@ def main(args=None):
             use_interpolation=args.interpolation,
             n_interp=args.ninterp,
             pickle=args.pickle,
+            check_ephemeris=not args.skip_ephemeris_check,
         )
         if args.include_theta:
             add_source_info_dl2(file, args.source_name, source_position=source_position)

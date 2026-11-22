@@ -80,6 +80,12 @@ def get_parser():
         required=True,
         help="Fermi-LAT spacecraft file (FT2)",
     )
+    parser.add_argument(
+        "--skip-ephemeris-check",
+        action="store_true",
+        dest="skip_ephemeris_check",
+        help="Compute the phases even if the events are outside the validity range of the ephemeris",
+    )
     return parser
 
 
@@ -102,7 +108,14 @@ def main(args=None):
 
     for file in filelist:
         # Calculate the phases
-        fermi_calphase(file, args.ephem, args.dir_output, args.pickle, args.ft2_file)
+        fermi_calphase(
+            file,
+            args.ephem,
+            args.dir_output,
+            args.pickle,
+            args.ft2_file,
+            check_ephemeris=not args.skip_ephemeris_check,
+        )
 
 
 if __name__ == "__main__":

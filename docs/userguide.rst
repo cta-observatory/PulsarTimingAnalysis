@@ -49,7 +49,9 @@ Before computing the phases, the tools check that the ephemeris is valid for
 the observation: the arrival times must be within the ``START`` - ``FINISH``
 range of a ``.par`` file (only a warning is given if the file does not define
 it) or covered by one of the lines of a ``.gro`` file. Otherwise an error is
-raised.
+raised. Use ``--skip-ephemeris-check`` only if you want to extrapolate the timing
+model on purpose: for a pulsar with timing noise or glitches like the Crab, the
+phases computed far from the validity range of the ephemeris are not reliable.
 
 * DL3 files: a new file ``{name}_pulsar.fits`` is written, with two new columns
   in the events table, ``PHASE`` and ``BARYCENT_TIME`` (MJD). To read the new
