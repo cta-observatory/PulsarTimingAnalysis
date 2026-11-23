@@ -10,7 +10,6 @@ ReadLSTFile
 
    .. autosummary::
 
-      ~ReadLSTFile.add_phases
       ~ReadLSTFile.calculate_tobs
       ~ReadLSTFile.read_LSTfile
       ~ReadLSTFile.run
@@ -18,7 +17,6 @@ ReadLSTFile
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: add_phases
    .. automethod:: calculate_tobs
    .. automethod:: read_LSTfile
    .. automethod:: run

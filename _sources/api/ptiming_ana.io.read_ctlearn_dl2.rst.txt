@@ -1,0 +1,6 @@
+read_ctlearn_dl2
+================
+
+.. currentmodule:: ptiming_ana.io
+
+.. autofunction:: read_ctlearn_dl2

@@ -1,0 +1,6 @@
+get_dl2_format
+==============
+
+.. currentmodule:: ptiming_ana.io
+
+.. autofunction:: get_dl2_format

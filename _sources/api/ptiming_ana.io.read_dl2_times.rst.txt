@@ -1,0 +1,6 @@
+read_dl2_times
+==============
+
+.. currentmodule:: ptiming_ana.io
+
+.. autofunction:: read_dl2_times

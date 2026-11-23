@@ -1,0 +1,6 @@
+check_ephemeris_validity
+========================
+
+.. currentmodule:: ptiming_ana.cphase
+
+.. autofunction:: check_ephemeris_validity
