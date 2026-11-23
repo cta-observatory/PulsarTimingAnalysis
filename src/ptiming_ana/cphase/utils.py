@@ -5,6 +5,7 @@
 ###################3
 
 
+import functools
 import inspect
 import logging
 import os
@@ -15,7 +16,7 @@ import pandas as pd
 from astropy.coordinates import AltAz, SkyCoord
 from astropy.coordinates.erfa_astrom import ErfaAstromInterpolator, erfa_astrom
 from astropy.time import Time
-from ctapipe.coordinates import CameraFrame
+from ctapipe_io_lst.constants import LST1_LOCATION
 from lstchain.io import global_metadata, write_metadata
 from lstchain.io.io import (
     dl2_params_lstcam_key,
@@ -23,6 +24,7 @@ from lstchain.io.io import (
     write_dataframe,
     write_dl2_dataframe,
 )
+from pint.models import get_model
 from pint.models import (
     parameter as p,
 )
@@ -31,16 +33,17 @@ from pint.models.timing_model import (
     TimingModel,
 )
 
-try:
-    from lstchain.reco.utils import location
-except ImportError:  # removed in recent versions of lstchain
-    from ctapipe_io_lst.constants import LST1_LOCATION as location
+from ptiming_ana.io import read_dl2_directions
+from ptiming_ana.io.dl2 import CTLEARN, get_dl2_format
+
 
 logger = logging.getLogger(__name__)
 
 
 __all__ = [
     "add_mjd",
+    "add_source_info_dl2",
+    "check_ephemeris_validity",
     "dl2time_totim",
     "merge_dl2_pulsar",
     "model_fromephem",
@@ -48,11 +51,37 @@ __all__ = [
 ]
 
 
+#: Tables added by ptiming_ana to the DL2 files, merged with the events
+PULSAR_TABLES = ("phase_info", "source_position")
+
+
+def _hdf_keys(file):
+    with pd.HDFStore(file, mode="r") as store:
+        return {key.lstrip("/") for key in store.keys()}
+
+
 def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
+    """
+    Merge the lstchain DL2 files (one per subrun) of a run into a single file.
+
+    The tables added by ``ptiming_ana`` (``phase_info`` and ``source_position``)
+    are merged too, so the phases computed for each subrun are kept.
+
+    Parameters
+    ----------
+    directory : str
+        Directory with the DL2 files.
+    run_number : str
+        Run number: the files whose name contains it are merged.
+    output_dir : str
+        Directory where the merged file is written.
+    src_dep : bool
+        Merge also the source-dependent parameters.
+    """
     # Read the DL2 subrun files for the given run number
     filelist = []
     for x in os.listdir(directory):
-        if str(run_number) in x:
+        if str(run_number) in x and x.endswith(".h5"):
             filelist.append(os.path.join(directory, x))
     filelist.sort()
 
@@ -61,12 +90,42 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
             f"No files found in {directory} for run number {run_number}"
         )
 
+    ctlearn_files = [file for file in filelist if get_dl2_format(file) == CTLEARN]
+    if ctlearn_files:
+        raise ValueError(
+            "Merging CTLearn DL2 files is not supported. Merge them with ctapipe "
+            f"(ctapipe-merge) before computing the phases: {ctlearn_files}"
+        )
+
+    # Tables added by ptiming_ana: they must be in all the files or in none
+    pulsar_tables = []
+    keys = [_hdf_keys(file) for file in filelist]
+    for table in PULSAR_TABLES:
+        n_files = sum(table in file_keys for file_keys in keys)
+        if n_files == len(filelist):
+            pulsar_tables.append(table)
+        elif n_files > 0:
+            raise ValueError(
+                f"The table '{table}' is only in {n_files} of the {len(filelist)} "
+                f"files of run {run_number}"
+            )
+
     # Read the Dl2 events and concatenate the dataframes
     df_list = []
     df_src_list = []
+    tables = {table: [] for table in pulsar_tables}
     for file in filelist:
         df_i = pd.read_hdf(file, key=dl2_params_lstcam_key)
         df_list.append(df_i)
+
+        for table in pulsar_tables:
+            table_i = pd.read_hdf(file, key=table)
+            if len(table_i) != len(df_i):
+                raise ValueError(
+                    f"The table '{table}' of {file} has {len(table_i)} rows but "
+                    f"there are {len(df_i)} events"
+                )
+            tables[table].append(table_i)
 
         # Include source dependent information if it is the case
         if src_dep:
@@ -96,59 +155,56 @@ def merge_dl2_pulsar(directory, run_number, output_dir, src_dep=False):
             df_src, output_file, dl2_params_src_dep_lstcam_key, meta=metadata
         )
 
+    for table, table_list in tables.items():
+        pd.concat(table_list, ignore_index=True).to_hdf(output_file, key=table)
 
-def add_source_info_dl2(file, source_name):
+    return output_file
+
+
+def add_source_info_dl2(file, source_name="Crab", source_position=None):
+    """
+    Add to a DL2 file (lstchain or CTLearn) a table called ``source_position``
+    with the squared angular distance (theta2, deg2) between the reconstructed
+    direction of each event and the source.
+
+    The reconstructed direction (Alt/Az) is transformed to ICRS and compared with
+    the position of the source, so the same definition of theta2 is used for
+    lstchain and CTLearn files.
+
+    Parameters
+    ----------
+    file : str
+        DL2 file.
+    source_name : str
+        Name of the source, resolved with `astropy.coordinates.SkyCoord.from_name`
+        (needs internet access). Not used if ``source_position`` is given.
+    source_position : astropy.coordinates.SkyCoord, optional
+        Position of the source.
+    """
     logger.info("Adding source information in %s", file)
 
-    coma_factor = 1.0466
-    focal = coma_factor * 28 * u.m
+    if source_position is None:
+        source_position = SkyCoord.from_name(source_name)
 
-    df1 = pd.read_hdf(file, key=dl2_params_lstcam_key)
-
-    source_pos = SkyCoord.from_name(source_name)
-
-    times = Time(df1["dragon_time"], format="unix", scale="utc")
-    tel_pos = SkyCoord(
-        alt=np.array(df1["alt_tel"]) * u.rad,
-        az=np.array(df1["az_tel"]) * u.rad,
-        frame=AltAz(obstime=times, location=location),
+    events = read_dl2_directions(file)
+    times = Time(events["dragon_time"].to_numpy(), format="unix", scale="utc")
+    reco_direction = SkyCoord(
+        alt=events["reco_alt"].to_numpy() * u.rad,
+        az=events["reco_az"].to_numpy() * u.rad,
+        frame=AltAz(obstime=times, location=LST1_LOCATION),
     )
-
-    with erfa_astrom.set(ErfaAstromInterpolator(5 * u.min)):
-        camera_frame = CameraFrame(
-            focal_length=focal,
-            telescope_pointing=tel_pos,
-            location=location,
-            obstime=times,
-        )
-        source_campos = source_pos.transform_to(camera_frame)
-
-    src_x = source_campos.data.x.value
-    src_y = source_campos.data.y.value
-
-    reco_src_x = df1["reco_src_x"]
-    reco_src_y = df1["reco_src_y"]
 
     logger.info("Computing theta2...")
-    theta_meters = np.sqrt(
-        np.power(reco_src_x - src_x, 2) + np.power(reco_src_y - src_y, 2)
-    )
-    theta_on = np.rad2deg(np.arctan2(theta_meters, focal.value))
-    theta2 = np.power(theta_on, 2)
-
-    theta_meters = np.sqrt(
-        np.power(reco_src_x + src_x, 2) + np.power(reco_src_y + src_y, 2)
-    )
-    theta_off = np.rad2deg(np.arctan2(theta_meters, focal.value))
-    theta2_off = np.power(theta_off, 2)
+    with erfa_astrom.set(ErfaAstromInterpolator(5 * u.min)):
+        reco_icrs = reco_direction.transform_to("icrs")
+    theta2 = reco_icrs.separation(source_position).to_value(u.deg) ** 2
 
     logger.info("Writing in new table...")
     table_source = pd.DataFrame(
         {
-            "src_x": list(src_x),
-            "src_y": list(src_y),
-            "theta2": list(theta2),
-            "theta2_off": list(theta2_off),
+            "obs_id": events["obs_id"].to_numpy(),
+            "event_id": events["event_id"].to_numpy(),
+            "theta2": theta2,
         }
     )
     table_source.to_hdf(file, key="source_position")
@@ -214,6 +270,95 @@ def dl2time_totim(times, name="times.tim", obs="lst"):
         timFile.writelines(f"{obs} 0.0 {time} 0.0 {obs} \n" for time in times)
 
 
+def _find_ephemeris_line(df_ephem, time):
+    """
+    Index of the line of a .gro ephemeris file (read with `read_ephemfile`)
+    valid for ``time`` (MJD), or None if no line covers it.
+    """
+    valid = np.flatnonzero(
+        (df_ephem["START"].to_numpy() <= time) & (time <= df_ephem["FINISH"].to_numpy())
+    )
+    return int(valid[0]) if len(valid) > 0 else None
+
+
+@functools.lru_cache(maxsize=16)
+def _par_validity_range(par_file, modification_time):
+    """
+    START and FINISH (MJD) of the ephemeris in a .par file (None if not given).
+
+    ``modification_time`` is only used to invalidate the cache if the file changes.
+    """
+    model = get_model(par_file)
+    return tuple(
+        None if param.value is None else float(param.value)
+        for param in (model.START, model.FINISH)
+    )
+
+
+def check_ephemeris_validity(times, ephem):
+    """
+    Check that the ephemeris is valid for all the given arrival times.
+
+    For a .par file the times must be within its START - FINISH range. If the
+    file does not give that range the check cannot be done and only a warning
+    is issued. For a .gro file (list of monthly ephemerides) all the times must
+    be covered by the file.
+
+    Parameters
+    ----------
+    times : array-like
+        Arrival times (MJD).
+    ephem : str
+        Ephemeris file (.par or .gro).
+
+    Raises
+    ------
+    ValueError
+        If some of the times are outside the validity range of the ephemeris.
+    """
+    times = np.asarray(times, dtype=float)
+    if len(times) == 0:
+        return
+    t_min, t_max = times.min(), times.max()
+    ephem = str(ephem)
+
+    if ephem.endswith(".par"):
+        start, finish = _par_validity_range(ephem, os.path.getmtime(ephem))
+        if start is None and finish is None:
+            logger.warning(
+                "The ephemeris %s has no START/FINISH: its validity for the "
+                "events (MJD %.6f - %.6f) cannot be checked",
+                ephem,
+                t_min,
+                t_max,
+            )
+            return
+        valid = (start is None or t_min >= start) and (
+            finish is None or t_max <= finish
+        )
+
+    elif ephem.endswith(".gro"):
+        ephemerides = read_ephemfile(ephem)
+        start, finish = ephemerides["START"].min(), ephemerides["FINISH"].max()
+        valid = all(
+            _find_ephemeris_line(ephemerides, t) is not None for t in (t_min, t_max)
+        )
+
+    else:
+        # The format of the file is checked in create_files
+        return
+
+    if not valid:
+        raise ValueError(
+            f"The events (MJD {t_min:.6f} - {t_max:.6f}) are outside the validity "
+            f"range of the ephemeris {ephem} (START={start}, FINISH={finish}). "
+            "Use an ephemeris that covers the observation."
+        )
+    logger.info(
+        "Ephemeris %s valid for the events (MJD %.6f - %.6f)", ephem, t_min, t_max
+    )
+
+
 def model_fromephem(times, ephem, model_name):
     """
     Creates a .par file using the parameters from the ephemeris associated with the arrival time range from TOAs
@@ -237,16 +382,12 @@ def model_fromephem(times, ephem, model_name):
 
     # Search the line of the ephemeris at which the interval time of arrivals given belongs
     first_time = float(times[0])
-    valid = np.flatnonzero(
-        (df_ephem["START"].to_numpy() <= first_time)
-        & (first_time <= df_ephem["FINISH"].to_numpy())
-    )
-    if len(valid) == 0:
+    i = _find_ephemeris_line(df_ephem, first_time)
+    if i is None:
         raise ValueError(
             f"No ephemeris available in {ephem} for MJD {first_time}. The file covers "
             f"MJD {df_ephem['START'].min()} - {df_ephem['FINISH'].max()}"
         )
-    i = int(valid[0])
 
     # Select componentes of the model
     all_components = Component.component_types

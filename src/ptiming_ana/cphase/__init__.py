@@ -7,6 +7,7 @@ from .pulsarphase_cal import (
 from .utils import (
     add_mjd,
     add_source_info_dl2,
+    check_ephemeris_validity,
     dl2time_totim,
     merge_dl2_pulsar,
     model_fromephem,
@@ -19,6 +20,7 @@ __all__ = [
     "DL3_calphase_gammapy",
     "add_mjd",
     "add_source_info_dl2",
+    "check_ephemeris_validity",
     "dl2time_totim",
     "fermi_calphase",
     "merge_dl2_pulsar",

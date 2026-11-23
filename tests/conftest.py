@@ -223,3 +223,143 @@ def dl2_dataframe():
             "event_type": np.where(np.arange(n_events) % 100 == 0, 2, 32),
         }
     )
+
+
+#: Position of the Crab pulsar used in the synthetic DL2 files
+CRAB_RA_DEC = (83.633, 22.0145)
+
+
+@pytest.fixture(scope="session")
+def dl2_directions():
+    """
+    Reconstructed directions (Alt/Az, rad) of the events of `dl2_dataframe`,
+    at known angular distances (theta, deg) from the Crab pulsar.
+    """
+    import astropy.units as u
+    from astropy.coordinates import AltAz, SkyCoord
+    from astropy.coordinates.erfa_astrom import ErfaAstromInterpolator, erfa_astrom
+    from astropy.time import Time
+    from ctapipe_io_lst.constants import LST1_LOCATION
+
+    rng = np.random.default_rng(11)
+    n_events = 30000
+    # Same times as in dl2_dataframe
+    dragon_time = 1678400000.0 + np.cumsum(
+        np.random.default_rng(7).exponential(1 / 5000, n_events)
+    )
+    theta = rng.uniform(0, 0.5, n_events)
+
+    frame = AltAz(
+        obstime=Time(dragon_time, format="unix", scale="utc"), location=LST1_LOCATION
+    )
+    source = SkyCoord(*CRAB_RA_DEC, unit="deg", frame="icrs")
+    with erfa_astrom.set(ErfaAstromInterpolator(5 * u.min)):
+        source_altaz = source.transform_to(frame)
+    reco = source_altaz.directional_offset_by(
+        rng.uniform(0, 360, n_events) * u.deg, theta * u.deg
+    )
+
+    return SimpleNamespace(reco_alt=reco.alt.rad, reco_az=reco.az.rad, theta2=theta**2)
+
+
+@pytest.fixture
+def write_ctlearn_dl2():
+    """
+    Function writing a CTLearn-like DL2 file of LST-1 (ctapipe data model) with
+    the events of a lstchain-like dataframe.
+
+    As in the files produced by CTLearn, the DL1 tables follow the order of the
+    original events, while the DL2 tables are sorted by event. Every 7th event
+    has no valid prediction.
+    """
+    import astropy.units as u
+    from astropy.table import Table
+    from astropy.time import Time
+    from ctapipe.io import write_table
+
+    def _write(path, events, prefixes=None, classification_group="classification"):
+        prefixes = prefixes or dict.fromkeys(
+            ("classification", "energy", "geometry"), "CTLearn"
+        )
+        events = events.reset_index(drop=True)
+        n_events = len(events)
+        time = Time(events["dragon_time"].to_numpy(), format="unix", scale="utc")
+        valid = np.arange(n_events) % 7 != 0
+        keys = {
+            "obs_id": events["obs_id"].to_numpy(),
+            "event_id": events["event_id"].to_numpy(),
+        }
+
+        trigger = Table(
+            keys
+            | {
+                "time": time,
+                "tel_with_trigger": np.ones((n_events, 1), dtype=bool),
+                "event_type": events["event_type"].to_numpy(),
+            }
+        )
+        write_table(trigger, path, "/dl1/event/subarray/trigger", overwrite=True)
+
+        pointing = Table(
+            {
+                "time": time,
+                "azimuth": events["az_tel"].to_numpy() * u.rad,
+                "altitude": events["alt_tel"].to_numpy() * u.rad,
+            }
+        )
+        write_table(
+            pointing, path, "/dl1/monitoring/telescope/pointing/tel_001", overwrite=True
+        )
+
+        parameters = Table(
+            keys
+            | {
+                "tel_id": np.ones(n_events, dtype=int),
+                "hillas_intensity": events["intensity"].to_numpy(),
+            }
+        )
+        write_table(
+            parameters, path, "/dl1/event/telescope/parameters/tel_001", overwrite=True
+        )
+
+        def _with_nan(values):
+            return np.where(valid, values, np.nan)
+
+        columns = {
+            "classification": {"prediction": _with_nan(events["gammaness"])},
+            "energy": {"energy": _with_nan(events["reco_energy"]) * u.TeV},
+            "geometry": {
+                "alt": _with_nan(np.rad2deg(events["reco_alt"])) * u.deg,
+                "az": _with_nan(np.rad2deg(events["reco_az"])) * u.deg,
+            },
+        }
+        for task, prefix in prefixes.items():
+            table = Table(
+                keys
+                | {f"{prefix}_{name}": value for name, value in columns[task].items()}
+                | {f"{prefix}_is_valid": valid}
+            )
+            table.sort(["obs_id", "event_id"])
+            group = classification_group if task == "classification" else task
+            write_table(
+                table, path, f"/dl2/event/subarray/{group}/{prefix}", overwrite=True
+            )
+        return str(path)
+
+    return _write
+
+
+@pytest.fixture
+def dl2_events(dl2_dataframe, dl2_directions):
+    """
+    `dl2_dataframe` with reconstructed directions and the event ids shuffled
+    within each block of 10 events, so that the events are not sorted by id
+    (the DL2 tables of CTLearn are).
+    """
+    events = dl2_dataframe.copy()
+    events["reco_alt"] = dl2_directions.reco_alt
+    events["reco_az"] = dl2_directions.reco_az
+    rng = np.random.default_rng(3)
+    event_id = events["event_id"].to_numpy().reshape(-1, 10)
+    events["event_id"] = rng.permuted(event_id, axis=1).ravel()
+    return events

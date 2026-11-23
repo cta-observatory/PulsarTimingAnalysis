@@ -154,8 +154,19 @@ class PulsarAnalysis:
         self.telescope = "lst"
         self.energy_units = "TeV"
 
-    def setLSTInputFile(self, filename=None, dirname=None, src_dep=False):
-        self.r = ReadLSTFile(file=filename, directory=dirname, src_dependent=src_dep)
+    def setLSTInputFile(
+        self, filename=None, dirname=None, src_dep=False, ctlearn_prefixes=None
+    ):
+        """
+        Use LST-1 DL2 files (lstchain or CTLearn, found from each file) as input.
+        See `ptiming_ana.phaseogram.ReadLSTFile`.
+        """
+        self.r = ReadLSTFile(
+            file=filename,
+            directory=dirname,
+            src_dependent=src_dep,
+            ctlearn_prefixes=ctlearn_prefixes,
+        )
         self.telescope = "lst"
         self.energy_units = "TeV"
 

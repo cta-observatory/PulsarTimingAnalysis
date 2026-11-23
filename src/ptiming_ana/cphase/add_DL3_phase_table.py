@@ -144,6 +144,12 @@ def get_parser():
         dest="create_tim",
         help="Set True to create and save a .tim file",
     )
+    parser.add_argument(
+        "--skip-ephemeris-check",
+        action="store_true",
+        dest="skip_ephemeris_check",
+        help="Compute the phases even if the events are outside the validity range of the ephemeris",
+    )
     return parser
 
 
@@ -173,6 +179,7 @@ def main(args=None):
             use_interpolation=args.interpolation,
             n_interp=args.ninterp,
             pickle=args.pickle,
+            check_ephemeris=not args.skip_ephemeris_check,
         )
 
 
